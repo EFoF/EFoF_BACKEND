@@ -1,7 +1,5 @@
-package com.service.surveyservice.dto;
+package com.service.surveyservice.domain.question.dto;
 
-import lombok.Data;
 
-@Data
-public class QuestionChoiceDTO {
+public class QuestionOptionDTO {
 }

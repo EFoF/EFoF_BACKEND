@@ -1,7 +1,6 @@
-package com.service.surveyservice.dto;
+package com.service.surveyservice.domain.survey.dto;
 
-import lombok.Data;
 
-@Data
+
 public class SurveyDTO {
 }

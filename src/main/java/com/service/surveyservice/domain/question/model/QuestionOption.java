@@ -1,13 +1,11 @@
 package com.service.surveyservice.domain.question.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor

@@ -9,6 +9,7 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
 public class MemberBase {
     @Id
     @Column(name = "member_id")

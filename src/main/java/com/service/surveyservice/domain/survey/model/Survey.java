@@ -8,6 +8,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,14 +27,14 @@ public class Survey {
     private Member author;
 
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Section> sections;
+    private List<Section> sections = new ArrayList<>();
 
     // FetchType.EAGER 고민중
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Constraint> constraints;
+    private List<Constraint> constraints = new ArrayList<>();
 
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<MemberSurvey> memberSurveys;
+    private List<MemberSurvey> memberSurveys = new ArrayList<>();
 
     private String title;
 

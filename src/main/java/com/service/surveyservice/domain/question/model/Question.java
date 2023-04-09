@@ -1,8 +1,11 @@
 package com.service.surveyservice.domain.question.model;
 
+import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -10,20 +13,24 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Question {
-    @Id // Primary Key 지정
-    @Column(name = "Question_ID") // 컬럼 지정
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 설정
+    @Id
+    @Column(name = "question_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column // 질문 유형(객관식, 객관식 중복, 주관식, OX)
+    @Column
     private String questionType;
 
-    @Column // 질문 내용
+    @Column
     private String questionText;
 
-//    여기 조인 / 관계 설정
-//    @ManyToOne
-//    @JoinColumn(name = "SURVEY_ID") // 어떤 column과 연결이 될 지 설정
-//    private Survey surveyId;
+    @ManyToOne
+    @JoinColumn(name = "section_id")
+    private Section section;
+
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<QuestionOption> questionOptions = new ArrayList<>();
+
+    // question에서는 answer를 알 필요가 없어보여서 일단 단방향으로 설정하겠다.
 }
 

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,11 +23,11 @@ public class Member extends MemberBase {
 
     // 내가 참여한 설문 리스트(를 가져오기 위한 객체 리스트)
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<MemberSurvey> memberSurveys;
+    private List<MemberSurvey> memberSurveys = new ArrayList<>();
 
     // 내가 만든 설문 리스트
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Survey> surveys;
+    private List<Survey> surveys = new ArrayList<>();
 
 
 }

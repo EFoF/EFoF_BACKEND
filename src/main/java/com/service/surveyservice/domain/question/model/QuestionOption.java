@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.question.model;
 
+import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,20 +11,27 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionOption {
-    @Id // Primary Key 지정
-    @Column(name = "QuestionOption_ID") // 컬럼 지정
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 설정
+    @Id
+    @Column(name = "question_option_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column // 몇 번 항목인지
     private Long index;
 
-    @Column // 객관식 답변 내용
-    private String answerChoiceText;
+    private String optionText;
 
-//    여기 조인 / 관계 설정
-//    @ManyToOne
-//    @JoinColumn(name = "Question_ID") // 어떤 column과 연결이 될 지 설정
-//    private Question questionId;
+    @OneToOne
+    @JoinColumn
+    private Section nextSection;
+
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
+
+    @OneToOne
+    @JoinColumn
+    private QuestionOptionImg questionOptionImg;
+
+
 }
 

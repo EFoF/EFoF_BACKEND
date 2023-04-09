@@ -1,5 +1,8 @@
 package com.service.surveyservice.domain.answer.model;
 
+import com.service.surveyservice.domain.member.model.MemberSurvey;
+import com.service.surveyservice.domain.model.BaseTimeEntity;
+import com.service.surveyservice.domain.question.model.Question;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,17 +13,23 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Answer {
+public class Answer extends BaseTimeEntity {
 
     @Id
     @Column(name = "answer_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 설정
     private Long id;
 
+    @OneToOne
+    @JoinColumn
+    private Question question;
 
+    @ManyToOne
+    @JoinColumn(name = "member_survey_id")
+    private MemberSurvey memberSurvey;
 
-    //- 객관식 + 찬부식 답변
-    //- 주관식 답변
-    // 아직 안 넣음
+    private int multipleChoiceAnswer;
+
+    private String essayQuestionAnswer;
 }
 

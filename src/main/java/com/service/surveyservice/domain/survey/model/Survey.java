@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.survey.model;
 import com.service.surveyservice.domain.constraint.model.Constraint;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberSurvey;
+import com.service.surveyservice.domain.model.BaseTimeEntity;
 import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Survey {
+public class Survey extends BaseTimeEntity {
     @Id
     @Column(name = "survey_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

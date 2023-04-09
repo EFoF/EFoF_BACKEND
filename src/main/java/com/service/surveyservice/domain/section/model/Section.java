@@ -1,7 +1,6 @@
 package com.service.surveyservice.domain.section.model;
 
 import com.service.surveyservice.domain.question.model.Question;
-import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.*;
 
@@ -23,7 +22,7 @@ public class Section {
     @ManyToOne
     private Section parentSection;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Section> child = new ArrayList<>();
 
     @ManyToOne

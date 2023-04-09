@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MemberSurvey {
     @Id
-    @Column(name = "member_survey_id")
+    @Column(name = "memberSurvey_id")
     @GeneratedValue
     private Long id;
 

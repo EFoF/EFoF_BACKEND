@@ -11,17 +11,18 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionOption {
+
     @Id
-    @Column(name = "question_option_id")
+    @Column(name = "questionChoice_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long index;
+    private Long order;
 
     private String optionText;
 
     @OneToOne
-    @JoinColumn
+    @JoinColumn(name = "section_id")
     private Section nextSection;
 
     @ManyToOne
@@ -29,7 +30,7 @@ public class QuestionOption {
     private Question question;
 
     @OneToOne
-    @JoinColumn
+    @JoinColumn(name = "questionOptionImg_id")
     private QuestionOptionImg questionOptionImg;
 
 

@@ -11,7 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class LocationConstraint {
     @Id
-    @Column(name = "Location_Constraint_ID")
+    @Column(name = "locationConstraint_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -22,7 +22,7 @@ public class LocationConstraint {
     private Float longitude;
 
     @OneToOne
-    @JoinColumn(name = "locationConstraint")
+    @JoinColumn(name = "constraint_id")
     private Constraint constraint;
 }
 

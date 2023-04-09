@@ -25,7 +25,7 @@ public class Answer extends BaseTimeEntity {
     private Question question;
 
     @ManyToOne
-    @JoinColumn(name = "member_survey_id")
+    @JoinColumn(name = "memberSurvey_id")
     private MemberSurvey memberSurvey;
 
     private int multipleChoiceAnswer;

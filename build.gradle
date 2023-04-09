@@ -37,6 +37,13 @@ dependencies {
     // queryDSL 의존성 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+    // spring security 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Swagger 의존성 추가 예정
 }
 
 tasks.named('test') {

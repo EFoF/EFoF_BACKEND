@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.member.model;
 
+import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,14 @@ public class Member extends MemberBase {
 
     private String mImageURL;
 
-    @OneToMany(mappedBy = "member_id", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    // 내가 참여한 설문 리스트(를 가져오기 위한 객체 리스트)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<MemberSurvey> memberSurveys;
+
+    // 내가 만든 설문 리스트
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Survey> surveys;
+
+
 }
 

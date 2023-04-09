@@ -1,9 +1,14 @@
 package com.service.surveyservice.domain.survey.model;
 
+import com.service.surveyservice.domain.constraint.model.Constraint;
+import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.member.model.MemberSurvey;
+import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -11,32 +16,38 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Survey {
-    @Id // Primary Key 지정
-    @Column(name = "SURVEY_ID") // 컬럼 지정
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 설정
+    @Id
+    @Column(name = "survey_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column // 설문조사 제목
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member author;
+
+    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Section> sections;
+
+    // FetchType.EAGER 고민중
+    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Constraint> constraints;
+
+    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<MemberSurvey> memberSurveys;
+
     private String title;
 
-    @Column // 설문조사 설명
     private String description;
 
-    @Column // 설문조사 헤더 이미지
     private String sImageURL;
 
-    @Column // 템플릿 색상
     private String pointColor;
 
-    @Column // ?
     private String questionOrder;
 
-    @Column // ?
     private String surveyStatus;
 
-    @Column // 설문 조사 시작 날짜
     private LocalDateTime openDate;
 
-    @Column // 설문 조사 종료 날짜
     private LocalDateTime expireDate;
 }

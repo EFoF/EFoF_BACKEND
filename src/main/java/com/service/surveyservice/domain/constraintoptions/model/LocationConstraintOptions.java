@@ -1,4 +1,4 @@
-package com.service.surveyservice.domain.constraint.model;
+package com.service.surveyservice.domain.constraintoptions.model;
 
 import lombok.*;
 
@@ -9,9 +9,9 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationConstraint {
+public class LocationConstraintOptions {
     @Id
-    @Column(name = "locationConstraint_id")
+    @Column(name = "locationConstraintOptions_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -22,7 +22,7 @@ public class LocationConstraint {
     private Float longitude;
 
     @OneToOne
-    @JoinColumn(name = "constraint_id")
-    private Constraint constraint;
+    @JoinColumn(name = "constraintOptions_id")
+    private ConstraintOptions constraintOptions;
 }
 

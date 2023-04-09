@@ -1,4 +1,4 @@
-package com.service.surveyservice.domain.constraint.model;
+package com.service.surveyservice.domain.constraintoptions.model;
 
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.*;
@@ -10,9 +10,9 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Constraint {
+public class ConstraintOptions {
     @Id
-    @Column(name = "constraint_id")
+    @Column(name = "constraintOptions_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 설정
     private Long id;
 
@@ -20,8 +20,8 @@ public class Constraint {
     @JoinColumn(name = "survey_id")
     private Survey survey;
 
-    @OneToOne(mappedBy = "constraint", cascade = CascadeType.REMOVE)
-    private LocationConstraint locationConstraint;
+    @OneToOne(mappedBy = "constraintOptions", cascade = CascadeType.REMOVE)
+    private LocationConstraintOptions locationConstraintOptions;
 
     @Column
     private String constraintType; //통계보기 허용, 수정 허용, GPS , PASSWORD , EMAIL, 익명

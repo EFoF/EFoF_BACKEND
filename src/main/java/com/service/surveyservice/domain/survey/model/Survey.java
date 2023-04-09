@@ -1,6 +1,6 @@
 package com.service.surveyservice.domain.survey.model;
 
-import com.service.surveyservice.domain.constraint.model.Constraint;
+import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberSurvey;
 import com.service.surveyservice.domain.model.BaseTimeEntity;
@@ -32,7 +32,7 @@ public class Survey extends BaseTimeEntity {
 
     // FetchType.EAGER 고민중
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Constraint> constraints = new ArrayList<>();
+    private List<ConstraintOptions> constraintOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<MemberSurvey> memberSurveys = new ArrayList<>();

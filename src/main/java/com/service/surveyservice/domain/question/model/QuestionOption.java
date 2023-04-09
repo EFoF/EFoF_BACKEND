@@ -17,7 +17,7 @@ public class QuestionOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long order;
+    private int questionNumbering;
 
     private String optionText;
 

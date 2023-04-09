@@ -1,4 +1,4 @@
-package com.service.surveyservice.domain.constraint.application;
+package com.service.surveyservice.domain.constraintoptions.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

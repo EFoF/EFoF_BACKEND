@@ -10,15 +10,15 @@ import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class) // 해당 클래스에 Auditing 기능을 포함
 @Getter
-@MappedSuperclass
+@MappedSuperclass // 자식 클래스에 매핑 정보만 제공
 public class BaseTimeEntity {
 
-    @CreatedDate
+    @CreatedDate // Entity가 생성되어 저장될 때 시간이 자동 저장
     @Column(updatable = false)
     private LocalDateTime createDate;
 
-    @LastModifiedDate
+    @LastModifiedDate  // 조회한 Entity 값을 변경할 때 시간이 자동 저장
     private LocalDateTime modifiedDate;
 }

@@ -20,5 +20,11 @@ public class MemberBase extends BaseTimeEntity {
     private String password;
 
     private String email;
+
+    private String userName;
+
+    private String organization;
+
+    private String organizationDetail;
 }
 

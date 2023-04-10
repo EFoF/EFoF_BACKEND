@@ -1,10 +1,7 @@
 package com.service.surveyservice.domain.member.model;
 
 import com.service.surveyservice.domain.survey.model.Survey;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,6 +26,7 @@ public class Member extends MemberBase {
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Survey> surveys = new ArrayList<>();
 
+//    @Builder
 
 }
 

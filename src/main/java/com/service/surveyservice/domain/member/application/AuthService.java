@@ -16,7 +16,7 @@ import javax.transaction.Transactional;
 public class AuthService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final PasswordEncoder passwordEncoder;
+//    private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, String> redisTemplate;
 

@@ -45,8 +45,6 @@ public class Survey extends BaseTimeEntity {
 
     private String pointColor;
 
-    private String questionOrder;
-
     private String surveyStatus;
 
     private LocalDateTime openDate;

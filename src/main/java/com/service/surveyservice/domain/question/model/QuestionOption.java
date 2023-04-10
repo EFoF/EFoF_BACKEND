@@ -17,11 +17,9 @@ public class QuestionOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int questionNumbering;
-
     private String optionText;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "section_id")
     private Section nextSection;
 

@@ -32,6 +32,9 @@ public class Section {
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Question> questions = new ArrayList<>();
 
+    // 기존에 섹션에 있던 질문 순서 필드.
+    private String questionOrder;
+
     // Section에서 QuestionOption을 가지고 있을 필요성이 크게 느껴지지 않아 단방향 연관관계로 설정하였다.
 //    @OneToOne(mappedBy = "nextSection", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 //    private QuestionOption questionOption;

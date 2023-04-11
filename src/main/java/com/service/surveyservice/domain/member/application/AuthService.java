@@ -22,8 +22,8 @@ import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
 import static com.service.surveyservice.global.common.constants.JwtConstants.REFRESH_TOKEN_EXPIRE_TIME;
 import static com.service.surveyservice.global.common.constants.ResponseConstants.CREATED;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class AuthService {
 

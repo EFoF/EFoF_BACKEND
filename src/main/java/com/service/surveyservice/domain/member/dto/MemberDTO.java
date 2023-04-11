@@ -3,12 +3,15 @@ package com.service.surveyservice.domain.member.dto;
 
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberLoginType;
+import com.service.surveyservice.domain.token.dto.TokenDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
 
 public class MemberDTO {
 
@@ -61,5 +64,30 @@ public class MemberDTO {
         public UsernamePasswordAuthenticationToken toAuthentication() {
             return new UsernamePasswordAuthenticationToken(email, password);
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberLoginDTO {
+
+        private MemberDetail memberDetail;
+        private TokenIssueDTO tokenIssueDTO;
+    }
+
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberDetail {
+        private Long id;
+        private String username;
+        private String email;
+        private String organization;
+        private String organizationDetail;
+
+
     }
 }

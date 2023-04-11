@@ -1,8 +1,8 @@
 package com.service.surveyservice.domain.member.application;
 
+import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.model.Member;
-import com.service.surveyservice.domain.token.dto.TokenDTO;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
@@ -31,6 +30,7 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
+    private final MemberCustomRepositoryImpl memberCustomRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -54,6 +54,8 @@ public class AuthService {
 
         // 프론트에 로그인한 유저의 정보를 넘겨주기 위해서 MemberDetail을 포함한다.
         return MemberLoginDTO.builder()
+                .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
+                .tokenInfo(tokenInfoDTO.toTokenIssueDTO())
                 .build();
     }
 

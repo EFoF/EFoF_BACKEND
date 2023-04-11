@@ -1,6 +1,7 @@
 package com.service.surveyservice.domain.member.dto;
 
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberLoginType;
 import com.service.surveyservice.domain.token.dto.TokenDTO;
@@ -73,14 +74,13 @@ public class MemberDTO {
     public static class MemberLoginDTO {
 
         private MemberDetail memberDetail;
-        private TokenIssueDTO tokenIssueDTO;
+        private TokenIssueDTO tokenInfo;
     }
 
 
     @Getter
     @Builder
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class MemberDetail {
         private Long id;
         private String username;
@@ -88,6 +88,13 @@ public class MemberDTO {
         private String organization;
         private String organizationDetail;
 
-
+        @QueryProjection
+        public MemberDetail(Long id, String username, String email, String organization, String organizationDetail) {
+            this.id = id;
+            this.username = username;
+            this.email = email;
+            this.organization = organization;
+            this.organizationDetail = organizationDetail;
+        }
     }
 }

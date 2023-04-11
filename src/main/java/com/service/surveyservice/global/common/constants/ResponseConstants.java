@@ -1,4 +1,4 @@
-package com.service.surveyservice.global.common;
+package com.service.surveyservice.global.common.constants;
 
 public class ResponseConstants {
     public static final String CREATED ="CREATED";

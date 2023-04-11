@@ -26,7 +26,12 @@ public class Member extends MemberBase {
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Survey> surveys = new ArrayList<>();
 
-//    @Builder
+    @Builder
+    public Member(Long id, String password, String email, String username, String organization, String organizationDetail, String nickname, String mImageURL) {
+        super(id, password, email, username, organization, organizationDetail);
+        this.nickname = nickname;
+        this.mImageURL = "https://cdn-icons-png.flaticon.com/128/7178/7178514.png";
+    }
 
 }
 

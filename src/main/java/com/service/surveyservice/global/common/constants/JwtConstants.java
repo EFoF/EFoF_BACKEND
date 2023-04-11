@@ -1,0 +1,9 @@
+package com.service.surveyservice.global.common.constants;
+
+public class JwtConstants {
+    public static final String AUTHORITIES_KEY = "auth";
+    public static final String BEARER_TYPE = "Bearer";
+
+    public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60*30;
+    public static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60*60*24*7;
+}

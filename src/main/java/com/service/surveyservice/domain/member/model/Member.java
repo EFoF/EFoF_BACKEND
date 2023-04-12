@@ -1,11 +1,14 @@
 package com.service.surveyservice.domain.member.model;
 
+import com.service.surveyservice.domain.member.dto.MailDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.service.surveyservice.domain.member.dto.MailDTO.*;
 
 @Entity
 @Getter
@@ -31,6 +34,15 @@ public class Member extends MemberBase {
         super(id, password, email, username, organization, organizationDetail);
         this.nickname = nickname;
         this.mImageURL = "https://cdn-icons-png.flaticon.com/128/7178/7178514.png";
+    }
+
+    public EncryptEmailDTO encryptEmailDTO() {
+        String[] subEmail = this.getEmail().split("@");
+        int asteriskNum = subEmail[0].length() - 3;
+        String asterisks = "*".repeat(asteriskNum);
+        subEmail[0] = subEmail[0].substring(0, 3) + asterisks;
+        String returnEmail = subEmail[0] + "@" + subEmail[1];
+        return new EncryptEmailDTO(returnEmail);
     }
 
 }

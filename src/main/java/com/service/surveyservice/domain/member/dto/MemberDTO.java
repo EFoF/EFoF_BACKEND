@@ -96,4 +96,25 @@ public class MemberDTO {
             this.organizationDetail = organizationDetail;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RedunCheckDTO {
+        private Boolean exists;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CheckEmailRequestDTO {
+        private String email;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CheckNicknameRequestDTO {
+        private String nickname;
+    }
 }

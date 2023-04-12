@@ -63,14 +63,14 @@ public class SecurityConfig {
                 .antMatchers("/user/**").hasRole("USER")
                 .anyRequest().authenticated()
 
-//                .and()
-//                .apply(new JwtSecurityConfig(jwtTokenProvider, redisTemplate))
-//                .and()
-//                .logout()
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/logout-redirect")
-//                .clearAuthentication(true)
-//                .logoutSuccessHandler(customLogoutSuccessHandler)
+                .and()
+                .apply(new JwtSecurityConfig(jwtTokenProvider, redisTemplate))
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/logout-redirect")
+                .clearAuthentication(true)
+                .logoutSuccessHandler(customLogoutSuccessHandler)
     }
 
     @Bean

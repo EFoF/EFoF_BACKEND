@@ -1,5 +1,6 @@
 package com.service.surveyservice.global.config;
 
+import com.service.surveyservice.global.jwt.CustomLogoutSuccessHandler;
 import com.service.surveyservice.global.jwt.JwtAccessDeniedHandler;
 import com.service.surveyservice.global.jwt.JwtAuthenticationEntryPoint;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
@@ -27,6 +28,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final RedisTemplate<String, String> redisTemplate;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -72,7 +74,9 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/logout-redirect")
                 .clearAuthentication(true)
-                .logoutSuccessHandler(customLogoutSuccessHandler)
+                .logoutSuccessHandler(customLogoutSuccessHandler);
+
+        return http.build();
     }
 
     @Bean

@@ -9,7 +9,6 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -17,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.service.surveyservice.global.config.EmailConstants.EMAIL_CERTIFICATION_TIME;
+import static com.service.surveyservice.global.common.constants.EmailConstants.EMAIL_CERTIFICATION_TIME;
 import static javax.mail.Message.RecipientType.TO;
 import static com.service.surveyservice.domain.member.dto.MailDTO.*;
 

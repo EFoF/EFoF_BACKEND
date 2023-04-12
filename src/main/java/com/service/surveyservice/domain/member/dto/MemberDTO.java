@@ -52,6 +52,7 @@ public class MemberDTO {
 
     @Getter
     @Builder
+    @ToString
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginRequestDTO {

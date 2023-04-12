@@ -52,6 +52,7 @@ public class MemberDTO {
 
     @Getter
     @Builder
+    @ToString
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginRequestDTO {
@@ -94,5 +95,26 @@ public class MemberDTO {
             this.organization = organization;
             this.organizationDetail = organizationDetail;
         }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RedunCheckDTO {
+        private Boolean exists;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CheckEmailRequestDTO {
+        private String email;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CheckNicknameRequestDTO {
+        private String nickname;
     }
 }

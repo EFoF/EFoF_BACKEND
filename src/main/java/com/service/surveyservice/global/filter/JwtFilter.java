@@ -4,6 +4,7 @@ import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -32,9 +33,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 hasKey = false;
             }
             if(StringUtils.hasText(jwt) && hasKey && jwtTokenProvider.validateToken(jwt)) {
-                Authentication authentication = jwtTokenProvider.
+                Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+
+        filterChain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {

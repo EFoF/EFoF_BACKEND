@@ -5,10 +5,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberLoginType;
 import com.service.surveyservice.domain.token.dto.TokenDTO;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -18,6 +15,7 @@ public class MemberDTO {
 
     @Getter
     @Builder
+    @ToString
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SignUpRequest {

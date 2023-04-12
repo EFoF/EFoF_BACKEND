@@ -117,4 +117,6 @@ public class MemberDTO {
     public static class CheckNicknameRequestDTO {
         private String nickname;
     }
+
+
 }

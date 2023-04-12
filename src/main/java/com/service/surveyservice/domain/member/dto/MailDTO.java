@@ -38,7 +38,26 @@ public class MailDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class EncryptEmailDTO {
+        // 사용자가 이메일 찾기를 요청했을 때, 응답으로 일부만 공개된 이메일을 보낸다.
+        private String email;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ConfirmEmailDTO {
         private String email;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FindEmailDTO {
+        private String userName;
+        // 전화번호를 필드로 가지지 않기 때문에 닉네임을 사용했다.
+        private String nickname;
     }
 }

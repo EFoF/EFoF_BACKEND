@@ -55,10 +55,17 @@ public class MemberController {
         return new ResponseEntity<>(EmailSentDTO.builder().email(confirmEmailDTO.getEmail()).success(true).build(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/auth/find/email")
+    // 코드 인증 요청 : 이메일 인증에서 인증 코드 생성과 동시에 이메일을 발송하고, 이 api로 코드가 일치한지 확인한다.
+    @GetMapping(value = "/auth/codeConfirm")
     public ResponseEntity<CodeConfirmDTO> codeConfirm(@RequestBody EmailConfirmCodeDTO emailConfirmCodeDTO) {
         return new ResponseEntity<>(emailCertificationService.confirmCode(emailConfirmCodeDTO), HttpStatus.OK);
     }
 
-//    @GetMapping(value = "/auth/")
+    // 이메일 찾기
+    @GetMapping(value = "/auth/find/email")
+    public ResponseEntity<EncryptEmailDTO> findEmail(@RequestBody FindEmailDTO findEmailDTO) {
+        EncryptEmailDTO userEmail = memberService.findUserEmail(findEmailDTO);
+        return new ResponseEntity<>(userEmail, HttpStatus.OK);
+    }
+
 }

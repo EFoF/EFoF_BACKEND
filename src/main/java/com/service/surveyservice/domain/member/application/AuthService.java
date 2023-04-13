@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.member.application;
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.token.exception.ExpiredRefreshTokenException;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,20 @@ public class AuthService {
                 .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
                 .tokenInfo(tokenInfoDTO.toTokenIssueDTO())
                 .build();
+    }
+
+    @Transactional
+    public TokenIssueDTO reissue(AccessTokenDTO accessTokenDTO) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        String refreshByAccess = valueOperations.get(accessTokenDTO.getAccessToken());
+        if(refreshByAccess == null) {
+            throw new ExpiredRefreshTokenException();
+        }
+        Authentication authentication = jwtTokenProvider.getAuthentication(accessTokenDTO.getAccessToken());
+        TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
+        valueOperations.set(tokenInfoDTO.getAccessToken(), tokenInfoDTO.getRefreshToken());
+        redisTemplate.expire(tokenInfoDTO.getAccessToken(), REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS);
+        return tokenInfoDTO.toTokenIssueDTO();
     }
 
 

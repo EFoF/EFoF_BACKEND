@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.service.surveyservice.domain.member.dto.MailDTO.*;
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
+import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
+import static com.service.surveyservice.global.common.constants.AuthenticationConstants.LOGOUT;
 
 @Slf4j
 @RestController
@@ -73,6 +75,16 @@ public class MemberController {
     public ResponseEntity<ReturnPasswordDTO> findPassword(@RequestBody FindPasswordRequestDTO findPasswordRequestDTO) {
         ReturnPasswordDTO returnPasswordDTO = memberService.findUserPassword(findPasswordRequestDTO);
         return new ResponseEntity<>(returnPasswordDTO, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/logout-redirect")
+    public ResponseEntity<String> loginRedirect() {
+        return new ResponseEntity<>(LOGOUT, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/auth/reissue")
+    public ResponseEntity<TokenIssueDTO> reissue(@RequestBody AccessTokenDTO accessTokenDTO) {
+        return new ResponseEntity<>(authService.reissue(accessTokenDTO), HttpStatus.OK);
     }
 
 }

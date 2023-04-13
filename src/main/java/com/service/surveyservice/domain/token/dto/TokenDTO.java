@@ -38,4 +38,12 @@ public class TokenDTO {
         private Long accessTokenExpiresIn;
 
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AccessTokenDTO {
+        private String accessToken;
+    }
 }

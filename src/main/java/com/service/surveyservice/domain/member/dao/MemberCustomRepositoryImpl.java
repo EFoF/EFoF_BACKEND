@@ -8,6 +8,8 @@ import com.service.surveyservice.domain.member.model.QMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
 import static com.service.surveyservice.domain.member.model.QMember.*;
 
@@ -23,5 +25,15 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .select(new QMemberDTO_MemberDetail(member.id, member.userName, member.email, member.organization, member.organizationDetail))
                 .from(member)
                 .where(member.id.eq(userId)).fetchOne();
+    }
+
+    @Override
+    public Optional<MemberDetail> getMemberDetailOptional(Long userId) {
+        MemberDetail memberDetail = queryFactory
+                .select(new QMemberDTO_MemberDetail(member.id, member.userName, member.email, member.organization, member.organizationDetail))
+                .from(member)
+                .where(member.id.eq(userId)).fetchOne();
+
+        return Optional.ofNullable(memberDetail);
     }
 }

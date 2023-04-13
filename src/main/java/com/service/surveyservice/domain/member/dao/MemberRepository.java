@@ -9,7 +9,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
 
     Optional<Member> findByEmail(String email);
     Optional<Member> findByUserNameAndNickname(String userName, String nickname);
-
+    Optional<Member> findByUserNameAndNicknameAndEmail(String userName, String nickname, String email);
 
     boolean existsByEmail(String email);
     boolean existsByNickname(String nickname);

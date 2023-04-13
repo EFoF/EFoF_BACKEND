@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class MailDTO {
 
@@ -56,8 +57,23 @@ public class MailDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class FindEmailDTO {
-        private String userName;
+        private String username;
         // 전화번호를 필드로 가지지 않기 때문에 닉네임을 사용했다.
         private String nickname;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateUserPasswordRequestDTO {
+        private Long userId;
+        private String oldPassword;
+        private String newPassword;
+
+        public void encrypt(PasswordEncoder passwordEncoder) {
+            this.oldPassword = passwordEncoder.encode(oldPassword);
+            this.newPassword = passwordEncoder.encode(newPassword);
+        }
     }
 }

@@ -45,5 +45,9 @@ public class Member extends MemberBase {
         return new EncryptEmailDTO(returnEmail);
     }
 
+    public void updatePasswordWithDTO(UpdateUserPasswordRequestDTO updateUserPasswordRequestDTO) {
+        super.updatePassword(updateUserPasswordRequestDTO.getNewPassword());
+    }
+
 }
 

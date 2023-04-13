@@ -68,4 +68,11 @@ public class MemberController {
         return new ResponseEntity<>(userEmail, HttpStatus.OK);
     }
 
+    // 비밀번호 찾기
+    @GetMapping(value = "/auth/find/password")
+    public ResponseEntity<ReturnPasswordDTO> findPassword(@RequestBody FindPasswordRequestDTO findPasswordRequestDTO) {
+        ReturnPasswordDTO returnPasswordDTO = memberService.findUserPassword(findPasswordRequestDTO);
+        return new ResponseEntity<>(returnPasswordDTO, HttpStatus.OK);
+    }
+
 }

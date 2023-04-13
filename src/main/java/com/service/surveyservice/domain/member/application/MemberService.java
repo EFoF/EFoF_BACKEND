@@ -8,6 +8,7 @@ import com.service.surveyservice.domain.member.exception.member.UserNotFoundByUs
 import com.service.surveyservice.domain.member.exception.member.UserNotFoundException;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.global.common.constants.RandomCharacters;
+import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,6 +74,13 @@ public class MemberService {
             sb.append(RandomCharacters.RandomCharacters[(int)(random.nextFloat() * RandomCharacters.RandomCharacters.length)]);
         }
         return sb.toString();
+    }
+
+    @Transactional(readOnly = true)
+    public MemberDetail getMemberDetail(long id) {
+        log.error("아이디" + id);
+        MemberDetail memberDetail = memberCustomRepository.getMemberDetailOptional(id).orElseThrow(NotFoundByIdException::new);
+        return memberDetail;
     }
 
 }

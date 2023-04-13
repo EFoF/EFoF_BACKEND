@@ -31,7 +31,7 @@ public class Member extends MemberBase {
 
     @Builder
     public Member(Long id, String password, String email, String username, String organization, String organizationDetail, String nickname, String mImageURL) {
-        super(id, password, email, username, organization, organizationDetail);
+        super(id, password, email, username, organization, organizationDetail, Authority.ROLE_USER);
         this.nickname = nickname;
         this.mImageURL = "https://cdn-icons-png.flaticon.com/128/7178/7178514.png";
     }

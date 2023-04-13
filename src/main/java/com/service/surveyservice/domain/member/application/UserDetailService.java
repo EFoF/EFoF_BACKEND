@@ -4,6 +4,8 @@ import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.model.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -35,10 +37,13 @@ public class UserDetailService implements UserDetailsService {
 
     // 어드민 유저는 일단은 게획에 없기 때문에, 권한은 빈 값으로 주고 후에 고도화 과정에서 다시 고려해보겠다.
     private UserDetails createUserDetails(Member member) {
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getAuthority().toString());
+        log.info("User Detail 객체 생성");
         return new User(
                 String.valueOf(member.getId()),
                 member.getPassword(),
-                Collections.emptyList()
+//                Collections.emptyList()
+                Collections.singleton(grantedAuthority)
         );
     }
 

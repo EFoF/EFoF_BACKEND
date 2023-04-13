@@ -26,5 +26,9 @@ public class MemberBase extends BaseTimeEntity {
     private String organization;
 
     private String organizationDetail;
+
+    public void updatePassword(String pw) {
+        this.password = pw;
+    }
 }
 

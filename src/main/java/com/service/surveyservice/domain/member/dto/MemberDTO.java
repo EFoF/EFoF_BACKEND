@@ -118,5 +118,21 @@ public class MemberDTO {
         private String nickname;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReturnPasswordDTO {
+        private String password;
+    }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FindPasswordRequestDTO {
+        private String userName;
+        private String nickname;
+        private String email;
+    }
 }

@@ -21,6 +21,12 @@ public class MemberController {
    private final MemberRepository memberRepository;
    private final MemberCustomRepositoryImpl memberCustomRepository;
 
+   // 닉네임 변경
+    @PatchMapping(value = "/member/update/nickname")
+    public ResponseEntity<String> updateMemberNickname(@RequestBody UpdateNicknameRequestDTO updateNicknameRequestDTO) {
+        String result = memberService.updateMemberNickname(updateNicknameRequestDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
   // 비밀번호 변경
   @PatchMapping(value = "/member/update/password")

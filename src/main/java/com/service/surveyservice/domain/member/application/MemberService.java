@@ -3,10 +3,7 @@ package com.service.surveyservice.domain.member.application;
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.dto.MemberDTO.RedunCheckDTO;
-import com.service.surveyservice.domain.member.exception.member.NotMatchingPasswordException;
-import com.service.surveyservice.domain.member.exception.member.UpdateDuplicatedPasswordException;
-import com.service.surveyservice.domain.member.exception.member.UserNotFoundByUsernameAndNickname;
-import com.service.surveyservice.domain.member.exception.member.UserNotFoundException;
+import com.service.surveyservice.domain.member.exception.member.*;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.global.common.constants.RandomCharacters;
 import com.service.surveyservice.global.error.exception.NotFoundByIdException;
@@ -90,11 +87,6 @@ public class MemberService {
         String oldPassword = updateMemberPasswordRequestDTO.getOldPassword();
         String newPassword = updateMemberPasswordRequestDTO.getNewPassword();
 
-        // 변경할 비밀번호가 현재 비밀번호랑 일치한다면 예외 발생
-        if(oldPassword.equals(newPassword)) {
-            throw new UpdateDuplicatedPasswordException();
-        }
-
         // 해당 이메일로 사용자를 찾을 수 없다면 예외 발생
         Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
@@ -103,9 +95,36 @@ public class MemberService {
             throw new NotMatchingPasswordException();
         }
 
+        // 변경할 비밀번호가 현재 비밀번호랑 일치한다면 예외 발생
+        if(oldPassword.equals(newPassword)) {
+            throw new UpdateDuplicatedPasswordException();
+        }
+
         // 비밀번호 변경
         updateMemberPasswordRequestDTO.encrypt(passwordEncoder);
         member.updatePasswordWithDTO(updateMemberPasswordRequestDTO);
+        return UPDATED;
+    }
+
+    @Transactional
+    public String updateMemberNickname(UpdateNicknameRequestDTO updateNicknameRequestDTO) {
+        String email = updateNicknameRequestDTO.getEmail();
+        String oldNickname = updateNicknameRequestDTO.getOldNickname();
+        String newNickname = updateNicknameRequestDTO.getNewNickname();
+
+        Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+
+        if(!member.getNickname().equals(oldNickname)) {
+            throw new NotMatchingUpdatingNicknameException();
+        }
+
+        if(oldNickname.equals(newNickname)) {
+            throw new UpdateDuplicatedNicknameException();
+        }
+
+        // 닉네임 변경
+        member.updateNickname(newNickname);
+
         return UPDATED;
     }
 

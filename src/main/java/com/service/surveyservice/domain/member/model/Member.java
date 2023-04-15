@@ -45,6 +45,10 @@ public class Member extends MemberBase {
         return new EncryptEmailDTO(returnEmail);
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     // 비밀번호 찾기를 통해 자동 생성된 비밀번호로 임시 변경할 때 사용됨
     public void updateToGeneratedPasswordWithDTO(UpdateGeneratedPasswordRequestDTO updateGeneratedPasswordRequestDTO) {
         super.updatePassword(updateGeneratedPasswordRequestDTO.getGeneratedPassword());

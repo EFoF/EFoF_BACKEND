@@ -82,14 +82,16 @@ public class MemberDTO {
     public static class MemberDetail {
         private Long id;
         private String username;
+        private String nickname;
         private String email;
         private String organization;
         private String organizationDetail;
 
         @QueryProjection
-        public MemberDetail(Long id, String username, String email, String organization, String organizationDetail) {
+        public MemberDetail(Long id, String username, String nickname, String email, String organization, String organizationDetail) {
             this.id = id;
             this.username = username;
+            this.nickname = nickname;
             this.email = email;
             this.organization = organization;
             this.organizationDetail = organizationDetail;
@@ -115,6 +117,16 @@ public class MemberDTO {
     @AllArgsConstructor
     public static class CheckNicknameRequestDTO {
         private String nickname;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateNicknameRequestDTO {
+        private String email;
+        private String oldNickname;
+        private String newNickname;
     }
 
     @Getter
@@ -152,6 +164,7 @@ public class MemberDTO {
     }
 
 
+    // 사용자의 요청으로 비밀번호를 변경하기 위한 DTO
     @Getter
     @Builder
     @NoArgsConstructor

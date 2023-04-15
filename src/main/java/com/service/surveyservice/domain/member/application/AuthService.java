@@ -48,7 +48,6 @@ public class AuthService {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = loginRequestDto.toAuthentication();
         // 인증 정보 받아오기
         Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(usernamePasswordAuthenticationToken);
-        log.error("여기는??");
         TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authenticate);
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(tokenInfoDTO.getAccessToken(), tokenInfoDTO.getRefreshToken());

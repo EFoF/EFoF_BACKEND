@@ -99,7 +99,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
         // 현재 사용자의 비밀번호가 전달 받은 비밀번호와 다르다면 예외 발생
-        if(!member.getPassword().equals(oldPassword)) {
+        if(!passwordEncoder.matches(oldPassword, member.getPassword())) {
             throw new NotMatchingPasswordException();
         }
 

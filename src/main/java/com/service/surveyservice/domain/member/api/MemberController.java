@@ -23,7 +23,7 @@ public class MemberController {
 
 
   // 비밀번호 변경
-  @PostMapping(value = "/member/update/password")
+  @PatchMapping(value = "/member/update/password")
   public ResponseEntity<String> updateMemberPassword(@RequestBody UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
         String result = memberService.updatePassword(updateMemberPasswordRequestDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);

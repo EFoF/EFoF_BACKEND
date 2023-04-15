@@ -28,8 +28,8 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
     @Override
     @Transactional
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        log.info("로그아웃 내부적으로 호출됨");
         String token = request.getHeader(AUTHORIZATION_HEADER).split(" ")[1];
-
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         // 로그아웃이라서 현재 활성화된 token을 지워준다.
         valueOperations.getAndDelete(token);

@@ -4,7 +4,6 @@ package com.service.surveyservice.domain.member.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberLoginType;
-import com.service.surveyservice.domain.token.dto.TokenDTO;
 import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -83,14 +82,16 @@ public class MemberDTO {
     public static class MemberDetail {
         private Long id;
         private String username;
+        private String nickname;
         private String email;
         private String organization;
         private String organizationDetail;
 
         @QueryProjection
-        public MemberDetail(Long id, String username, String email, String organization, String organizationDetail) {
+        public MemberDetail(Long id, String username, String nickname, String email, String organization, String organizationDetail) {
             this.id = id;
             this.username = username;
+            this.nickname = nickname;
             this.email = email;
             this.organization = organization;
             this.organizationDetail = organizationDetail;
@@ -122,6 +123,25 @@ public class MemberDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class UpdateNicknameRequestDTO {
+        private String email;
+        private String oldNickname;
+        private String newNickname;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateMemberProfileImgRequestDTO {
+        private String email;
+        private String newProfileImg;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReturnPasswordDTO {
         private String password;
     }
@@ -134,5 +154,38 @@ public class MemberDTO {
         private String userName;
         private String nickname;
         private String email;
+    }
+
+    // 사용자의 비밀번호를 비밀번호 찾기 과정에서 생성된 랜덤 비밀번호로 임시 변경하기 위한 DTO
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateGeneratedPasswordRequestDTO {
+        private Long userId;
+        private String oldPassword;
+        private String generatedPassword;
+
+        public void encrypt(PasswordEncoder passwordEncoder) {
+            this.oldPassword = passwordEncoder.encode(oldPassword);
+            this.generatedPassword = passwordEncoder.encode(generatedPassword);
+        }
+    }
+
+
+    // 사용자의 요청으로 비밀번호를 변경하기 위한 DTO
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateMemberPasswordRequestDTO {
+        private String email;
+        private String oldPassword;
+        private String newPassword;
+
+        public void encrypt(PasswordEncoder passwordEncoder) {
+            this.oldPassword = passwordEncoder.encode(oldPassword);
+            this.newPassword = passwordEncoder.encode(newPassword);
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.service.surveyservice.global.filter;
 
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import static com.service.surveyservice.global.common.constants.JwtConstants.AUTHORIZATION_HEADER;
 import static com.service.surveyservice.global.common.constants.JwtConstants.BEARER_PREFIX;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -27,6 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String jwt = resolveToken(request);
+        log.info("APi 호출됨");
         if(jwt != null) {
             Boolean hasKey = redisTemplate.hasKey(jwt);
             if(hasKey == null) {

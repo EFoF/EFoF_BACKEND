@@ -22,7 +22,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     @Override
     public MemberDetail getMemberDetail(Long userId) {
         return queryFactory
-                .select(new QMemberDTO_MemberDetail(member.id, member.userName, member.email, member.organization, member.organizationDetail))
+                .select(new QMemberDTO_MemberDetail(member.id, member.userName, member.nickname, member.email, member.organization, member.organizationDetail))
                 .from(member)
                 .where(member.id.eq(userId)).fetchOne();
     }
@@ -30,7 +30,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     @Override
     public Optional<MemberDetail> getMemberDetailOptional(Long userId) {
         MemberDetail memberDetail = queryFactory
-                .select(new QMemberDTO_MemberDetail(member.id, member.userName, member.email, member.organization, member.organizationDetail))
+                .select(new QMemberDTO_MemberDetail(member.id, member.userName, member.nickname, member.email, member.organization, member.organizationDetail))
                 .from(member)
                 .where(member.id.eq(userId)).fetchOne();
 

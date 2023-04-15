@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
+import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
 import static com.service.surveyservice.global.common.constants.AuthenticationConstants.LOGOUT;
 
 @Slf4j
@@ -84,7 +85,7 @@ public class AuthController {
 
     // 토큰 재발급
     @GetMapping(value = "/auth/reissue")
-    public ResponseEntity<TokenDTO.TokenIssueDTO> reissue(@RequestBody TokenDTO.AccessTokenDTO accessTokenDTO) {
+    public ResponseEntity<TokenIssueDTO> reissue(@RequestBody AccessTokenDTO accessTokenDTO) {
         return new ResponseEntity<>(authService.reissue(accessTokenDTO), HttpStatus.OK);
     }
 }

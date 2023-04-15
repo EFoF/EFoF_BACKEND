@@ -8,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
 
@@ -23,6 +21,26 @@ public class MemberController {
    private final MemberRepository memberRepository;
    private final MemberCustomRepositoryImpl memberCustomRepository;
 
+   // 닉네임 변경
+    @PatchMapping(value = "/member/update/nickname")
+    public ResponseEntity<String> updateMemberNickname(@RequestBody UpdateNicknameRequestDTO updateNicknameRequestDTO) {
+        String result = memberService.updateMemberNickname(updateNicknameRequestDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // 프로필 이미지 변경
+    @PatchMapping(value = "/member/update/profile")
+    public ResponseEntity<String> updateMemberProfile(@RequestBody UpdateMemberProfileImgRequestDTO updateMemberProfileImgRequestDTO) {
+        String result = memberService.updateMemberProfileImg(updateMemberProfileImgRequestDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+  // 비밀번호 변경
+    @PatchMapping(value = "/member/update/password")
+    public ResponseEntity<String> updateMemberPassword(@RequestBody UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
+        String result = memberService.updatePassword(updateMemberPasswordRequestDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
    // 특정 사용자 정보 조회
    @GetMapping(value = "/member/{memberId}")
@@ -30,8 +48,5 @@ public class MemberController {
        return new ResponseEntity<>(memberService.getMemberDetail(memberId), HttpStatus.OK);
    }
 
-   // 사용자 전체 조회 페이징
-   @GetMapping(value = "/member")
-   public ResponseEntity<>
 
 }

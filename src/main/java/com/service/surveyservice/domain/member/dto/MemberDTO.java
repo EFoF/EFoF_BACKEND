@@ -133,6 +133,15 @@ public class MemberDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class UpdateMemberProfileImgRequestDTO {
+        private String email;
+        private String newProfileImg;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReturnPasswordDTO {
         private String password;
     }

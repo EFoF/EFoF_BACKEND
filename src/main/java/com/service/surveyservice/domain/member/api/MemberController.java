@@ -28,12 +28,19 @@ public class MemberController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    // 프로필 이미지 변경
+    @PatchMapping(value = "/member/update/profile")
+    public ResponseEntity<String> updateMemberProfile(@RequestBody UpdateMemberProfileImgRequestDTO updateMemberProfileImgRequestDTO) {
+        String result = memberService.updateMemberProfileImg(updateMemberProfileImgRequestDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
   // 비밀번호 변경
-  @PatchMapping(value = "/member/update/password")
-  public ResponseEntity<String> updateMemberPassword(@RequestBody UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
+    @PatchMapping(value = "/member/update/password")
+    public ResponseEntity<String> updateMemberPassword(@RequestBody UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
         String result = memberService.updatePassword(updateMemberPasswordRequestDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
-  }
+    }
 
    // 특정 사용자 정보 조회
    @GetMapping(value = "/member/{memberId}")
@@ -41,7 +48,5 @@ public class MemberController {
        return new ResponseEntity<>(memberService.getMemberDetail(memberId), HttpStatus.OK);
    }
 
-   // 설문 참여 사용자 조회 - 페이지네이션
-   //
 
 }

@@ -128,6 +128,16 @@ public class MemberService {
         return UPDATED;
     }
 
+    @Transactional
+    public String updateMemberProfileImg(UpdateMemberProfileImgRequestDTO updateMemberProfileImgRequestDTO) {
+        String email = updateMemberProfileImgRequestDTO.getEmail();
+        String newProfileImg = updateMemberProfileImgRequestDTO.getNewProfileImg();
+        Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        // 프로필 이미지 변경
+        member.updateProfileImg(newProfileImg);
+        return UPDATED;
+    }
+
     // 마이페이지용 사용자 세부 정보 조회
     @Transactional(readOnly = true)
     public MemberDetail getMemberDetail(long id) {

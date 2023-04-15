@@ -2,8 +2,9 @@ package com.service.surveyservice.domain.member.application;
 
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
-import com.service.surveyservice.domain.member.dto.MemberDTO;
 import com.service.surveyservice.domain.member.dto.MemberDTO.RedunCheckDTO;
+import com.service.surveyservice.domain.member.exception.member.NotMatchingPasswordException;
+import com.service.surveyservice.domain.member.exception.member.UpdateDuplicatedPasswordException;
 import com.service.surveyservice.domain.member.exception.member.UserNotFoundByUsernameAndNickname;
 import com.service.surveyservice.domain.member.exception.member.UserNotFoundException;
 import com.service.surveyservice.domain.member.model.Member;
@@ -19,6 +20,7 @@ import java.util.Random;
 
 import static com.service.surveyservice.domain.member.dto.MailDTO.*;
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
+import static com.service.surveyservice.global.common.constants.ResponseConstants.UPDATED;
 
 
 @Slf4j
@@ -30,16 +32,19 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
 
+    // 중복되는 이메일이 존재하는지 검사
     @Transactional(readOnly = true)
     public RedunCheckDTO existsByEmail(String email) {
         return new RedunCheckDTO(memberRepository.existsByEmail(email));
     }
 
+    // 중복되는 닉네임이 존재하는지 검사
     @Transactional(readOnly = true)
     public RedunCheckDTO existsByNickname(String nickname) {
         return new RedunCheckDTO(memberRepository.existsByNickname(nickname));
     }
 
+    // 이메일 찾기 기능에서 유저 정보를 찾아서 암호화된 이메일을 반환함
     @Transactional(readOnly = true)
     public EncryptEmailDTO findUserEmail(FindEmailDTO findEmailDTO) {
         String userName = findEmailDTO.getUsername();
@@ -48,6 +53,7 @@ public class MemberService {
         return member.encryptEmailDTO();
     }
 
+    // 비밀번호 찾기 기능에서 유저 정보를 찾아서 새로운 비밀번호로 변경 후 반환
     @Transactional
     public ReturnPasswordDTO findUserPassword(FindPasswordRequestDTO findPasswordRequestDTO) {
         String userName = findPasswordRequestDTO.getUserName();
@@ -55,17 +61,18 @@ public class MemberService {
         String email = findPasswordRequestDTO.getEmail();
         Member member = memberRepository.findByUserNameAndNicknameAndEmail(userName, nickname, email).orElseThrow(UserNotFoundException::new);
         String newPassword = createTemporalPassword();
-        UpdateUserPasswordRequestDTO updateUserPasswordRequestDTO = UpdateUserPasswordRequestDTO.builder()
+        UpdateGeneratedPasswordRequestDTO updateGeneratedPasswordRequestDTO = UpdateGeneratedPasswordRequestDTO.builder()
                 .oldPassword(member.getPassword())
-                .newPassword(newPassword)
+                .generatedPassword(newPassword)
                 .build();
-        updateUserPasswordRequestDTO.encrypt(passwordEncoder);
-        member.updatePasswordWithDTO(updateUserPasswordRequestDTO);
+        updateGeneratedPasswordRequestDTO.encrypt(passwordEncoder);
+        member.updateToGeneratedPasswordWithDTO(updateGeneratedPasswordRequestDTO);
         return ReturnPasswordDTO.builder()
                 .password(newPassword)
                 .build();
     }
 
+    // 비밀번호 찾기 기능에서 사용되는 임시 비밀번호 생성
     private String createTemporalPassword() {
         int targetStringLength = 10;
         Random random = new Random();
@@ -76,6 +83,33 @@ public class MemberService {
         return sb.toString();
     }
 
+    // 비밀번호 변경
+    @Transactional
+    public String updatePassword(UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
+        String email = updateMemberPasswordRequestDTO.getEmail();
+        String oldPassword = updateMemberPasswordRequestDTO.getOldPassword();
+        String newPassword = updateMemberPasswordRequestDTO.getNewPassword();
+
+        // 변경할 비밀번호가 현재 비밀번호랑 일치한다면 예외 발생
+        if(oldPassword.equals(newPassword)) {
+            throw new UpdateDuplicatedPasswordException();
+        }
+
+        // 해당 이메일로 사용자를 찾을 수 없다면 예외 발생
+        Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+
+        // 현재 사용자의 비밀번호가 전달 받은 비밀번호와 다르다면 예외 발생
+        if(!member.getPassword().equals(oldPassword)) {
+            throw new NotMatchingPasswordException();
+        }
+
+        // 비밀번호 변경
+        updateMemberPasswordRequestDTO.encrypt(passwordEncoder);
+        member.updatePasswordWithDTO(updateMemberPasswordRequestDTO);
+        return UPDATED;
+    }
+
+    // 마이페이지용 사용자 세부 정보 조회
     @Transactional(readOnly = true)
     public MemberDetail getMemberDetail(long id) {
         log.error("아이디" + id);

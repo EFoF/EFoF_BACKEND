@@ -4,7 +4,6 @@ package com.service.surveyservice.domain.member.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberLoginType;
-import com.service.surveyservice.domain.token.dto.TokenDTO;
 import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -134,5 +133,37 @@ public class MemberDTO {
         private String userName;
         private String nickname;
         private String email;
+    }
+
+    // 사용자의 비밀번호를 비밀번호 찾기 과정에서 생성된 랜덤 비밀번호로 임시 변경하기 위한 DTO
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateGeneratedPasswordRequestDTO {
+        private Long userId;
+        private String oldPassword;
+        private String generatedPassword;
+
+        public void encrypt(PasswordEncoder passwordEncoder) {
+            this.oldPassword = passwordEncoder.encode(oldPassword);
+            this.generatedPassword = passwordEncoder.encode(generatedPassword);
+        }
+    }
+
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateMemberPasswordRequestDTO {
+        private String email;
+        private String oldPassword;
+        private String newPassword;
+
+        public void encrypt(PasswordEncoder passwordEncoder) {
+            this.oldPassword = passwordEncoder.encode(oldPassword);
+            this.newPassword = passwordEncoder.encode(newPassword);
+        }
     }
 }

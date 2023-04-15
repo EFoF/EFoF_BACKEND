@@ -61,19 +61,4 @@ public class MailDTO {
         // 전화번호를 필드로 가지지 않기 때문에 닉네임을 사용했다.
         private String nickname;
     }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateUserPasswordRequestDTO {
-        private Long userId;
-        private String oldPassword;
-        private String newPassword;
-
-        public void encrypt(PasswordEncoder passwordEncoder) {
-            this.oldPassword = passwordEncoder.encode(oldPassword);
-            this.newPassword = passwordEncoder.encode(newPassword);
-        }
-    }
 }

@@ -1,6 +1,5 @@
 package com.service.surveyservice.domain.member.model;
 
-import com.service.surveyservice.domain.member.dto.MailDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.*;
 
@@ -9,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.service.surveyservice.domain.member.dto.MailDTO.*;
+import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
 
 @Entity
 @Getter
@@ -45,9 +45,16 @@ public class Member extends MemberBase {
         return new EncryptEmailDTO(returnEmail);
     }
 
-    public void updatePasswordWithDTO(UpdateUserPasswordRequestDTO updateUserPasswordRequestDTO) {
-        super.updatePassword(updateUserPasswordRequestDTO.getNewPassword());
+    // 비밀번호 찾기를 통해 자동 생성된 비밀번호로 임시 변경할 때 사용됨
+    public void updateToGeneratedPasswordWithDTO(UpdateGeneratedPasswordRequestDTO updateGeneratedPasswordRequestDTO) {
+        super.updatePassword(updateGeneratedPasswordRequestDTO.getGeneratedPassword());
     }
+
+    // 사용자의 비밀번호 변경 요청을 수행할 때 사용됨
+    public void updatePasswordWithDTO(UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
+        super.updatePassword(updateMemberPasswordRequestDTO.getNewPassword());
+    }
+
 
 }
 

@@ -1,6 +1,7 @@
 package com.service.surveyservice.domain.survey.application;
 
 import com.service.surveyservice.domain.member.dao.MemberRepository;
+import com.service.surveyservice.domain.member.exception.member.NotMatchingCurrentMemberAndRequesterException;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.dao.SurveyCustomRepositoryImpl;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
@@ -27,13 +28,17 @@ public class SurveyService {
     private final SurveyRepository surveyRepository;
     private final SurveyCustomRepositoryImpl surveyCustomRepository;
 
-    public SurveyInfoDTO createSurvey(CreateSurveyRequestDTO createSurveyRequestDTO) {
+    public SurveyInfoDTO createSurvey(CreateSurveyRequestDTO createSurveyRequestDTO, long currentMemberId) {
         LocalDateTime openDate = createSurveyRequestDTO.getOpenDate();
         LocalDateTime expireDate = createSurveyRequestDTO.getExpireDate();
         SurveyStatus surveyStatus = SurveyStatus.PRE_RELEASE;
 
         // 요청으로 넘어온 사용자가 존재하는지 확인
         Member member = memberRepository.findById(createSurveyRequestDTO.getAuthor()).orElseThrow(() -> new NotFoundByIdException("사용자"));
+
+        if(member.getId() != currentMemberId) {
+            throw new NotMatchingCurrentMemberAndRequesterException();
+        }
 
         if(expireDate.isEqual(openDate)) {
             throw new ExpireBeforeOpenException("마감 기간과 설문 시작 기간은 같을 수 없습니다.");

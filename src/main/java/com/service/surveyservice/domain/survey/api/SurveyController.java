@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.survey.api;
 import com.service.surveyservice.domain.member.application.MemberService;
 import com.service.surveyservice.domain.survey.application.SurveyService;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
+import com.service.surveyservice.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,8 @@ public class SurveyController {
 
     @PostMapping(value = "/form")
     public ResponseEntity<SurveyInfoDTO> createSurvey(@RequestBody CreateSurveyRequestDTO createSurveyRequestDTO) {
-        SurveyInfoDTO surveyInfoDTO = surveyService.createSurvey(createSurveyRequestDTO);
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        SurveyInfoDTO surveyInfoDTO = surveyService.createSurvey(createSurveyRequestDTO, currentMemberId);
         return new ResponseEntity<>(surveyInfoDTO, HttpStatus.CREATED);
     }
 }

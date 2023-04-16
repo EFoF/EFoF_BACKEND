@@ -5,12 +5,15 @@ import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberSurvey;
 import com.service.surveyservice.domain.model.BaseTimeEntity;
 import com.service.surveyservice.domain.section.model.Section;
+import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 
 @Entity
 @Getter
@@ -51,4 +54,18 @@ public class Survey extends BaseTimeEntity {
     private LocalDateTime openDate;
 
     private LocalDateTime expireDate;
+
+    @Builder
+    public Survey(Long id, Member author, String title, String description, String sImageURL, String pointColor, SurveyStatus surveyStatus, LocalDateTime openDate, LocalDateTime expireDate) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.openDate = openDate;
+        this.sImageURL = sImageURL;
+        this.expireDate = expireDate;
+        this.pointColor = pointColor;
+        this.description = description;
+        this.surveyStatus = surveyStatus;
+    }
+
 }

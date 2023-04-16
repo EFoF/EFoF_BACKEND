@@ -1,4 +1,4 @@
-package com.service.surveyservice.domain.member.exception.member;
+package com.service.surveyservice.domain.member.exception.exceptions.member;
 
 public class UserNotFoundByUsernameAndNickname extends IllegalArgumentException {
     public UserNotFoundByUsernameAndNickname() {

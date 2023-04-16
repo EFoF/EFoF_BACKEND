@@ -3,7 +3,7 @@ package com.service.surveyservice.domain.member.application;
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.dto.MemberDTO.RedunCheckDTO;
-import com.service.surveyservice.domain.member.exception.member.*;
+import com.service.surveyservice.domain.member.exception.exceptions.member.*;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.global.common.constants.RandomCharacters;
 import com.service.surveyservice.global.error.exception.NotFoundByIdException;

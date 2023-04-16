@@ -1,4 +1,4 @@
-package com.service.surveyservice.domain.member.exception.mail;
+package com.service.surveyservice.domain.member.exception.exceptions.mail;
 
 public class EmailCertificationExpireException extends IllegalArgumentException{
     public EmailCertificationExpireException() {

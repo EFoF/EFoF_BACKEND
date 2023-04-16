@@ -1,6 +1,6 @@
 package com.service.surveyservice.domain.member.application;
 
-import com.service.surveyservice.domain.member.exception.mail.EmailCertificationExpireException;
+import com.service.surveyservice.domain.member.exception.exceptions.mail.EmailCertificationExpireException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;

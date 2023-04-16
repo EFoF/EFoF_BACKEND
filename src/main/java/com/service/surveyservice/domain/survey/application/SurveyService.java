@@ -43,6 +43,7 @@ public class SurveyService {
         }
 
         // 오픈 시간이 현재이거나 현재보다 과거라면 suveyStatus를 진행중으로 바꾼다.
+        // 오픈 시간을 과거로 설정할 수 있게 할지는 고민중이다.
         if(LocalDateTime.now().isAfter(openDate)) {
             surveyStatus = SurveyStatus.IN_PROGRESS;
         }

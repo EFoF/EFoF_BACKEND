@@ -33,6 +33,7 @@ public class MemberController {
    // 닉네임 변경
     @PatchMapping(value = "/member/update/nickname")
     public ResponseEntity<String> updateMemberNickname(@RequestBody UpdateNicknameRequestDTO updateNicknameRequestDTO) {
+        // TODO 아이디 조회 로직 추가
         String result = memberService.updateMemberNickname(updateNicknameRequestDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -40,6 +41,7 @@ public class MemberController {
     // 프로필 이미지 변경
     @PatchMapping(value = "/member/update/profile")
     public ResponseEntity<String> updateMemberProfile(@RequestBody UpdateMemberProfileImgRequestDTO updateMemberProfileImgRequestDTO) {
+        // TODO 아이디 조회 로직 추가
         String result = memberService.updateMemberProfileImg(updateMemberProfileImgRequestDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -47,6 +49,7 @@ public class MemberController {
   // 비밀번호 변경
     @PatchMapping(value = "/member/update/password")
     public ResponseEntity<String> updateMemberPassword(@RequestBody UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
+        // TODO 아이디 조회 로직 추가
         String result = memberService.updatePassword(updateMemberPasswordRequestDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

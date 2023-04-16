@@ -45,7 +45,8 @@ public class Survey extends BaseTimeEntity {
 
     private String pointColor;
 
-    private String surveyStatus;
+    @Enumerated(EnumType.STRING)
+    private SurveyStatus surveyStatus;
 
     private LocalDateTime openDate;
 

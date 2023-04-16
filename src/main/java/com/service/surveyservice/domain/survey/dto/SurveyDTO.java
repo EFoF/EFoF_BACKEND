@@ -1,6 +1,7 @@
 package com.service.surveyservice.domain.survey.dto;
 
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
@@ -46,14 +47,23 @@ public class SurveyDTO {
     @Getter
     @Builder
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class SurveyInfoDTO {
         private String title;
         private String description;
         private Long author;
         private String surveyImageUrl;
-        private String pointColor;
+//        private String pointColor;
         private SurveyStatus surveyStatus;
         // 개봉, 마감일 포함할까 고민 중
+
+        @QueryProjection
+        public SurveyInfoDTO(String title, String description, Long author, String surveyImageUrl, SurveyStatus surveyStatus) {
+            this.title = title;
+            this.description = description;
+            this.author = author;
+            this.surveyImageUrl = surveyImageUrl;
+//            this.pointColor = pointColor;
+            this.surveyStatus = surveyStatus;
+        }
     }
 }

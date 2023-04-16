@@ -82,7 +82,7 @@ public class MemberService {
 
     // 비밀번호 변경
     @Transactional
-    public String updatePassword(UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO, long currentMemberId) {
+    public String updatePassword(UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO, Long currentMemberId) {
         String email = updateMemberPasswordRequestDTO.getEmail();
         String oldPassword = updateMemberPasswordRequestDTO.getOldPassword();
         String newPassword = updateMemberPasswordRequestDTO.getNewPassword();
@@ -91,7 +91,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
         // 요청자와 변경할 비밀번호의 주인이 다르다면 예외 발생
-        if(member.getId() != currentMemberId) {
+        if(!member.getId().equals(currentMemberId)) {
             throw new NotMatchingCurrentMemberAndRequesterException();
         }
 
@@ -112,14 +112,14 @@ public class MemberService {
     }
 
     @Transactional
-    public String updateMemberNickname(UpdateNicknameRequestDTO updateNicknameRequestDTO, long currentMemberId) {
+    public String updateMemberNickname(UpdateNicknameRequestDTO updateNicknameRequestDTO, Long currentMemberId) {
         String email = updateNicknameRequestDTO.getEmail();
         String oldNickname = updateNicknameRequestDTO.getOldNickname();
         String newNickname = updateNicknameRequestDTO.getNewNickname();
 
         Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
-        if(member.getId() != currentMemberId) {
+        if(!member.getId().equals(currentMemberId)) {
             throw new NotMatchingCurrentMemberAndRequesterException();
         }
 
@@ -138,11 +138,11 @@ public class MemberService {
     }
 
     @Transactional
-    public String updateMemberProfileImg(UpdateMemberProfileImgRequestDTO updateMemberProfileImgRequestDTO, long currentMemberId) {
+    public String updateMemberProfileImg(UpdateMemberProfileImgRequestDTO updateMemberProfileImgRequestDTO, Long currentMemberId) {
         String email = updateMemberProfileImgRequestDTO.getEmail();
         String newProfileImg = updateMemberProfileImgRequestDTO.getNewProfileImg();
         Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-        if(member.getId() != currentMemberId) {
+        if(!member.getId().equals(currentMemberId)) {
             throw new NotMatchingCurrentMemberAndRequesterException();
         }
         // 프로필 이미지 변경
@@ -152,7 +152,7 @@ public class MemberService {
 
     // 마이페이지용 사용자 세부 정보 조회
     @Transactional(readOnly = true)
-    public MemberDetail getMemberDetail(long id, long currentMemberId) {
+    public MemberDetail getMemberDetail(long id, Long currentMemberId) {
         log.error("아이디" + id);
         if(id != currentMemberId) {
             throw new NotMatchingCurrentMemberAndRequesterException();

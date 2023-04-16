@@ -1,6 +1,6 @@
 package com.service.surveyservice.domain.member.application;
 
-import com.service.surveyservice.domain.member.exception.mail.EmailCertificationExpireException;
+import com.service.surveyservice.domain.member.exception.exceptions.mail.EmailCertificationExpireException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -50,7 +50,7 @@ public class EmailCertificationService {
         msg += "</div>";
 
         message.setText(msg, "utf-8", "html");
-        message.setFrom(new InternetAddress("oldstyle4@naver.com", "COKIRI_admin"));
+        message.setFrom(new InternetAddress("oldstyle4@naver.com", "DOKSEOL_admin"));
         return message;
     }
 

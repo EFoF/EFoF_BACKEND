@@ -36,6 +36,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         sendResponse(response, authException);
     }
 
+    // 애플리케이션 내에서 쓰이는 예외는 모두 여기서 핸들링이 되어야 한다.
     private void sendResponse(HttpServletResponse response, AuthenticationException authenticationException) throws IOException {
         String result;
         if(authenticationException instanceof BadCredentialsException) {

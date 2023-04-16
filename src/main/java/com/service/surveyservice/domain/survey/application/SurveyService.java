@@ -13,9 +13,14 @@ import com.service.surveyservice.global.common.constants.ResponseConstants;
 import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 
@@ -60,11 +65,22 @@ public class SurveyService {
         return SurveyInfoDTO.builder()
                 .surveyImageUrl(createSurveyRequestDTO.getSurveyImageUrl())
                 .description(createSurveyRequestDTO.getDescription())
-                .pointColor(createSurveyRequestDTO.getPointColor())
+//                .pointColor(createSurveyRequestDTO.getPointColor())
                 .title(createSurveyRequestDTO.getTitle())
                 .surveyStatus(surveyStatus)
                 .author(member.getId())
                 .build();
 
+    }
+
+    public Page<SurveyInfoDTO> getAuthorSurveyList(Long memberId, Long currentMemberId, Pageable pageable) {
+        // 아이디 검증
+        if(!memberId.equals(currentMemberId)) {
+            throw new NotMatchingCurrentMemberAndRequesterException();
+        }
+        Page<SurveyInfoDTO> surveyInfoDTOPage = surveyCustomRepository.findSurveyInfoDTOByAuthorId(memberId, pageable);
+        List<SurveyInfoDTO> resultList = new ArrayList<>();
+//        return new PageImpl<>(resultList, pageable, surveyInfoDTOPage.getTotalElements());
+        return surveyInfoDTOPage;
     }
 }

@@ -50,7 +50,7 @@ public class EmailCertificationService {
         msg += "</div>";
 
         message.setText(msg, "utf-8", "html");
-        message.setFrom(new InternetAddress("oldstyle4@naver.com", "COKIRI_admin"));
+        message.setFrom(new InternetAddress("oldstyle4@naver.com", "DOKSEOL_admin"));
         return message;
     }
 

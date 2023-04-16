@@ -7,6 +7,7 @@ import com.service.surveyservice.domain.member.dto.MemberDTO;
 import com.service.surveyservice.domain.survey.application.SurveyService;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
+import com.service.surveyservice.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,37 +34,38 @@ public class MemberController {
    // 닉네임 변경
     @PatchMapping(value = "/member/update/nickname")
     public ResponseEntity<String> updateMemberNickname(@RequestBody UpdateNicknameRequestDTO updateNicknameRequestDTO) {
-        // TODO 아이디 조회 로직 추가
-        String result = memberService.updateMemberNickname(updateNicknameRequestDTO);
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        String result = memberService.updateMemberNickname(updateNicknameRequestDTO, currentMemberId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     // 프로필 이미지 변경
     @PatchMapping(value = "/member/update/profile")
     public ResponseEntity<String> updateMemberProfile(@RequestBody UpdateMemberProfileImgRequestDTO updateMemberProfileImgRequestDTO) {
-        // TODO 아이디 조회 로직 추가
-        String result = memberService.updateMemberProfileImg(updateMemberProfileImgRequestDTO);
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        String result = memberService.updateMemberProfileImg(updateMemberProfileImgRequestDTO, currentMemberId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
   // 비밀번호 변경
     @PatchMapping(value = "/member/update/password")
     public ResponseEntity<String> updateMemberPassword(@RequestBody UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
-        // TODO 아이디 조회 로직 추가
-        String result = memberService.updatePassword(updateMemberPasswordRequestDTO);
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        String result = memberService.updatePassword(updateMemberPasswordRequestDTO, currentMemberId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
    // 특정 사용자 정보 조회
    @GetMapping(value = "/member/{memberId}")
     public ResponseEntity<MemberDetail> getMemberDetail(@PathVariable long memberId) {
-       return new ResponseEntity<>(memberService.getMemberDetail(memberId), HttpStatus.OK);
+       Long currentMemberId = SecurityUtil.getCurrentMemberId();
+       return new ResponseEntity<>(memberService.getMemberDetail(memberId, currentMemberId), HttpStatus.OK);
    }
 
    // 특정 사용자가 생성한 설문조사 조회 - 페이지네이션 적용
 //    @GetMapping(value = "/member/form/author/{memberId}")
 //    public ResponseEntity<Page<SurveyInfoDTO>> getAuthorSurveyInfo(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
-//
+//        Long currentMemberId = SecurityUtil.getCurrentMemberId();
 //    }
 
 }

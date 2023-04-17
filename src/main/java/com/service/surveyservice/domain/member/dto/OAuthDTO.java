@@ -21,4 +21,21 @@ public class OAuthDTO {
         private String picture;
         private String locale;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GoogleLoginRequestDTO {
+        private String email;
+        private String name;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GoogleTokenDTO {
+        private String token;
+    }
 }

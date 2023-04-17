@@ -26,6 +26,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     private void sendResponse(HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
+        log.error("JwtAccessDeniedHandler 에서 sendResponse 실행됨");
         String result = objectMapper.writeValueAsString(new ErrorResponse(HttpStatus.FORBIDDEN, accessDeniedException.getMessage()));
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");

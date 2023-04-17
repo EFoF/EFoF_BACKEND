@@ -30,8 +30,8 @@ public class Member extends MemberBase {
     private List<Survey> surveys = new ArrayList<>();
 
     @Builder
-    public Member(Long id, String password, String email, String username, String organization, String organizationDetail, String nickname, String mImageURL) {
-        super(id, password, email, username, organization, organizationDetail, Authority.ROLE_USER);
+    public Member(Long id, String password, String email, String username, String organization, String organizationDetail, String nickname, String mImageURL, MemberLoginType memberLoginType) {
+        super(id, password, email, username, organization, organizationDetail, Authority.ROLE_USER, memberLoginType);
         this.nickname = nickname;
         this.mImageURL = "https://cdn-icons-png.flaticon.com/128/7178/7178514.png";
     }

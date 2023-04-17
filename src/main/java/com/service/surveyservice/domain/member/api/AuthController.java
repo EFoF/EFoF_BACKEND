@@ -3,8 +3,10 @@ package com.service.surveyservice.domain.member.api;
 import com.service.surveyservice.domain.member.application.AuthService;
 import com.service.surveyservice.domain.member.application.EmailCertificationService;
 import com.service.surveyservice.domain.member.application.MemberService;
+import com.service.surveyservice.domain.member.application.OAuth2UserService;
 import com.service.surveyservice.domain.member.dto.MailDTO;
 import com.service.surveyservice.domain.member.dto.MemberDTO;
+import com.service.surveyservice.domain.member.dto.OAuthDTO;
 import com.service.surveyservice.domain.token.dto.TokenDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.service.surveyservice.domain.member.dto.MailDTO.*;
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
+import static com.service.surveyservice.domain.member.dto.OAuthDTO.*;
 import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
 import static com.service.surveyservice.global.common.constants.AuthenticationConstants.LOGOUT;
 
@@ -27,6 +30,7 @@ public class AuthController {
     private final AuthService authService;
     private final MemberService memberService;
     private final EmailCertificationService emailCertificationService;
+    private final OAuth2UserService oAuth2UserService;
 
     @PostMapping(value = "/auth/signup")
     public ResponseEntity<String> signup(@RequestBody SignUpRequest signUpRequest) {
@@ -36,6 +40,11 @@ public class AuthController {
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MemberLoginDTO> loginJson (@RequestBody LoginRequestDTO loginRequestDTO) {
         return new ResponseEntity<>(authService.login(loginRequestDTO), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/auth/google_login")
+    public ResponseEntity<MemberLoginDTO> googleLogin(@RequestBody GoogleLoginRequestDTO googleLoginRequestDTO) {
+        return new ResponseEntity<>(oAuth2UserService.googleLogin(googleLoginRequestDTO), HttpStatus.OK);
     }
 
     // 이메일 중복 확인

@@ -22,5 +22,5 @@ Dependencies : Lombok / Spring Web / Spring Data JPA / MySQL Driver
 
 ## 도메인 ERD
 
-![image](https://user-images.githubusercontent.com/82303989/230872566-dbb2f04d-3b3c-4471-8cd0-3c325d7dfcaa.png)
+![image](https://user-images.githubusercontent.com/82303989/232641239-a0b7b49c-404f-4ee2-9461-4e4c429b78df.png)
 

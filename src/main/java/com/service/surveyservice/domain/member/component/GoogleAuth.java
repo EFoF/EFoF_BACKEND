@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 import static com.service.surveyservice.domain.member.dto.OAuthDTO.*;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class GoogleAuth {
 

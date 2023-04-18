@@ -30,8 +30,11 @@ public class Survey extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member author;
 
-    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Section> sections = new ArrayList<>();
+//    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+//    private List<Section> sections = new ArrayList<>();
+
+    @OneToOne(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private Section section;
 
     // FetchType.EAGER 고민중
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)

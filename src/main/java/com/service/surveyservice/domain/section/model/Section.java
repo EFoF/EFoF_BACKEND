@@ -25,7 +25,7 @@ public class Section {
     @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Section> child = new ArrayList<>();
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "survey_id")
     private Survey survey;
 

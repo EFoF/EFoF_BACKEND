@@ -22,9 +22,8 @@ public class OAuth2UserService {
     private final GoogleAuth googleAuth;
     private final AuthService authService;
     private final MemberRepository memberRepository;
-
     @Value("${spring.OAuth2.google.client_password}")
-    private final String CLIENT_PW;
+    private String CLIENT_PW;
 
     @Transactional
     public MemberLoginDTO googleLogin(GoogleLoginRequestDTO googleLoginRequestDTO) {
@@ -39,7 +38,7 @@ public class OAuth2UserService {
                     .email(googleLoginRequestDTO.getEmail())
                     .userName(googleLoginRequestDTO.getName())
                     .memberLoginType(MemberLoginType.GOOGLE)
-                    .nickname("독수리 회원 " + Long.toString(System.currentTimeMillis()))
+                    .nickname("독수리 회원 " + System.currentTimeMillis())
                     .password(CLIENT_PW)
                     .build();
             authService.signUp(signUpRequest);

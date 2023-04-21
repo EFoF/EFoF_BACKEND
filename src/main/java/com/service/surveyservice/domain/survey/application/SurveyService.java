@@ -7,6 +7,7 @@ import com.service.surveyservice.domain.survey.dao.SurveyCustomRepositoryImpl;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.dto.MemberSurveyDTO;
 import com.service.surveyservice.domain.survey.exception.ExpireBeforeOpenException;
+import com.service.surveyservice.domain.survey.exception.SurveyConvertException;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import com.service.surveyservice.global.error.exception.NotFoundByIdException;
@@ -86,12 +87,14 @@ public class SurveyService {
     public Page<SurveyInfoDTO> getParticipatedSurveyInfo(Page<MemberSurveyInfoDTO> infoPage) {
         Page<SurveyInfoDTO> surveyInfoDTOPage = infoPage.map(element -> {
             Long id = element.getId();
-
-        })
+            return _findSurveyInfoById(id);
+        });
+        return surveyInfoDTOPage;
     }
 
     // 내부적으로 사용되는 메서드. id로 SurveyInfoDTO를 찾아온다.
-    private SurveyInfoDTO _findSurveyInfoById (Long suveyId) {
-
+    private SurveyInfoDTO _findSurveyInfoById (Long surveyId) {
+        SurveyInfoDTO surveyInfoDTO = surveyRepository.findSurveyInfoDTOById(surveyId).orElseThrow(SurveyConvertException::new);
+        return surveyInfoDTO;
     }
 }

@@ -11,7 +11,7 @@ import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 
 public interface SurveyRepository extends JpaRepository<Survey, Long>, SurveyCustomRepository {
 
-    @Query("SELECT new com.service.surveyservice.domain.survey.dto.SurveyDTO.SurveyInfoDTO(s.title, s.description, s.author.id, s.sImageURL, s.surveyStatus)" +
-            "FROM Survey s WHERE s.id = :id")
+    @Query(value = "SELECT new com.service.surveyservice.domain.survey.dto.SurveyDTO.SurveyInfoDTO(s.title, s.description, s.author.id, s.sImageURL, s.surveyStatus)" +
+            "FROM Survey s WHERE s.id = :id", nativeQuery = true)
     Optional<SurveyInfoDTO> findSurveyInfoDTOById(Long id);
 }

@@ -76,8 +76,6 @@ public class SurveyService {
             throw new NotMatchingCurrentMemberAndRequesterException();
         }
         Page<SurveyInfoDTO> surveyInfoDTOPage = surveyCustomRepository.findSurveyInfoDTOByAuthorId(memberId, pageable);
-        List<SurveyInfoDTO> resultList = new ArrayList<>();
-//        return new PageImpl<>(resultList, pageable, surveyInfoDTOPage.getTotalElements());
         return surveyInfoDTOPage;
     }
 }

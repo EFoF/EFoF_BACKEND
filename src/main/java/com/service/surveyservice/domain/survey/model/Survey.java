@@ -2,18 +2,14 @@ package com.service.surveyservice.domain.survey.model;
 
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
 import com.service.surveyservice.domain.member.model.Member;
-import com.service.surveyservice.domain.member.model.MemberSurvey;
 import com.service.surveyservice.domain.model.BaseTimeEntity;
 import com.service.surveyservice.domain.section.model.Section;
-import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 
 @Entity
 @Getter

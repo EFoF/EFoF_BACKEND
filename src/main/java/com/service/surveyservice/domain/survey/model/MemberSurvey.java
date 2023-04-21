@@ -1,6 +1,7 @@
-package com.service.surveyservice.domain.member.model;
+package com.service.surveyservice.domain.survey.model;
 
 import com.service.surveyservice.domain.answer.model.Answer;
+import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

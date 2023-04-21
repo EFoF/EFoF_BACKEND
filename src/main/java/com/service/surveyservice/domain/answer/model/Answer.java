@@ -1,6 +1,6 @@
 package com.service.surveyservice.domain.answer.model;
 
-import com.service.surveyservice.domain.member.model.MemberSurvey;
+import com.service.surveyservice.domain.survey.model.MemberSurvey;
 import com.service.surveyservice.domain.model.BaseTimeEntity;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;

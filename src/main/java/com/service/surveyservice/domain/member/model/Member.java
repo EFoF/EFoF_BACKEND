@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.member.model;
 
+import com.service.surveyservice.domain.survey.model.MemberSurvey;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.*;
 

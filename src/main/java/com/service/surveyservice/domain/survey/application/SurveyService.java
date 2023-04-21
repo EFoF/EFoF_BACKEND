@@ -5,6 +5,7 @@ import com.service.surveyservice.domain.member.exception.exceptions.member.NotMa
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.dao.SurveyCustomRepositoryImpl;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
+import com.service.surveyservice.domain.survey.dto.MemberSurveyDTO;
 import com.service.surveyservice.domain.survey.exception.ExpireBeforeOpenException;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
@@ -12,6 +13,7 @@ import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.service.surveyservice.domain.survey.dto.MemberSurveyDTO.*;
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 
 @Slf4j
@@ -77,5 +80,18 @@ public class SurveyService {
         }
         Page<SurveyInfoDTO> surveyInfoDTOPage = surveyCustomRepository.findSurveyInfoDTOByAuthorId(memberId, pageable);
         return surveyInfoDTOPage;
+    }
+
+    // MemberSurveyService에서 받아온 MemberSurveyInfoDTO의 page를 api에서 사용하기 위해 SurveyInfoDTO로 변환 시켜주는 작업
+    public Page<SurveyInfoDTO> getParticipatedSurveyInfo(Page<MemberSurveyInfoDTO> infoPage) {
+        Page<SurveyInfoDTO> surveyInfoDTOPage = infoPage.map(element -> {
+            Long id = element.getId();
+
+        })
+    }
+
+    // 내부적으로 사용되는 메서드. id로 SurveyInfoDTO를 찾아온다.
+    private SurveyInfoDTO _findSurveyInfoById (Long suveyId) {
+
     }
 }

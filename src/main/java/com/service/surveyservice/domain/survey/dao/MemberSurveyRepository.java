@@ -14,8 +14,8 @@ import static com.service.surveyservice.domain.survey.dto.MemberSurveyDTO.*;
 public interface MemberSurveyRepository extends JpaRepository<MemberSurvey, Long>, MemberSurveyCustomRepository {
 
     Optional<MemberSurvey> findById(Long id);
-    @Query("SELECT new com.service.surveyservice.domain.survey.dto.MemberSurveyDTO.MemberSurveyInfoDTO(ms.id, ms.member.id, ms.survey.id)" +
-            "FROM MemberSurvey ms WHERE ms.member.id = :id")
+    @Query(value = "SELECT new com.service.surveyservice.domain.survey.dto.MemberSurveyDTO.MemberSurveyInfoDTO(ms.id, ms.member.id, ms.survey.id)" +
+            "FROM MemberSurvey ms WHERE ms.member.id = :id", nativeQuery = true)
     List<MemberSurveyInfoDTO> findByMemberId(Long id);
     List<MemberSurvey> findBySurveyId(Long id);
 }

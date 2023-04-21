@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.survey.application;
 
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
+import com.service.surveyservice.domain.member.exception.exceptions.member.NotMatchingCurrentMemberAndRequesterException;
 import com.service.surveyservice.domain.survey.dao.MemberSurveyCustomRepositoryImpl;
 import com.service.surveyservice.domain.survey.dao.MemberSurveyRepository;
 import com.service.surveyservice.domain.survey.dao.SurveyCustomRepositoryImpl;
@@ -37,11 +38,17 @@ public class MemberSurveyService {
      */
 
     // 페이지네이션을 지원하는 참여 설문 조회
-    public Page<MemberSurveyInfoDTO> getInfoWithoutPage(Long currentMemberId, Pageable pageable) {
+    public Page<MemberSurveyInfoDTO> getInfoPagination(Long requesterId, Long currentMemberId,Pageable pageable) {
+        if(!requesterId.equals(currentMemberId)) {
+            throw new NotMatchingCurrentMemberAndRequesterException();
+        }
         return memberSurveyCustomRepository.findByMemberIdWithPage(currentMemberId, pageable);
     }
 
-    public List<MemberSurveyInfoDTO> getInfoAll(Long currentMemberId) {
+    public List<MemberSurveyInfoDTO> getInfoAll(Long requesterId, Long currentMemberId) {
+        if(!requesterId.equals(currentMemberId)) {
+            throw new NotMatchingCurrentMemberAndRequesterException();
+        }
         return memberSurveyRepository.findByMemberId(currentMemberId);
     }
 }

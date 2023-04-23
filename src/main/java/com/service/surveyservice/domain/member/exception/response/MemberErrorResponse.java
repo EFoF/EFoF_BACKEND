@@ -40,4 +40,9 @@ public class MemberErrorResponse {
             .status(HttpStatus.CONFLICT)
             .message("요청자와 현재 사용자가 일치하지 않습니다.")
             .build(), HttpStatus.CONFLICT);
+
+    public static final ResponseEntity<ErrorResponse> DUPLICATED_SIGN_UP = new ResponseEntity<>(ErrorResponse.builder()
+            .status(HttpStatus.CONFLICT)
+            .message("이미 연동이 완료된 계정입니다.")
+            .build(), HttpStatus.CONFLICT);
 }

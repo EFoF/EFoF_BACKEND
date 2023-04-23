@@ -6,6 +6,7 @@ import com.service.surveyservice.domain.member.exception.exceptions.member.Dupli
 import com.service.surveyservice.domain.member.model.Authority;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberLoginType;
+import com.service.surveyservice.domain.member.model.UserPrincipal;
 import com.service.surveyservice.global.oauth.OAuth2UserInfo;
 import com.service.surveyservice.global.oauth.OAuth2UserInfoFactory;
 import lombok.AllArgsConstructor;
@@ -34,24 +35,22 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService oAuth2UserService = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
+        // 위 코드 2줄로 리소스 서버(구글, 네이버, ...)로부터 유저 정보를 받아왔다.
 
         MemberLoginType memberLoginType = MemberLoginType.LabelToValue(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
-        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
-                .getUserInfoEndpoint().getUserNameAttributeName();
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(memberLoginType.getType(), oAuth2User.getAttributes());
 
-        Optional<Member> optionalMember = memberRepository.findByEmail(userInfo.getEmail());
-        if(optionalMember.isPresent()) {
-            Member member = optionalMember.get();
+        Member member = memberRepository.findByEmailForOAuth(userInfo.getEmail());
+        if(member != null) {
             if(memberLoginType != member.getMemberLoginType()) {
                 throw new DuplicatedSignUpException(member.getMemberLoginType().getType() + "계정으로 회원가입 되어있습니다.");
             }
         } else {
-
+            // 사용자가 없으면 바로 가입시킨다.
+             member = createMember(userInfo, memberLoginType);
         }
 
-
-        return null;
+        return UserPrincipal.create(member, userInfo.getAttributes());
     }
 
     private Member createMember(OAuth2UserInfo memberInfo, MemberLoginType memberLoginType) {
@@ -65,7 +64,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .email(memberInfo.getEmail())
                 .password(password)
                 .build();
-        return member;
+
+        return memberRepository.save(member);
     }
 
 }

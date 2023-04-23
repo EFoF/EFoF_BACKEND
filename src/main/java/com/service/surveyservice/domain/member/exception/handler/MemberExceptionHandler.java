@@ -55,4 +55,10 @@ public class MemberExceptionHandler {
         log.error(request.getDescription(false));
         return NOT_MATCHING_CURRENT_MEMBER_AND_REQUESTER;
     }
+
+    @ExceptionHandler(DuplicatedSignUpException.class)
+    protected final ResponseEntity<ErrorResponse> handleDuplicatedSignUpException(DuplicatedSignUpException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return DUPLICATED_SIGN_UP;
+    }
 }

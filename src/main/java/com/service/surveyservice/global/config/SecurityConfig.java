@@ -1,5 +1,6 @@
 package com.service.surveyservice.global.config;
 
+import com.service.surveyservice.domain.member.application.CustomOAuth2UserService;
 import com.service.surveyservice.global.jwt.CustomLogoutSuccessHandler;
 import com.service.surveyservice.global.jwt.JwtAccessDeniedHandler;
 import com.service.surveyservice.global.jwt.JwtAuthenticationEntryPoint;
@@ -29,6 +30,7 @@ public class SecurityConfig {
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final RedisTemplate<String, String> redisTemplate;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -44,6 +46,7 @@ public class SecurityConfig {
                 .cors().configurationSource(corsConfigurationSource());
         http
                 .exceptionHandling()
+                // 인증, 인가되지 않은 요청 시 발생
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
 
@@ -74,10 +77,26 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/logout-redirect")
                 .clearAuthentication(true)
-                .logoutSuccessHandler(customLogoutSuccessHandler);
+                .logoutSuccessHandler(customLogoutSuccessHandler)
+
+                .and()
+                .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorization")
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
+                .successHandler()
 
         return http.build();
     }
+
+    @Bean
+    public OAuth2AuthenticationSuccessHandler
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

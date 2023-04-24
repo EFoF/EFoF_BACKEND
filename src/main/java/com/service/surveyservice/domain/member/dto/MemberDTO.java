@@ -2,11 +2,15 @@ package com.service.surveyservice.domain.member.dto;
 
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.service.surveyservice.domain.member.model.Authority;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.member.model.MemberLoginType;
 import lombok.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
 
@@ -30,7 +34,11 @@ public class MemberDTO {
 
         private String organizationDetail;
 
+        @Enumerated(value = EnumType.STRING)
         private MemberLoginType memberLoginType;
+
+        @Enumerated(value = EnumType.STRING)
+        private Authority authority;
 
         public void encrypt(PasswordEncoder passwordEncoder) {
             this.password = passwordEncoder.encode(password);
@@ -43,6 +51,7 @@ public class MemberDTO {
                     .password(password)
                     .username(userName)
                     .nickname(nickname)
+                    .authority(authority)
                     .organization(organization)
                     .organizationDetail(organizationDetail)
                     .build();

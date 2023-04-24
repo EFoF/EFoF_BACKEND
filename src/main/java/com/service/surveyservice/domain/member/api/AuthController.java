@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import static com.service.surveyservice.domain.member.dto.MailDTO.*;
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
 import static com.service.surveyservice.domain.member.dto.OAuthDTO.*;
@@ -38,8 +41,8 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MemberLoginDTO> loginJson (@RequestBody LoginRequestDTO loginRequestDTO) {
-        return new ResponseEntity<>(authService.login(loginRequestDTO), HttpStatus.OK);
+    public ResponseEntity<MemberLoginDTO> loginJson (@RequestBody LoginRequestDTO loginRequestDTO, HttpServletRequest request, HttpServletResponse response) {
+        return new ResponseEntity<>(authService.login(loginRequestDTO, request, response), HttpStatus.OK);
     }
 
     @PostMapping(value = "/auth/google_login")

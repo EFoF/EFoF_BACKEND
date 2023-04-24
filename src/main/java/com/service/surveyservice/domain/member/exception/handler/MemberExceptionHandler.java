@@ -61,4 +61,10 @@ public class MemberExceptionHandler {
         log.error(request.getDescription(false));
         return DUPLICATED_SIGN_UP;
     }
+
+    @ExceptionHandler(InvalidEmailAndPasswordRequestException.class)
+    protected final ResponseEntity<ErrorResponse> handleInvalidEmailAndPasswordRequestException(InvalidEmailAndPasswordRequestException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return INVALID_EMAIL_AND_PASSWORD_REQUEST;
+    }
 }

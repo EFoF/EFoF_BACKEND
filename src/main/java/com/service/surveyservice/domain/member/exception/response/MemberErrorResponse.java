@@ -45,4 +45,9 @@ public class MemberErrorResponse {
             .status(HttpStatus.CONFLICT)
             .message("이미 연동이 완료된 계정입니다.")
             .build(), HttpStatus.CONFLICT);
+
+    public static final ResponseEntity<ErrorResponse> INVALID_EMAIL_AND_PASSWORD_REQUEST = new ResponseEntity<>(ErrorResponse.builder()
+            .status(HttpStatus.BAD_REQUEST)
+            .message("아이디 또는 비밀번호가 일치하지 않습니다.")
+            .build(), HttpStatus.BAD_REQUEST);
 }

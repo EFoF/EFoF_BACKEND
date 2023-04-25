@@ -60,4 +60,9 @@ public class MemberErrorResponse {
             .status(HttpStatus.GONE)
             .message("유효하지 않은 refresh token입니다.")
             .build(), HttpStatus.GONE);
+
+    public static final ResponseEntity<ErrorResponse> DUPLICATED_EMAIL = new ResponseEntity<>(ErrorResponse.builder()
+            .status(HttpStatus.CONFLICT)
+            .message("다른 사용자가 사용 중인 이메일입니다.")
+            .build(), HttpStatus.CONFLICT);
 }

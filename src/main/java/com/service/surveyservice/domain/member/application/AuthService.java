@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.member.application;
 
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
+import com.service.surveyservice.domain.member.exception.exceptions.member.DuplicatedEmailException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidEmailAndPasswordRequestException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidRefreshTokenException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.NotSignInException;
@@ -51,6 +52,9 @@ public class AuthService {
     @Transactional
     public String signUp(SignUpRequest signUpRequest) {
         signUpRequest.encrypt(passwordEncoder);
+        if(memberRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new DuplicatedEmailException();
+        }
         Member member = signUpRequest.toEntity();
         memberRepository.save(member);
         return CREATED;
@@ -63,9 +67,6 @@ public class AuthService {
         try {
             Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(usernamePasswordAuthenticationToken);
             TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authenticate);
-//        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-//        valueOperations.set(tokenInfoDTO.getAccessToken(), tokenInfoDTO.getRefreshToken());
-//        redisTemplate.expire(tokenInfoDTO.getAccessToken(), REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS);
             String refreshToken = tokenInfoDTO.getRefreshToken();
             saveRefreshTokenInStorage(refreshToken, Long.valueOf(authenticate.getName()));
             CookieUtil.deleteCookie(request, response, ACCESS_TOKEN);
@@ -79,21 +80,6 @@ public class AuthService {
             throw new InvalidEmailAndPasswordRequestException();
         }
     }
-
-//    @Transactional
-//    public TokenIssueDTO reissue(AccessTokenDTO accessTokenDTO) {
-//        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-//        String refreshByAccess = valueOperations.get(accessTokenDTO.getAccessToken());
-//        if(refreshByAccess == null) {
-//            throw new ExpiredRefreshTokenException();
-//        }
-//        Authentication authentication = jwtTokenProvider.getAuthentication(accessTokenDTO.getAccessToken());
-//        TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
-//        valueOperations.set(tokenInfoDTO.getAccessToken(), tokenInfoDTO.getRefreshToken());
-//        redisTemplate.expire(tokenInfoDTO.getAccessToken(), REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS);
-//        return tokenInfoDTO.toTokenIssueDTO();
-//    }
-
 
     /**
      *
@@ -137,30 +123,6 @@ public class AuthService {
     }
 
 
-    /**
-     * @param request
-     * @param response
-     * 쿠키를 삭제하고 로그아웃
-     */
-    @Transactional
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
-        String accessToken;
-        if(cookie == null) {
-            throw new NotSignInException();
-        } else {
-            accessToken = cookie.getValue();
-        }
-        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-        if(authentication != null && authentication.isAuthenticated()) {
-            refreshTokenDao.removeRefreshToken(Long.valueOf(authentication.getName()));
-            Cookie deletedCookie = new Cookie(ACCESS_TOKEN, null);
-            deletedCookie.setPath("/");
-            deletedCookie.setMaxAge(0);
-            response.addCookie(deletedCookie);
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-    }
 
     /**
      *

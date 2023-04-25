@@ -31,7 +31,12 @@ public class MemberController {
    private final MemberRepository memberRepository;
    private final MemberCustomRepositoryImpl memberCustomRepository;
 
-   // 닉네임 변경
+    /**
+     *
+     * @param updateNicknameRequestDTO
+     * @return ResponseBody<String>
+     * 닉네임 변경
+     */
     @PatchMapping(value = "/member/update/nickname")
     public ResponseEntity<String> updateMemberNickname(@RequestBody UpdateNicknameRequestDTO updateNicknameRequestDTO) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
@@ -39,7 +44,12 @@ public class MemberController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    // 프로필 이미지 변경
+    /**
+     *
+     * @param updateMemberProfileImgRequestDTO
+     * @return ResponseBody<String>
+     * 프로필 변경
+     */
     @PatchMapping(value = "/member/update/profile")
     public ResponseEntity<String> updateMemberProfile(@RequestBody UpdateMemberProfileImgRequestDTO updateMemberProfileImgRequestDTO) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
@@ -47,7 +57,12 @@ public class MemberController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-  // 비밀번호 변경
+    /**
+     *
+     * @param updateMemberPasswordRequestDTO
+     * @return ResponseBody<String>
+     * 비밀번호 변경
+     */
     @PatchMapping(value = "/member/update/password")
     public ResponseEntity<String> updateMemberPassword(@RequestBody UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
@@ -55,14 +70,25 @@ public class MemberController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-   // 특정 사용자 정보 조회
+    /**
+     *
+     * @param memberId
+     * @return ResponseBody<MemberDetail>
+     * 특정 사용자 정보 조회
+     */
    @GetMapping(value = "/member/{memberId}")
     public ResponseEntity<MemberDetail> getMemberDetail(@PathVariable long memberId) {
        Long currentMemberId = SecurityUtil.getCurrentMemberId();
        return new ResponseEntity<>(memberService.getMemberDetail(memberId, currentMemberId), HttpStatus.OK);
    }
 
-   // 특정 사용자가 생성한 설문조사 조회 - 페이지네이션 적용
+    /**
+     *
+     * @param memberId
+     * @param pageable
+     * @return ResponseBody<Page<SurveyInfoDTO>>
+     *  특정 사용자가 생성한 설문조사 조회 - 페이지네이션 적용
+     */
     @GetMapping(value = "/member/form/author/{memberId}")
     public ResponseEntity<Page<SurveyInfoDTO>> getAuthorSurveyInfo(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();

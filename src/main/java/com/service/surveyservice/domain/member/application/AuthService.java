@@ -67,9 +67,6 @@ public class AuthService {
         try {
             Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(usernamePasswordAuthenticationToken);
             TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authenticate);
-//        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-//        valueOperations.set(tokenInfoDTO.getAccessToken(), tokenInfoDTO.getRefreshToken());
-//        redisTemplate.expire(tokenInfoDTO.getAccessToken(), REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS);
             String refreshToken = tokenInfoDTO.getRefreshToken();
             saveRefreshTokenInStorage(refreshToken, Long.valueOf(authenticate.getName()));
             CookieUtil.deleteCookie(request, response, ACCESS_TOKEN);
@@ -83,21 +80,6 @@ public class AuthService {
             throw new InvalidEmailAndPasswordRequestException();
         }
     }
-
-//    @Transactional
-//    public TokenIssueDTO reissue(AccessTokenDTO accessTokenDTO) {
-//        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-//        String refreshByAccess = valueOperations.get(accessTokenDTO.getAccessToken());
-//        if(refreshByAccess == null) {
-//            throw new ExpiredRefreshTokenException();
-//        }
-//        Authentication authentication = jwtTokenProvider.getAuthentication(accessTokenDTO.getAccessToken());
-//        TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
-//        valueOperations.set(tokenInfoDTO.getAccessToken(), tokenInfoDTO.getRefreshToken());
-//        redisTemplate.expire(tokenInfoDTO.getAccessToken(), REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS);
-//        return tokenInfoDTO.toTokenIssueDTO();
-//    }
-
 
     /**
      *

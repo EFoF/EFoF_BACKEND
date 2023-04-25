@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -89,8 +90,14 @@ public class AuthController {
         return new ResponseEntity<>(returnPasswordDTO, HttpStatus.OK);
     }
 
+//    @PostMapping(value = "/logout")
+//    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+//        authService.logout(request, response);
+//        return new ResponseEntity<>(null, HttpStatus.OK);
+//    }
+
     // 로그아웃 리디렉션
-    @PostMapping(value = "/logout-redirect")
+    @GetMapping(value = "/logout-redirect")
     public ResponseEntity<String> loginRedirect() {
         return new ResponseEntity<>(LOGOUT, HttpStatus.OK);
     }

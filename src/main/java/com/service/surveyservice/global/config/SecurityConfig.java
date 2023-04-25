@@ -21,6 +21,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -74,10 +76,12 @@ public class SecurityConfig {
                 .apply(new JwtSecurityConfig(jwtTokenProvider, redisTemplate))
                 .and()
                 .logout()
-                .logoutUrl("/logout")
+                .logoutUrl("/user/logout")
                 .logoutSuccessUrl("/logout-redirect")
-                .clearAuthentication(true)
-                .logoutSuccessHandler(customLogoutSuccessHandler);
+                .deleteCookies(ACCESS_TOKEN);
+//                .clearAuthentication(true)
+//                .logoutSuccessHandler(customLogoutSuccessHandler)
+//                .deleteCookies(ACCESS_TOKEN).permitAll();
 
 //                .and()
 //                .oauth2Login()

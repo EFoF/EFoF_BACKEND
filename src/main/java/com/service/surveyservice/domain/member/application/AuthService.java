@@ -123,30 +123,6 @@ public class AuthService {
     }
 
 
-    /**
-     * @param request
-     * @param response
-     * 쿠키를 삭제하고 로그아웃
-     */
-    @Transactional
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
-        String accessToken;
-        if(cookie == null) {
-            throw new NotSignInException();
-        } else {
-            accessToken = cookie.getValue();
-        }
-        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-        if(authentication != null && authentication.isAuthenticated()) {
-            refreshTokenDao.removeRefreshToken(Long.valueOf(authentication.getName()));
-            Cookie deletedCookie = new Cookie(ACCESS_TOKEN, null);
-            deletedCookie.setPath("/");
-            deletedCookie.setMaxAge(0);
-            response.addCookie(deletedCookie);
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-    }
 
     /**
      *

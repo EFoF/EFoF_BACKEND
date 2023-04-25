@@ -67,4 +67,10 @@ public class MemberExceptionHandler {
         log.error(request.getDescription(false));
         return INVALID_EMAIL_AND_PASSWORD_REQUEST;
     }
+
+    @ExceptionHandler(NotSignInException.class)
+    protected final ResponseEntity<ErrorResponse> handleNotSignInException(NotSignInException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return NOT_SIGN_IN;
+    }
 }

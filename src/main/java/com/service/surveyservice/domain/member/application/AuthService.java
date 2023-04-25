@@ -74,7 +74,7 @@ public class AuthService {
 
             return MemberLoginDTO.builder()
                     .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
-                    .tokenInfo(tokenInfoDTO.toTokenIssueDTO())
+//                    .tokenInfo(tokenInfoDTO.toTokenIssueDTO())
                     .build();
         } catch (BadCredentialsException e) {
             throw new InvalidEmailAndPasswordRequestException();

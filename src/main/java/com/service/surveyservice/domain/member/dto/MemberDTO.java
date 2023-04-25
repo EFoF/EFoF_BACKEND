@@ -81,7 +81,7 @@ public class MemberDTO {
     public static class MemberLoginDTO {
 
         private MemberDetail memberDetail;
-        private TokenIssueDTO tokenInfo;
+//        private TokenIssueDTO tokenInfo;
     }
 
 

@@ -16,6 +16,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
     boolean existsByEmail(String email);
     boolean existsByNickname(String nickname);
 
-    @Query(value = "SELECT m FROM Member m WHERE m.email = :email", nativeQuery = true)
+    @Query(value = "SELECT m FROM Member m WHERE m.email = :email")
     Member findByEmailForOAuth(String email);
 }

@@ -1,10 +1,14 @@
 package com.service.surveyservice.global.config;
 
 import com.service.surveyservice.domain.member.application.CustomOAuth2UserService;
+import com.service.surveyservice.domain.token.dao.RefreshTokenDao;
 import com.service.surveyservice.global.jwt.CustomLogoutSuccessHandler;
 import com.service.surveyservice.global.jwt.JwtAccessDeniedHandler;
 import com.service.surveyservice.global.jwt.JwtAuthenticationEntryPoint;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
+import com.service.surveyservice.global.oauth.handler.OAuth2AuthenticationFailureHandler;
+import com.service.surveyservice.global.oauth.handler.OAuth2AuthenticationSuccessHandler;
+import com.service.surveyservice.global.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +25,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -31,6 +37,7 @@ public class SecurityConfig {
     private final RedisTemplate<String, String> redisTemplate;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final RefreshTokenDao refreshTokenDao;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -68,35 +75,53 @@ public class SecurityConfig {
                 .antMatchers("/logout-redirect").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasRole("USER")
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
 
                 .and()
                 .apply(new JwtSecurityConfig(jwtTokenProvider, redisTemplate))
                 .and()
                 .logout()
-                .logoutUrl("/logout")
+                .logoutUrl("/user/logout")
                 .logoutSuccessUrl("/logout-redirect")
-                .clearAuthentication(true)
-                .logoutSuccessHandler(customLogoutSuccessHandler);
+                .deleteCookies(ACCESS_TOKEN)
 
-//                .and()
-//                .oauth2Login()
-//                .authorizationEndpoint()
-//                .baseUri("/oauth2/authorization")
-//                .and()
-//                .redirectionEndpoint()
-//                .baseUri("/oauth2/callback/*")
-//                .and()
-//                .userInfoEndpoint()
-//                .userService(customOAuth2UserService)
-//                .and()
-//                .successHandler()
+                .and()
+                .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorization")
+                .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository())
+                .and()
+                .redirectionEndpoint()
+//                .baseUri("/auth/social_login/*")
+                .baseUri("/*/oauth2/code/*")
+                .and()
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
+                .successHandler(oAuth2AuthenticationSuccessHandler())
+                .failureHandler(oAuth2AuthenticationFailureHandler());
 
         return http.build();
     }
 
-//    @Bean
-//    public OAuth2AuthenticationSuccessHandler
+    @Bean
+    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandler(
+                jwtTokenProvider,
+                refreshTokenDao,
+                oAuth2AuthorizationRequestBasedOnCookieRepository()
+        );
+    }
+
+    @Bean
+    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+        return new OAuth2AuthenticationFailureHandler(oAuth2AuthorizationRequestBasedOnCookieRepository());
+    }
+
+    @Bean
+    public OAuth2AuthorizationRequestBasedOnCookieRepository oAuth2AuthorizationRequestBasedOnCookieRepository() {
+        return new OAuth2AuthorizationRequestBasedOnCookieRepository();
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

@@ -3,9 +3,12 @@ package com.service.surveyservice.domain.member.application;
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidEmailAndPasswordRequestException;
+import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidRefreshTokenException;
+import com.service.surveyservice.domain.member.exception.exceptions.member.NotSignInException;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.token.dao.RefreshTokenDao;
 import com.service.surveyservice.domain.token.exception.ExpiredRefreshTokenException;
+import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import com.service.surveyservice.global.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +20,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.WebRequest;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -65,7 +71,6 @@ public class AuthService {
             CookieUtil.deleteCookie(request, response, ACCESS_TOKEN);
             CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME);
 
-
             return MemberLoginDTO.builder()
                     .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
                     .tokenInfo(tokenInfoDTO.toTokenIssueDTO())
@@ -75,18 +80,86 @@ public class AuthService {
         }
     }
 
+//    @Transactional
+//    public TokenIssueDTO reissue(AccessTokenDTO accessTokenDTO) {
+//        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+//        String refreshByAccess = valueOperations.get(accessTokenDTO.getAccessToken());
+//        if(refreshByAccess == null) {
+//            throw new ExpiredRefreshTokenException();
+//        }
+//        Authentication authentication = jwtTokenProvider.getAuthentication(accessTokenDTO.getAccessToken());
+//        TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
+//        valueOperations.set(tokenInfoDTO.getAccessToken(), tokenInfoDTO.getRefreshToken());
+//        redisTemplate.expire(tokenInfoDTO.getAccessToken(), REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS);
+//        return tokenInfoDTO.toTokenIssueDTO();
+//    }
+
+
+    /**
+     *
+     * @param request
+     * @param response
+     * 쿠키가 모두 유효하지만 만료되어서 다시 발급받아야 하는 경우 호출
+     */
     @Transactional
-    public TokenIssueDTO reissue(AccessTokenDTO accessTokenDTO) {
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        String refreshByAccess = valueOperations.get(accessTokenDTO.getAccessToken());
-        if(refreshByAccess == null) {
-            throw new ExpiredRefreshTokenException();
+    public void reissue(HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
+        String accessToken;
+        // 쿠키가 없으면 로그인 조차 되어있지 않은 상태
+        if(cookie == null) {
+            throw new NotSignInException();
+        } else {
+            accessToken = cookie.getValue();
         }
-        Authentication authentication = jwtTokenProvider.getAuthentication(accessTokenDTO.getAccessToken());
+        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+        Long memberId = Long.valueOf(authentication.getName());
+        // 1. 사용자가 존재하는지 확인
+        if(!memberRepository.existsById(memberId)) {
+            throw new NotFoundByIdException();
+        }
+        // 2. redis에서 사용자 정보로 refresh token 가져오기
+        String refreshToken = refreshTokenDao.getRefreshToken(memberId);
+        // 쿠키는 있지만 refresh token이 없다면 로그아웃된 사용자
+        // 하지만 로그인이라는 같은 기능을 요구하기 때문에 쿠키가 없을 때와 같은 예외를 발생시키겠음
+        if(refreshToken == null) {
+            throw new NotSignInException();
+        }
+        // 3. refresh token 검증
+        if(jwtTokenProvider.validateToken(refreshToken)) {
+            throw new InvalidRefreshTokenException();
+        }
+        // 4. 새로운 토큰 생성
         TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
-        valueOperations.set(tokenInfoDTO.getAccessToken(), tokenInfoDTO.getRefreshToken());
-        redisTemplate.expire(tokenInfoDTO.getAccessToken(), REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS);
-        return tokenInfoDTO.toTokenIssueDTO();
+        // 5. 저장소에 저장
+        saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
+        // 6. 토큰 발급
+        CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME);
+    }
+
+
+    /**
+     * @param request
+     * @param response
+     * 쿠키를 삭제하고 로그아웃
+     */
+    @Transactional
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
+        String accessToken;
+        if(cookie == null) {
+            throw new NotSignInException();
+        } else {
+            accessToken = cookie.getValue();
+        }
+        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+        if(authentication != null && authentication.isAuthenticated()) {
+            refreshTokenDao.removeRefreshToken(Long.valueOf(authentication.getName()));
+            Cookie deletedCookie = new Cookie(ACCESS_TOKEN, null);
+            deletedCookie.setPath("/");
+            deletedCookie.setMaxAge(0);
+            response.addCookie(deletedCookie);
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
     }
 
     /**

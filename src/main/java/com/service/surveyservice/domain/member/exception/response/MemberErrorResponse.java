@@ -50,4 +50,14 @@ public class MemberErrorResponse {
             .status(HttpStatus.BAD_REQUEST)
             .message("아이디 또는 비밀번호가 일치하지 않습니다.")
             .build(), HttpStatus.BAD_REQUEST);
+
+    public static final ResponseEntity<ErrorResponse> NOT_SIGN_IN = new ResponseEntity<>(ErrorResponse.builder()
+            .status(HttpStatus.BAD_REQUEST)
+            .message("로그인되지 않았습니다.")
+            .build(), HttpStatus.BAD_REQUEST);
+
+    public static final ResponseEntity<ErrorResponse> INVALID_REFRESH_TOKEN = new ResponseEntity<>(ErrorResponse.builder()
+            .status(HttpStatus.GONE)
+            .message("유효하지 않은 refresh token입니다.")
+            .build(), HttpStatus.GONE);
 }

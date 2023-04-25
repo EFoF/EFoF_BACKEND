@@ -3,7 +3,7 @@ package com.service.surveyservice.domain.member.api;
 import com.service.surveyservice.domain.member.application.AuthService;
 import com.service.surveyservice.domain.member.application.EmailCertificationService;
 import com.service.surveyservice.domain.member.application.MemberService;
-import com.service.surveyservice.domain.member.application.OAuth2UserService;
+//import com.service.surveyservice.domain.member.application.OAuth2UserService;
 import com.service.surveyservice.domain.member.dto.MailDTO;
 import com.service.surveyservice.domain.member.dto.MemberDTO;
 import com.service.surveyservice.domain.member.dto.OAuthDTO;
@@ -33,7 +33,7 @@ public class AuthController {
     private final AuthService authService;
     private final MemberService memberService;
     private final EmailCertificationService emailCertificationService;
-    private final OAuth2UserService oAuth2UserService;
+//    private final OAuth2UserService oAuth2UserService;
 
     @PostMapping(value = "/auth/signup")
     public ResponseEntity<String> signup(@RequestBody SignUpRequest signUpRequest) {
@@ -45,10 +45,10 @@ public class AuthController {
         return new ResponseEntity<>(authService.login(loginRequestDTO, request, response), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/auth/google_login")
-    public ResponseEntity<MemberLoginDTO> googleLogin(@RequestBody GoogleLoginRequestDTO googleLoginRequestDTO) {
-        return new ResponseEntity<>(oAuth2UserService.googleLogin(googleLoginRequestDTO), HttpStatus.OK);
-    }
+//    @PostMapping(value = "/auth/google_login")
+//    public ResponseEntity<MemberLoginDTO> googleLogin(@RequestBody GoogleLoginRequestDTO googleLoginRequestDTO) {
+//        return new ResponseEntity<>(oAuth2UserService.googleLogin(googleLoginRequestDTO), HttpStatus.OK);
+//    }
 
     // 이메일 중복 확인
     @PostMapping(value = "/auth/check-email")
@@ -96,8 +96,13 @@ public class AuthController {
     }
 
     // 토큰 재발급
+//    @PostMapping(value = "/auth/reissue")
+//    public ResponseEntity<TokenIssueDTO> reissue(@RequestBody AccessTokenDTO accessTokenDTO) {
+//        return new ResponseEntity<>(authService.reissue(accessTokenDTO), HttpStatus.OK);
+//    }
+
     @PostMapping(value = "/auth/reissue")
-    public ResponseEntity<TokenIssueDTO> reissue(@RequestBody AccessTokenDTO accessTokenDTO) {
-        return new ResponseEntity<>(authService.reissue(accessTokenDTO), HttpStatus.OK);
+    public ResponseEntity<TokenIssueDTO> reissue(HttpServletRequest request, HttpServletResponse response) {
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }

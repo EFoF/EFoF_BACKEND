@@ -73,4 +73,10 @@ public class MemberExceptionHandler {
         log.error(request.getDescription(false));
         return NOT_SIGN_IN;
     }
+
+    @ExceptionHandler(DuplicatedEmailException.class)
+    protected final ResponseEntity<ErrorResponse> handleDuplicatedEmailException(DuplicatedEmailException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return DUPLICATED_EMAIL;
+    }
 }

@@ -1,10 +1,13 @@
 package com.service.surveyservice.global.util;
 
+import com.service.surveyservice.domain.member.exception.exceptions.member.NotSignInException;
 import com.service.surveyservice.global.error.exception.NotAuthorizedException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import static com.service.surveyservice.global.common.constants.AuthenticationConstants.ANONYMOUS_USER;
 
 @Slf4j
 @NoArgsConstructor
@@ -15,6 +18,11 @@ public class SecurityUtil {
         if(authentication == null || authentication.getName() == null) {
             throw new NotAuthorizedException();
         }
+
+        if(authentication.getName().equals(ANONYMOUS_USER)) {
+            throw new NotSignInException();
+        }
+
         return Long.parseLong(authentication.getName());
     }
 

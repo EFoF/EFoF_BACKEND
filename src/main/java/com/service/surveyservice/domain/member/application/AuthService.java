@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.member.application;
 
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
+import com.service.surveyservice.domain.member.exception.exceptions.member.DuplicatedEmailException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidEmailAndPasswordRequestException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidRefreshTokenException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.NotSignInException;
@@ -51,6 +52,9 @@ public class AuthService {
     @Transactional
     public String signUp(SignUpRequest signUpRequest) {
         signUpRequest.encrypt(passwordEncoder);
+        if(memberRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new DuplicatedEmailException();
+        }
         Member member = signUpRequest.toEntity();
         memberRepository.save(member);
         return CREATED;

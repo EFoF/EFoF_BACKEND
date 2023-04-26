@@ -6,6 +6,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,8 +28,9 @@ import static com.service.surveyservice.global.common.constants.JwtConstants.*;
 public class JwtTokenProvider {
     private final Key key;
 
-    public JwtTokenProvider() {
-        byte[] keyBytes = Decoders.BASE64.decode(System.getenv("JWT_SECRET"));
+    public JwtTokenProvider(@Value("${jwt.secret}") String jwt_secret) {
+//        byte[] keyBytes = Decoders.BASE64.decode(System.getenv("JWT_SECRET"));
+        byte[] keyBytes = Decoders.BASE64.decode(jwt_secret);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 

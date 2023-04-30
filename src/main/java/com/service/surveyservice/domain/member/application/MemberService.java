@@ -150,14 +150,21 @@ public class MemberService {
         return UPDATED;
     }
 
+//    // 사용자 세부 정보 조회
+//    @Transactional(readOnly = true)
+//    public MemberDetail getMemberDetail(long id, Long currentMemberId) {
+//        log.error("아이디" + id);
+//        if(id != currentMemberId) {
+//            throw new NotMatchingCurrentMemberAndRequesterException();
+//        }
+//        MemberDetail memberDetail = memberCustomRepository.getMemberDetailOptional(id).orElseThrow(NotFoundByIdException::new);
+//        return memberDetail;
+//    }
+
     // 마이페이지용 사용자 세부 정보 조회
     @Transactional(readOnly = true)
-    public MemberDetail getMemberDetail(long id, Long currentMemberId) {
-        log.error("아이디" + id);
-        if(id != currentMemberId) {
-            throw new NotMatchingCurrentMemberAndRequesterException();
-        }
-        MemberDetail memberDetail = memberCustomRepository.getMemberDetailOptional(id).orElseThrow(NotFoundByIdException::new);
+    public MemberDetail getMyInfoDetail(Long currentMemberId) {
+        MemberDetail memberDetail = memberCustomRepository.getMemberDetailOptional(currentMemberId).orElseThrow(NotFoundByIdException::new);
         return memberDetail;
     }
 

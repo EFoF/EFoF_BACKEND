@@ -72,15 +72,27 @@ public class MemberController {
 
     /**
      *
-     * @param memberId
      * @return ResponseBody<MemberDetail>
      * 특정 사용자 정보 조회
      */
-   @GetMapping(value = "/member/{memberId}")
-    public ResponseEntity<MemberDetail> getMemberDetail(@PathVariable long memberId) {
-       Long currentMemberId = SecurityUtil.getCurrentMemberId();
-       return new ResponseEntity<>(memberService.getMemberDetail(memberId, currentMemberId), HttpStatus.OK);
-   }
+    @GetMapping(value = "/member/myInfo")
+    public ResponseEntity<MemberDetail> getMyInfo() {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        return new ResponseEntity<>(memberService.getMyInfoDetail(currentMemberId), HttpStatus.OK);
+    }
+
+
+//    /**
+//     *
+//     * @param memberId
+//     * @return ResponseBody<MemberDetail>
+//     * 특정 사용자 정보 조회
+//     */
+//   @GetMapping(value = "/member/{memberId}")
+//    public ResponseEntity<MemberDetail> getMemberDetail(@PathVariable long memberId) {
+//       Long currentMemberId = SecurityUtil.getCurrentMemberId();
+//       return new ResponseEntity<>(memberService.getMemberDetail(memberId, currentMemberId), HttpStatus.OK);
+//   }
 
     /**
      *

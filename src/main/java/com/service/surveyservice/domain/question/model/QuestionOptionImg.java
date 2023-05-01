@@ -20,6 +20,5 @@ public class QuestionOptionImg {
     private Long id;
 
     // QuestionOptionImg 에서는 QuestionOption 필드를 가지고 있을 이유가 없어보여서 단방향으로 설정하겠다.
-
     private String imgUrl;
 }

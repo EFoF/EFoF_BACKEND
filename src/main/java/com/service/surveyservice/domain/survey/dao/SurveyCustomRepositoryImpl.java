@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.survey.dao;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dto.QSurveyDTO_SurveyInfoDTO;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.model.QSurvey;
@@ -10,8 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
@@ -20,6 +25,8 @@ import static com.service.surveyservice.domain.survey.model.QSurvey.*;
 @Slf4j
 @RequiredArgsConstructor
 public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
+
+
 
     private final JPAQueryFactory queryFactory;
 
@@ -45,4 +52,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
 
         return results;
     }
+
+
+
 }

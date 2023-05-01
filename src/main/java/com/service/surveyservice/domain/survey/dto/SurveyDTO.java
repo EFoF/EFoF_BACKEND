@@ -3,14 +3,15 @@ package com.service.surveyservice.domain.survey.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static com.service.surveyservice.domain.section.dto.SectionDTO.*;
 
 public class SurveyDTO {
 
@@ -35,7 +36,7 @@ public class SurveyDTO {
                     .author(author)
                     .title(this.title)
                     .openDate(this.openDate)
-                    .pointColor(this.pointColor)
+//                    .pointColor(this.pointColor)
                     .expireDate(this.expireDate)
                     .description(this.description)
                     .sImageURL(this.surveyImageUrl)
@@ -52,7 +53,7 @@ public class SurveyDTO {
         private String description;
         private Long author;
         private String surveyImageUrl;
-//        private String pointColor;
+        //        private String pointColor;
         private SurveyStatus surveyStatus;
         // 개봉, 마감일 포함할까 고민 중
 
@@ -66,4 +67,40 @@ public class SurveyDTO {
             this.surveyStatus = surveyStatus;
         }
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SaveSurveyRequestDto {
+        private String title;
+        private String detail;
+        private String image;
+        private String fontColor;
+        private String bgColor;
+        private String btColor;
+        private List<SaveSectionRequestDto> sections;
+
+        public Survey toEntity(Member author, SurveyStatus surveyStatus) {
+            return Survey.builder()
+                    .author(author)
+                    .description(this.detail)
+                    .sImageURL(image)
+                    .surveyStatus(surveyStatus)
+                    .bgColor(this.bgColor)
+                    .fontColor(this.fontColor)
+                    .btColor(this.btColor)
+                    .title(this.title).build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SurveyIdDto {
+        private Long id;
+
+    }
+
 }

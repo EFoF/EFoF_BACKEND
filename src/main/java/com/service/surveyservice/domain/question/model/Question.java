@@ -9,20 +9,22 @@ import java.util.List;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
+
 public class Question {
     @Id
     @Column(name = "question_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String questionType;
+    @Enumerated(value = EnumType.STRING)
+    private QuestionType questionType;
 
-    @Column
     private String questionText;
+
+    private boolean isNecessary;
 
     @ManyToOne
     @JoinColumn(name = "section_id")

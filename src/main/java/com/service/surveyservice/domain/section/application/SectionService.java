@@ -49,7 +49,6 @@ public class SectionService {
                     .survey(sections.get(i).getSurvey())
                     .parentSection(sectionMap.get(nextSection)).build());
         }
-
     }
 
     @Transactional

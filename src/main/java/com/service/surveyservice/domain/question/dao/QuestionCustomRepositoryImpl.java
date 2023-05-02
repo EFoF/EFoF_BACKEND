@@ -1,7 +1,10 @@
 package com.service.surveyservice.domain.question.dao;
 
 import com.service.surveyservice.domain.question.dto.QuestionDTO;
+import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.domain.question.model.Question;
+import com.service.surveyservice.domain.question.model.QuestionOption;
+import com.service.surveyservice.domain.question.model.QuestionOptionImg;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
@@ -12,44 +15,79 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
 @Repository
 public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final QuestionRepository questionRepository;
+
+    private final QuestionOptionImgRepository questionOptionImgRepository;
+
+    private final QuestionOptionRepository questionOptionRepository;
 
     @Override
     public void saveAll(List<Section> sectionList, SurveyDTO.SaveSurveyRequestDto saveSurveyRequestDto) {
-        String sql = "INSERT INTO question (question_Text,question_Type,is_Necessary,section_id)  " +
-                "VALUES (?,?,?,?)";
 
-        for (int j=0; j<sectionList.size(); j++) {
-            List<QuestionDTO.SaveQuestionRequestDto> questionList = saveSurveyRequestDto.getSections().get(j).getQuestionList();
-            Section section = sectionList.get(j);
-            jdbcTemplate.batchUpdate(sql,
-                    new BatchPreparedStatementSetter() {
-                        @Override
-                        public void setValues(PreparedStatement ps, int i) throws SQLException {
-                            Question question = questionList.get(i).toEntity(section);
-                            ps.setString(1,question.getQuestionText());
-                            ps.setString(2,question.getQuestionType().getName());
-                            ps.setBoolean(3,question.isNecessary());
-                            ps.setLong(4,section.getId());
-                        }
+        Map<String, Section> sectionMap = new HashMap<>();
 
-                        @Override
-                        public int getBatchSize() {
-                            return questionList.size();
-                        }
-                    });
+        List<SectionDTO.SaveSectionRequestDto> requestSections = saveSurveyRequestDto.getSections();
 
+        for (int i = 0; i < requestSections.size(); i++) {
+            sectionMap.put(requestSections.get(i).getId(), sectionList.get(i));
         }
 
+        for (int j = 0; j < sectionList.size(); j++) {
+            StringBuilder sb = new StringBuilder(); //questionOrder 를 만들기 위한 StringBuilder
+            Section section = sectionList.get(j);
+            Section nextSection = sectionMap.get(requestSections.get(j).getNextSectionId());
 
+            List<QuestionDTO.SaveQuestionRequestDto> questionList = saveSurveyRequestDto.getSections().get(j).getQuestionList();
+
+
+            List<Question> questions    //request 에서 받아온 question 들을 각각의 section 마다 저장 후 question 리스트 반환
+                    = questionRepository.saveAll(QuestionDTO.toEntities(questionList, section));
+
+            for(int k=0; k<questions.size(); k++){
+                sb.append(questions.get(k).getId()).append(",");
+
+                List<QuestionOptionDTO.SaveQuestionOptionRequestDTO> options = questionList.get(k).getOptions();
+                List<QuestionOption> questionOptionList = new ArrayList<>();
+
+                for (int i=0; i< options.size(); i++){
+
+                    Section optionNextSection = sectionMap.get(requestSections.get(j).getQuestionList().get(k).getOptions().get(i).getNextSectionId());
+                    QuestionOption questionOption = options.get(i).toQuestionOptionEntity(optionNextSection,questions.get(k));
+
+                    if(!options.get(i).getImage().isEmpty()){
+                        QuestionOptionImg questionOptionImg = options.get(i).toQuestionOptionImgEntity();
+                        questionOptionImgRepository.save(questionOptionImg);
+                        questionOption.setQuestionOptionImg(questionOptionImg);
+
+                    }
+                    else{
+                        questionOption.setQuestionOptionImg(null);
+                    }
+                    questionOptionList.add(questionOption);
+                }
+
+                questionOptionRepository.saveAll(questionOptionList);
+
+
+            }
+            sb.deleteCharAt(sb.length() - 1);
+
+            section.setParentSection(nextSection);
+            section.setQuestionOrder(String.valueOf(sb));
+
+        }
     }
 }

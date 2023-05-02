@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,16 +40,20 @@ public class SurveyController {
     private final SectionService sectionService;
 
     private final QuestionService questionService;
+
+    /**
+     * 설문조사 생성
+     * @param saveSurveyRequestDto
+     * @return
+     */
+
     @PostMapping
     public ResponseEntity<SurveyInfoDTO> createSurvey(@RequestBody SaveSurveyRequestDto saveSurveyRequestDto) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
-
         Survey survey = surveyService.createSurvey(saveSurveyRequestDto, currentMemberId);
-        sectionService.createSection(saveSurveyRequestDto,survey);
-//        List<Section> sectionList = sectionService.findSectionListBySurveyId(survey.getId());
-        questionService.createQuestion(saveSurveyRequestDto,survey);
-
+        sectionService.createSection(saveSurveyRequestDto, survey);
+        questionService.createQuestion(saveSurveyRequestDto, survey);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -61,23 +66,37 @@ public class SurveyController {
         return new ResponseEntity<>(participatedSurveyInfo, HttpStatus.OK);
     }
 
+    /**
+     *
+     * @param image
+     * @return 설문조사 대표 이미지 생성
+     * @throws IOException
+     */
     @PostMapping(value = "/image")
     public String saveImage(@RequestBody MultipartFile image) throws IOException {
 
         return surveyService.saveSurveyImage(image);
     }
 
+    /**
+     * 설문조사 대표 이미지 삭제
+     * @param imageUrl
+     */
     @DeleteMapping(value = "/image")
-    public void deleteBoardImage(@RequestBody String imageUrl) {
+    public void deleteImage(@RequestBody String imageUrl) {
         surveyService.deleteSurveyImage(imageUrl);
     }
 
-//    @PostMapping
-//    public SaveSurveyRequestDto saveSurvey(@RequestBody SaveSurveyRequestDto saveSurveyRequestDto) throws IOException {
-//            log.info(saveSurveyRequestDto.toString());
-//            return saveSurveyRequestDto;
-//    }
 
-
+    /**
+     * 추후 구현 계획
+     *
+     * 1. 임시 저장(수정)을 위한 survey 테이블 관련 데이터 변경
+     * 2. 설문조사 대표 이미지 변경 - S3 데이터 삭제 및 추가 후 S3 url로 db column update
+     * 3. 날짜 및 제약 사항 추가(배포 페이지에서 하는 것)
+     * 4. 설문조사 삭제 - 설문 관련 정보 모두 삭제
+     * 5. 설문조사 내용 조회 - 설문조사 참여 페이지에 띄워줄 데이터 조회
+     * 6. 설문조사 리스트 조회 - survey 테이블의 데이터 조회정도(어떤 설문이 있는지의 리스트를 보여주기 위함이므로 질문과 같은 데이터는 필요 없음)
+     */
 
 }

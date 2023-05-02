@@ -25,9 +25,6 @@ public class SectionDTO {
         private String nextSectionId;
         private List<QuestionDTO.SaveQuestionRequestDto> questionList;
 
-        public Section toEntity(Survey survey) {
-            return Section.builder()
-                    .survey(survey).build();
-        }
+
     }
 }

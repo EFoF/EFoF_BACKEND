@@ -47,5 +47,12 @@ public class Section {
         this.questions = questions;
         this.questionOrder = questionOrder;
     }
+
+    public void setParentSection(Section parentSection){
+        this.parentSection = parentSection;
+    }
+    public void setQuestionOrder(String questionOrder){
+        this.questionOrder = questionOrder;
+    }
 }
 

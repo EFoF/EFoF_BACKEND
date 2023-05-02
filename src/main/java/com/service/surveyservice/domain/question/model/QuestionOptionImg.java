@@ -1,15 +1,12 @@
 package com.service.surveyservice.domain.question.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-@ToString
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionOptionImg {

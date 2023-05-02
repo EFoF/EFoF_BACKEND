@@ -63,7 +63,6 @@ public class AuthService {
     @Transactional
     public MemberLoginDTO login(LoginRequestDTO loginRequestDto, HttpServletRequest request, HttpServletResponse response) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = loginRequestDto.toAuthentication();
-        // 인증 정보 받아오기
         try {
             Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(usernamePasswordAuthenticationToken);
             TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authenticate);
@@ -74,7 +73,6 @@ public class AuthService {
 
             return MemberLoginDTO.builder()
                     .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
-//                    .tokenInfo(tokenInfoDTO.toTokenIssueDTO())
                     .build();
         } catch (BadCredentialsException e) {
             throw new InvalidEmailAndPasswordRequestException();

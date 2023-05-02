@@ -30,13 +30,6 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String jwt = resolveToken(request);
-        log.info("APi 호출됨");
-//        if(jwt != null) {
-//            if(StringUtils.hasText(jwt) && hasKey && jwtTokenProvider.validateToken(jwt)) {
-//                Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
-//            }
-//        }
         if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -46,11 +39,6 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-//        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-//            return bearerToken.substring(7);
-//        }
-//        return null;
         Cookie bearerToken = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
         if(bearerToken != null) {
             return bearerToken.getValue();

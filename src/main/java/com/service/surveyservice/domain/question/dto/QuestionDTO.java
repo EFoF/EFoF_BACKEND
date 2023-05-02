@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QuestionDTO {
 
@@ -19,14 +20,14 @@ public class QuestionDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SaveQuestionRequestDto{
+    public static class SaveQuestionRequestDto {
         private String id;
         private int type;
         private String questionContent;
         private boolean isNecessary;
-        private List<SectionDTO.SaveSectionRequestDto> options;
+        private List<QuestionOptionDTO.SaveQuestionOptionRequestDTO> options;
 
-        public Question toEntity(Section section){
+        public Question toEntity(Section section) {
             return Question.builder()
                     .questionType(QuestionType.fromId(this.type))
                     .questionText(this.questionContent)
@@ -34,5 +35,11 @@ public class QuestionDTO {
                     .section(section).build();
         }
 
+    }
+
+    public static List<Question> toEntities(List<SaveQuestionRequestDto> dtoList, Section section) {
+        return dtoList.stream()
+                .map(dto -> dto.toEntity(section))
+                .collect(Collectors.toList());
     }
 }

@@ -49,34 +49,9 @@ public class SurveyService {
         // 요청으로 넘어온 사용자가 존재하는지 확인
         Member member = memberRepository.findById(currentMemberId).orElseThrow(() -> new NotFoundByIdException("사용자"));
 
-//        if(member.getId() != currentMemberId) {
-//            throw new NotMatchingCurrentMemberAndRequesterException();
-//        }
-//
-//        if(expireDate.isEqual(openDate)) {
-//            throw new ExpireBeforeOpenException("마감 기간과 설문 시작 기간은 같을 수 없습니다.");
-//        }
-//        if(expireDate.isBefore(openDate)) {
-//            throw new ExpireBeforeOpenException();
-//        }
-
-        // 오픈 시간이 현재이거나 현재보다 과거라면 suveyStatus를 진행중으로 바꾼다.
-        // 오픈 시간을 과거로 설정할 수 있게 할지는 고민중이다.
-//        if(LocalDateTime.now().isAfter(openDate)) {
-//            surveyStatus = SurveyStatus.IN_PROGRESS;
-//        }
 
         // 설문조사 저장
         return surveyRepository.save(saveSurveyRequestDto.toEntity(member, surveyStatus));
-
-//        return SurveyInfoDTO.builder()
-//                .surveyImageUrl(createSurveyRequestDTO.getSurveyImageUrl())
-//                .description(createSurveyRequestDTO.getDescription())
-////                .pointColor(createSurveyRequestDTO.getPointColor())
-//                .title(createSurveyRequestDTO.getTitle())
-//                .surveyStatus(surveyStatus)
-//                .author(member.getId())
-//                .build();
 
     }
 
@@ -104,6 +79,12 @@ public class SurveyService {
         return surveyInfoDTO;
     }
 
+    /**
+     * 이미지 업로드
+     * @param inputBoardImage
+     * @return
+     * @throws IOException
+     */
     @Transactional
     public String saveSurveyImage(MultipartFile inputBoardImage) throws IOException {
         String imageUrl = s3Uploader.upload(inputBoardImage,"survey");

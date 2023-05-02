@@ -2,13 +2,14 @@ package com.service.surveyservice.domain.question.model;
 
 import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 public class QuestionOption {
 
@@ -20,7 +21,7 @@ public class QuestionOption {
     private String optionText;
 
     @ManyToOne
-    @JoinColumn(name = "section_id")
+    @JoinColumn(name = "nextSection_id")
     private Section nextSection;
 
     @ManyToOne
@@ -28,9 +29,13 @@ public class QuestionOption {
     private Question question;
 
     @OneToOne
+    @Nullable
     @JoinColumn(name = "questionOptionImg_id")
     private QuestionOptionImg questionOptionImg;
 
 
+    public void setQuestionOptionImg(QuestionOptionImg questionOptionImg) {
+        this.questionOptionImg = questionOptionImg;
+    }
 }
 

@@ -6,63 +6,27 @@ import org.springframework.http.ResponseEntity;
 
 public class MemberErrorResponse {
 
-    public static final ResponseEntity<ErrorResponse> USER_NOT_FOUND = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.NOT_FOUND)
-            .message("해당 사용자를 찾을 수 없습니다.")
-            .build(),HttpStatus.NOT_FOUND);
+    public static final ResponseEntity<String> USER_NOT_FOUND = new ResponseEntity<>("해당 사용자를 찾을 수 없습니다.",HttpStatus.NOT_FOUND);
 
-    public static final ResponseEntity<ErrorResponse> USER_NOT_FOUND_BY_USERNAME_AND_NICKNAME = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.NOT_FOUND)
-            .message("해당 본명과 닉네임으로 존재하는 유저를 찾을 수 없습니다.")
-            .build(), HttpStatus.NOT_FOUND);
+    public static final ResponseEntity<String> USER_NOT_FOUND_BY_USERNAME_AND_NICKNAME = new ResponseEntity<>("해당 본명과 닉네임으로 존재하는 유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
-    public static final ResponseEntity<ErrorResponse> UPDATE_DUPLICATED_PASSWORD = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.CONFLICT)
-            .message("변경하려는 비밀번호가 기존 비밀번호와 동일합니다.")
-            .build(),HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> UPDATE_DUPLICATED_PASSWORD = new ResponseEntity<>("변경하려는 비밀번호가 기존 비밀번호와 동일합니다.",HttpStatus.CONFLICT);
 
-    public static final ResponseEntity<ErrorResponse> UPDATE_DUPLICATED_NICKNAME = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.CONFLICT)
-            .message("변경하려는 닉네임이 기존 닉네임과 동일합니다.")
-            .build(),HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> UPDATE_DUPLICATED_NICKNAME = new ResponseEntity<>("변경하려는 닉네임이 기존 닉네임과 동일합니다.",HttpStatus.CONFLICT);
 
-    public static final ResponseEntity<ErrorResponse> NOT_MATCHING_UPDATING_NICKNAME = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.CONFLICT)
-            .message("해당 이메일을 통해 찾은 사용자의 닉네임이 전달받은 닉네임과 일치하지 않습니다.")
-            .build(),HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> NOT_MATCHING_UPDATING_NICKNAME = new ResponseEntity<>("해당 이메일을 통해 찾은 사용자의 닉네임이 전달받은 닉네임과 일치하지 않습니다.",HttpStatus.CONFLICT);
 
-    public static final ResponseEntity<ErrorResponse> NOT_MATCHING_PASSWORD = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.CONFLICT)
-            .message("해당 이메일을 통해 찾은 사용자의 비밀번호가 전달받은 비밀번호와 일치하지 않습니다.")
-            .build(), HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> NOT_MATCHING_PASSWORD = new ResponseEntity<>("해당 이메일을 통해 찾은 사용자의 비밀번호가 전달받은 비밀번호와 일치하지 않습니다.", HttpStatus.CONFLICT);
 
-    public static final ResponseEntity<ErrorResponse> NOT_MATCHING_CURRENT_MEMBER_AND_REQUESTER = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.CONFLICT)
-            .message("요청자와 현재 사용자가 일치하지 않습니다.")
-            .build(), HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> NOT_MATCHING_CURRENT_MEMBER_AND_REQUESTER = new ResponseEntity<>("요청자와 현재 사용자가 일치하지 않습니다.", HttpStatus.CONFLICT);
 
-    public static final ResponseEntity<ErrorResponse> DUPLICATED_SIGN_UP = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.CONFLICT)
-            .message("이미 연동이 완료된 계정입니다.")
-            .build(), HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> DUPLICATED_SIGN_UP = new ResponseEntity<>("이미 연동이 완료된 계정입니다.", HttpStatus.CONFLICT);
 
-    public static final ResponseEntity<ErrorResponse> INVALID_EMAIL_AND_PASSWORD_REQUEST = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.BAD_REQUEST)
-            .message("아이디 또는 비밀번호가 일치하지 않습니다.")
-            .build(), HttpStatus.BAD_REQUEST);
+    public static final ResponseEntity<String> INVALID_EMAIL_AND_PASSWORD_REQUEST = new ResponseEntity<>("아이디 또는 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
 
-    public static final ResponseEntity<ErrorResponse> NOT_SIGN_IN = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.BAD_REQUEST)
-            .message("로그인되지 않았습니다.")
-            .build(), HttpStatus.BAD_REQUEST);
+    public static final ResponseEntity<String> NOT_SIGN_IN = new ResponseEntity<>("로그인되지 않았습니다.", HttpStatus.BAD_REQUEST);
 
-    public static final ResponseEntity<ErrorResponse> INVALID_REFRESH_TOKEN = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.GONE)
-            .message("유효하지 않은 refresh token입니다.")
-            .build(), HttpStatus.GONE);
+    public static final ResponseEntity<String> INVALID_REFRESH_TOKEN = new ResponseEntity<>("유효하지 않은 refresh token입니다.", HttpStatus.GONE);
 
-    public static final ResponseEntity<ErrorResponse> DUPLICATED_EMAIL = new ResponseEntity<>(ErrorResponse.builder()
-            .status(HttpStatus.CONFLICT)
-            .message("다른 사용자가 사용 중인 이메일입니다.")
-            .build(), HttpStatus.CONFLICT);
+    public static final ResponseEntity<String> DUPLICATED_EMAIL = new ResponseEntity<>("다른 사용자가 사용 중인 이메일입니다.", HttpStatus.CONFLICT);
 }

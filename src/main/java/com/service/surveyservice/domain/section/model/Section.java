@@ -10,9 +10,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
-@AllArgsConstructor
 public class Section {
     @Id
     @Column(name = "section_id")
@@ -25,7 +23,7 @@ public class Section {
     @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Section> child = new ArrayList<>();
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "survey_id")
     private Survey survey;
 
@@ -40,5 +38,14 @@ public class Section {
 //    private QuestionOption questionOption;
 
 
+    @Builder
+    public Section(Long id, Section parentSection, List<Section> child, Survey survey, List<Question> questions, String questionOrder) {
+        this.id = id;
+        this.parentSection = parentSection;
+        this.child = child;
+        this.survey = survey;
+        this.questions = questions;
+        this.questionOrder = questionOrder;
+    }
 }
 

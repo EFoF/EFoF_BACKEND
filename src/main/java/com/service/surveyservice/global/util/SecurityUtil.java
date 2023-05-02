@@ -15,6 +15,7 @@ public class SecurityUtil {
 
     public static Long getCurrentMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info(String.valueOf(authentication));
         if(authentication == null || authentication.getName() == null) {
             throw new NotAuthorizedException();
         }

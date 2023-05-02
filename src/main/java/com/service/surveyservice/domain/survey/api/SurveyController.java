@@ -42,9 +42,9 @@ public class SurveyController {
     @PostMapping
     public ResponseEntity<SurveyInfoDTO> createSurvey(@RequestBody SaveSurveyRequestDto saveSurveyRequestDto) {
 
-//        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
-        Survey survey = surveyService.createSurvey(saveSurveyRequestDto, 1L);
+        Survey survey = surveyService.createSurvey(saveSurveyRequestDto, currentMemberId);
         sectionService.createSection(saveSurveyRequestDto,survey);
 //        List<Section> sectionList = sectionService.findSectionListBySurveyId(survey.getId());
         questionService.createQuestion(saveSurveyRequestDto,survey);

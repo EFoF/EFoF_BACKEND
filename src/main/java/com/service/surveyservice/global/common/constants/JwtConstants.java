@@ -14,4 +14,6 @@ public class JwtConstants {
 
     public static final String PREFIX_REFRESH_TOKEN = "refreshToken:";
     public static final String ACCESS_TOKEN = "token";
+
+    public static final String TOKEN_PUBLISH_CONFIRM = "tokenPublishConfirm";
 }

@@ -8,6 +8,7 @@ import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionNotFoundException;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionOptionNotFoundException;
+import com.service.surveyservice.domain.question.exception.exceptions.QuestionSectionMisMatchException;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.question.model.QuestionOptionImg;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -97,7 +99,7 @@ public class QuestionService {
 
 
     /**
-     * 이미 설문 및 질문이 생성되어 있는 경우 설문에 질문을 수정하는 로직
+     * 이미 설문 및 질문이 생성되어 있는 경우 설문에 질문을 수정(이미지와 섹션은 따로)하는 로직
      * @param saveQuestionRequestDto
      * @param member_id
      * @param question_id
@@ -109,14 +111,7 @@ public class QuestionService {
                                Long question_id,
                                Long survey_id) {
 
-        //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //질문이 존재하지 않는 경우
         Question question = questionRepository.findById(question_id)
@@ -125,22 +120,25 @@ public class QuestionService {
         question.updateQuestion(saveQuestionRequestDto);
     }
 
+
+
+    /**
+     * 질문 삭제하는 로직 - cascade.remove 로 연관된 데이터 다 삭제되고 S3의 이미지도 삭제된다.
+     * @param question_id
+     * @param survey_id
+     * @param member_id
+     */
     @Transactional
     public void deleteQuestion(Long question_id,Long survey_id,Long member_id) {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //질문이 존재하지 않는 경우
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
+        //해당 질문에 포함된 image 리스트
         List<String> imgUrlList = questionRepository.findImgUrlByQuestionId(question.getId());
 
         for (String img : imgUrlList) {
@@ -164,13 +162,7 @@ public class QuestionService {
                                      Long member_id, Long question_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //질문이 존재하지 않는 경우
         Question question = questionRepository.findById(question_id)
@@ -181,18 +173,19 @@ public class QuestionService {
         questionOptionRepository.save(questionOption);
     }
 
+    /**
+     * 질문 항목의 내용 변경
+     * @param saveQuestionOptionTextRequestDTO
+     * @param member_id
+     * @param question_option_id
+     * @param survey_id
+     */
     @Transactional
     public void updateQuestionOptionText(QuestionOptionDTO.SaveQuestionOptionTextRequestDTO saveQuestionOptionTextRequestDTO,
                                          Long member_id, Long question_option_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
                 .orElseThrow(QuestionOptionNotFoundException::new);
@@ -200,19 +193,20 @@ public class QuestionService {
         questionOption.setQuestionOptionText(saveQuestionOptionTextRequestDTO.getOptionText());
     }
 
+    /**
+     * 질문 항목이 가르키는 다음 섹션 변경
+     * @param saveQuestionOptionNextSectionRequestDTO
+     * @param member_id
+     * @param question_option_id
+     * @param survey_id
+     */
     @Transactional
     public void updateQuestionOptionNextSection(QuestionOptionDTO.SaveQuestionOptionNextSectionRequestDTO saveQuestionOptionNextSectionRequestDTO,
                                                 Long member_id, Long question_option_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
-
+        checkSurveyOwner(member_id, survey_id);
+        //다음 섹션 변경이면 옵션은 존재해야하는데 없는 경우
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
                 .orElseThrow(QuestionOptionNotFoundException::new);
 
@@ -222,19 +216,22 @@ public class QuestionService {
         questionOption.setQuestionOptionNextSection(nextSection);
     }
 
+    /**
+     * 질문 항목의 이미지 업데이트 - 기존 S3 이미지 삭제 후 새로운 이미지 추가 및 세팅
+     * @param image
+     * @param member_id
+     * @param question_option_id
+     * @param survey_id
+     * @return
+     * @throws IOException
+     */
     @Transactional
     public String updateQuestionOptionImg(MultipartFile image,
                                         Long member_id, Long question_option_id, Long survey_id) throws IOException {
 
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //questionOption이 존재하지 않는 경우
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
@@ -250,45 +247,26 @@ public class QuestionService {
                     .imgUrl(imageUrl).build();
             questionOptionImgRepository.save(optionImg);
         }
-        else{ //이미 다른 optionImg 가 생성되어 있는 경우 이름만 바꿔줌
+        else{ //이미 다른 optionImg 가 생성되어 있는 경우 기존 이미지 삭제 후 이름 바꿔줌
+            s3Uploader.delete(questionOptionImg.getImgUrl(),DIRECTORY);
             questionOptionImg.setImgUrl(imageUrl);
         }
         return imageUrl;
     }
 
-    @Transactional
-    public void deleteQuestionOption(Long member_id, Long question_option_id, Long survey_id) throws IOException {
 
-
-        //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
-
-        //questionOption이 존재하지 않는 경우
-        QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
-                .orElseThrow(QuestionOptionNotFoundException::new);
-
-        String img = questionOption.getQuestionOptionImg().getImgUrl();
-        s3Uploader.delete(img,DIRECTORY);
-        questionOptionRepository.delete(questionOption);
-    }
-
+    /**
+     * 질문 항목의 이미지 삭제 - S3 데이터 삭제 및 QuestionOptionImage 테이블 데이터 삭제
+     * @param member_id
+     * @param question_option_id
+     * @param survey_id
+     * @throws IOException
+     */
     @Transactional
     public void deleteQuestionOptionImg(Long member_id, Long question_option_id, Long survey_id) throws IOException {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //questionOption이 존재하지 않는 경우
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
@@ -300,4 +278,71 @@ public class QuestionService {
         questionOption.setQuestionOptionImg(null);
     }
 
+
+    /**
+     * 질문 항목 삭제 - S3의 이미지 삭제 후 QuestionOption 삭제 -> QuestionOptionImage 도 삭제된다.
+     * @param member_id
+     * @param question_option_id
+     * @param survey_id
+     * @throws IOException
+     */
+    @Transactional
+    public void deleteQuestionOption(Long member_id, Long question_option_id, Long survey_id) throws IOException {
+
+
+        //설문이 존재하지 않는경우
+        checkSurveyOwner(member_id, survey_id);
+
+        //questionOption이 존재하지 않는 경우
+        QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
+                .orElseThrow(QuestionOptionNotFoundException::new);
+
+        String img = questionOption.getQuestionOptionImg().getImgUrl();
+        s3Uploader.delete(img,DIRECTORY);
+        questionOptionRepository.delete(questionOption);
+    }
+
+
+
+    /**
+     * 질문 순서 바뀌는 경우 로직 추가 예정
+     */
+    @Transactional
+    public void updateQuestionOrder(Long survey_id, Long member_id,
+                                    Long start_section_id, Long start_section_idx,
+                                    Long end_section_id, Long end_section_idx,
+                                    Long question_id){
+        //설문이 존재하지 않는경우
+        checkSurveyOwner(member_id, survey_id);
+
+        Question question = questionRepository.findById(question_id)
+                .orElseThrow(QuestionNotFoundException::new);
+
+        Section startSection = sectionRepository.findById(start_section_id)
+                .orElseThrow(SectionNotFoundException::new);
+
+        //시작 섹션이 원래 question의 section id 이므로 검사
+        if(!question.getSection().getId().equals(start_section_id)){
+            throw new QuestionSectionMisMatchException();
+        }
+
+        String startQuestionOrder = startSection.getQuestionOrder();
+
+
+
+        Section endSection = sectionRepository.findById(end_section_id)
+                .orElseThrow(SectionNotFoundException::new);
+        String endQuestionOrder = endSection.getQuestionOrder();
+    }
+
+    private void checkSurveyOwner(Long member_id, Long survey_id) {
+        //설문이 존재하지 않는경우
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+    }
 }

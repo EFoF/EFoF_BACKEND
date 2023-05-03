@@ -1,5 +1,5 @@
 package com.service.surveyservice.domain.question.exception.exceptions;
 
-public class QuestionOptionNotFoundException extends RuntimeException{
+public class QuestionSectionMisMatchException extends RuntimeException{
 
 }

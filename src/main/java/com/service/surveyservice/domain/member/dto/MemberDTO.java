@@ -52,8 +52,6 @@ public class MemberDTO {
                     .username(userName)
                     .nickname(nickname)
                     .authority(authority)
-                    .organization(organization)
-                    .organizationDetail(organizationDetail)
                     .build();
         }
     }
@@ -81,7 +79,6 @@ public class MemberDTO {
     public static class MemberLoginDTO {
 
         private MemberDetail memberDetail;
-//        private TokenIssueDTO tokenInfo;
     }
 
 
@@ -93,17 +90,13 @@ public class MemberDTO {
         private String username;
         private String nickname;
         private String email;
-        private String organization;
-        private String organizationDetail;
 
         @QueryProjection
-        public MemberDetail(Long id, String username, String nickname, String email, String organization, String organizationDetail) {
+        public MemberDetail(Long id, String username, String nickname, String email) {
             this.id = id;
             this.username = username;
             this.nickname = nickname;
             this.email = email;
-            this.organization = organization;
-            this.organizationDetail = organizationDetail;
         }
     }
 

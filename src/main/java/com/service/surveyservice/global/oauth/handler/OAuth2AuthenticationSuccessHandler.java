@@ -58,7 +58,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         saveRefreshTokenInStorage(tokenDTO.getRefreshToken(), Long.valueOf(authentication.getName()));
         CookieUtil.deleteCookie(request,response,ACCESS_TOKEN);
-        CookieUtil.addCookie(response,ACCESS_TOKEN,tokenDTO.getAccessToken(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME);
+        CookieUtil.addCookie(response,ACCESS_TOKEN,tokenDTO.getAccessToken(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
         String uriString = UriComponentsBuilder.fromUriString(targetUrl)
 //                .queryParam("token", tokenDTO.getAccessToken())
                 .build().toUriString();

@@ -6,6 +6,7 @@ import com.service.surveyservice.domain.model.BaseTimeEntity;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -75,4 +76,7 @@ public class Survey extends BaseTimeEntity {
         this.expireDate = expireDate;
     }
 
+    public void setImageURL(@Nullable String sImageURL){
+        this.sImageURL=sImageURL;
+    }
 }

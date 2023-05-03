@@ -30,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -123,12 +125,8 @@ public class QuestionService {
         question.updateQuestion(saveQuestionRequestDto);
     }
 
-    // 추후 구현 해야함
     @Transactional
-    public void deleteQuestion(QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
-                                      Long member_id,
-                                      Long question_id,
-                                      Long survey_id) {
+    public void deleteQuestion(Long question_id,Long survey_id,Long member_id) {
 
         //설문이 존재하지 않는경우
         Survey survey = surveyRepository.findById(survey_id)
@@ -143,10 +141,13 @@ public class QuestionService {
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
-        question.updateQuestion(saveQuestionRequestDto);
-//        Question question = saveQuestionRequestDto.toEntity(section);
-
-        questionRepository.save(question);
+        List<QuestionOption> questionOptions = question.getQuestionOptions();
+        for (QuestionOption questionOption : questionOptions) {
+            String imgUrl = questionOption.getQuestionOptionImg().getImgUrl();
+            s3Uploader.delete(imgUrl,DIRECTORY);
+        }
+        //cascade 를 통해 자동으로 questionOption , questionOptionImg 도 삭제된다.
+        questionRepository.delete(question);
     }
 
 
@@ -239,7 +240,7 @@ public class QuestionService {
                 .orElseThrow(QuestionOptionNotFoundException::new);
 
         //이미지 전송 -> 저장 -> return 받은 url 로 업데이트
-        String imageUrl = s3Uploader.upload(image,"survey");
+        String imageUrl = s3Uploader.upload(image,DIRECTORY);
         QuestionOptionImg questionOptionImg = questionOption.getQuestionOptionImg();
 
         if(questionOptionImg==null){//해당 option 에 대한 optionImg 가 생성되어 있지 않은 경우

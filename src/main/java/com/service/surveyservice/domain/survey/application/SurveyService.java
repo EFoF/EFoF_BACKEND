@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.service.surveyservice.domain.survey.dto.MemberSurveyDTO.*;
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
+import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
 
 @Slf4j
 @Service
@@ -87,12 +88,12 @@ public class SurveyService {
      */
     @Transactional
     public String saveSurveyImage(MultipartFile inputBoardImage) throws IOException {
-        String imageUrl = s3Uploader.upload(inputBoardImage,"survey");
+        String imageUrl = s3Uploader.upload(inputBoardImage,DIRECTORY);
         return imageUrl;
     }
 
     @Transactional
     public void deleteSurveyImage(String imageUrl) {
-        s3Uploader.delete(imageUrl,"survey");
+        s3Uploader.delete(imageUrl,DIRECTORY);
     }
 }

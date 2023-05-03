@@ -18,6 +18,8 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.UUID;
 
+import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
+
 @Slf4j
 @Service
 @NoArgsConstructor
@@ -65,10 +67,10 @@ public class S3Config {
     }
 
     public String getDefaultSurveyUrl(){
-        return s3Client.getUrl(bucket+"/" + "survey", "survey_default.png").toString();
+        return s3Client.getUrl(bucket+"/" + DIRECTORY, "survey_default.png").toString();
     }
 
     public String getDefaultOptionUrl(){
-        return s3Client.getUrl(bucket+"/" + "survey", "option_default.png").toString();
+        return s3Client.getUrl(bucket+"/" + DIRECTORY, "option_default.png").toString();
     }
 }

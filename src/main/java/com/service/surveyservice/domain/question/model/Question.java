@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.question.model;
 
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
@@ -34,5 +35,11 @@ public class Question {
     private List<QuestionOption> questionOptions = new ArrayList<>();
 
     // question에서는 answer를 알 필요가 없어보여서 일단 단방향으로 설정하겠다.
+
+    public void updateQuestion(QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto){
+        this.questionText = saveQuestionRequestDto.getQuestionContent();
+        this.questionType = QuestionType.fromId(saveQuestionRequestDto.getType());
+        this.isNecessary = saveQuestionRequestDto.isNecessary();
+    }
 }
 

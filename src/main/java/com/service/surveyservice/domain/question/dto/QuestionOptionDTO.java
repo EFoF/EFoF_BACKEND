@@ -10,16 +10,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class QuestionOptionDTO {
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SaveQuestionOptionRequestDTO{
+    public static class SaveQuestionOptionRequestDTOInit {
         private String id;
         private String option;
         private String image;
@@ -38,5 +35,28 @@ public class QuestionOptionDTO {
                     .imgUrl(image)
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SaveQuestionOptionTextRequestDTO {
+        private String optionText;
+
+        public QuestionOption toEntity(Question question){
+            return QuestionOption.builder()
+                    .question(question)
+                    .optionText(this.optionText).build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SaveQuestionOptionNextSectionRequestDTO {
+        private Long nextSection_id;
+
     }
 }

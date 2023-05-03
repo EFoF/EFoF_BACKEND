@@ -8,16 +8,10 @@ import com.service.surveyservice.domain.question.model.QuestionOptionImg;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
-import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +44,7 @@ public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
             Section section = sectionList.get(j);
             Section nextSection = sectionMap.get(requestSections.get(j).getNextSectionId());
 
-            List<QuestionDTO.SaveQuestionRequestDto> questionList = saveSurveyRequestDto.getSections().get(j).getQuestionList();
+            List<QuestionDTO.SaveSurveyQuestionRequestDto> questionList = saveSurveyRequestDto.getSections().get(j).getQuestionList();
 
 
             List<Question> questions    //request 에서 받아온 question 들을 각각의 section 마다 저장 후 question 리스트 반환
@@ -59,7 +53,7 @@ public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
             for(int k=0; k<questions.size(); k++){
                 sb.append(questions.get(k).getId()).append(",");
 
-                List<QuestionOptionDTO.SaveQuestionOptionRequestDTO> options = questionList.get(k).getOptions();
+                List<QuestionOptionDTO.SaveQuestionOptionRequestDTOInit> options = questionList.get(k).getOptions();
                 List<QuestionOption> questionOptionList = new ArrayList<>();
 
                 for (int i=0; i< options.size(); i++){

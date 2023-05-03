@@ -141,7 +141,7 @@ public class QuestionService {
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
-가        List<String> imgUrlList = questionRepository.findImgUrlByQuestionId(question.getId());
+        List<String> imgUrlList = questionRepository.findImgUrlByQuestionId(question.getId());
 
         for (String img : imgUrlList) {
             s3Uploader.delete(img,DIRECTORY);

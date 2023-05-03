@@ -3,12 +3,8 @@ package com.service.surveyservice.domain.survey.api;
 import com.service.surveyservice.domain.member.application.MemberService;
 import com.service.surveyservice.domain.question.application.QuestionService;
 import com.service.surveyservice.domain.section.application.SectionService;
-import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.application.MemberSurveyService;
 import com.service.surveyservice.domain.survey.application.SurveyService;
-import com.service.surveyservice.domain.survey.dto.MemberSurveyDTO;
-import com.service.surveyservice.domain.survey.dto.SurveyDTO;
-import com.service.surveyservice.domain.survey.model.MemberSurvey;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 import static com.service.surveyservice.domain.survey.dto.MemberSurveyDTO.*;
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
@@ -53,7 +47,7 @@ public class SurveyController {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         Survey survey = surveyService.createSurvey(saveSurveyRequestDto, currentMemberId);
         sectionService.createSection(saveSurveyRequestDto, survey);
-        questionService.createQuestion(saveSurveyRequestDto, survey);
+        questionService.createQuestionInit(saveSurveyRequestDto, survey);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

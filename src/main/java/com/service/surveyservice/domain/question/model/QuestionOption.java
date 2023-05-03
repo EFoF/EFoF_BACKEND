@@ -37,5 +37,15 @@ public class QuestionOption {
     public void setQuestionOptionImg(QuestionOptionImg questionOptionImg) {
         this.questionOptionImg = questionOptionImg;
     }
+
+    public void setQuestionOptionText(String optionText) {
+        this.optionText = optionText;
+    }
+
+    public void setQuestionOptionNextSection(Section nextSection) {
+        this.nextSection = nextSection;
+    }
+
+
 }
 

@@ -28,15 +28,16 @@ public class QuestionOption {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE,orphanRemoval = true)
     @Nullable
     @JoinColumn(name = "questionOptionImg_id")
     private QuestionOptionImg questionOptionImg;
 
 
-    public void setQuestionOptionImg(QuestionOptionImg questionOptionImg) {
+    public void setQuestionOptionImg(@Nullable QuestionOptionImg questionOptionImg) {
         this.questionOptionImg = questionOptionImg;
     }
+
 
     public void setQuestionOptionText(String optionText) {
         this.optionText = optionText;

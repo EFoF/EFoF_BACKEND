@@ -141,11 +141,12 @@ public class QuestionService {
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
-        List<QuestionOption> questionOptions = question.getQuestionOptions();
-        for (QuestionOption questionOption : questionOptions) {
-            String imgUrl = questionOption.getQuestionOptionImg().getImgUrl();
-            s3Uploader.delete(imgUrl,DIRECTORY);
+가        List<String> imgUrlList = questionRepository.findImgUrlByQuestionId(question.getId());
+
+        for (String img : imgUrlList) {
+            s3Uploader.delete(img,DIRECTORY);
         }
+
         //cascade 를 통해 자동으로 questionOption , questionOptionImg 도 삭제된다.
         questionRepository.delete(question);
     }
@@ -252,6 +253,50 @@ public class QuestionService {
         else{ //이미 다른 optionImg 가 생성되어 있는 경우 이름만 바꿔줌
             questionOptionImg.setImgUrl(imageUrl);
         }
+    }
+
+    @Transactional
+    public void deleteQuestionOption(Long member_id, Long question_option_id, Long survey_id) throws IOException {
+
+
+        //설문이 존재하지 않는경우
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+
+        //questionOption이 존재하지 않는 경우
+        QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
+                .orElseThrow(QuestionOptionNotFoundException::new);
+
+        String img = questionOption.getQuestionOptionImg().getImgUrl();
+        s3Uploader.delete(img,DIRECTORY);
+        questionOptionRepository.delete(questionOption);
+    }
+
+    @Transactional
+    public void deleteQuestionOptionImg(Long member_id, Long question_option_id, Long survey_id) throws IOException {
+
+        //설문이 존재하지 않는경우
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+
+        //questionOption이 존재하지 않는 경우
+        QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
+                .orElseThrow(QuestionOptionNotFoundException::new);
+
+        String img = questionOption.getQuestionOptionImg().getImgUrl();
+        s3Uploader.delete(img,DIRECTORY);
+
+        questionOption.setQuestionOptionImg(null);
     }
 
 }

@@ -23,10 +23,6 @@ public class MemberBase extends BaseTimeEntity {
 
     private String userName;
 
-    private String organization;
-
-    private String organizationDetail;
-
     @Enumerated(EnumType.STRING)
     protected Authority authority;
 

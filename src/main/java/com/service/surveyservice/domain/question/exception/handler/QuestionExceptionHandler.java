@@ -1,6 +1,7 @@
 package com.service.surveyservice.domain.question.exception.handler;
 
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionNotFoundException;
+import com.service.surveyservice.domain.question.exception.exceptions.QuestionOptionNotFoundException;
 import com.service.surveyservice.global.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,11 @@ public class QuestionExceptionHandler {
         return QUESTION_NOT_FOUND;
     }
 
+    @ExceptionHandler(QuestionOptionNotFoundException.class)
+    protected final ResponseEntity<ErrorResponse> handleQuestionOptionNotFoundException(QuestionOptionNotFoundException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return QUESTION_OPTION_NOT_FOUND;
+    }
 
 
 }

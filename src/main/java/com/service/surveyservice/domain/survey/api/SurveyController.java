@@ -52,13 +52,13 @@ public class SurveyController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/form/participate/{memberId}")
-    public ResponseEntity<Page<SurveyInfoDTO>> getParticipatedSurveyList(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        Page<MemberSurveyInfoDTO> infos = memberSurveyService.getInfoPagination(currentMemberId, memberId, pageable);
-        Page<SurveyInfoDTO> participatedSurveyInfo = surveyService.getParticipatedSurveyInfo(infos);
-        return new ResponseEntity<>(participatedSurveyInfo, HttpStatus.OK);
-    }
+//    @GetMapping(value = "/form/participate/{memberId}")
+//    public ResponseEntity<Page<SurveyInfoDTO>> getParticipatedSurveyList(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
+//        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+//        Page<MemberSurveyInfoDTO> infos = memberSurveyService.getInfoPagination(currentMemberId, memberId, pageable);
+//        Page<SurveyInfoDTO> participatedSurveyInfo = surveyService.getParticipatedSurveyInfo(infos);
+//        return new ResponseEntity<>(participatedSurveyInfo, HttpStatus.OK);
+//    }
 
     /**
      *

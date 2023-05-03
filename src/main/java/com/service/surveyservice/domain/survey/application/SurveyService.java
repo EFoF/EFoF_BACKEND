@@ -4,6 +4,8 @@ import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.dao.SurveyCustomRepositoryImpl;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import com.service.surveyservice.global.config.S3Config;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.List;
+
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
 
@@ -82,6 +86,35 @@ public class SurveyService {
     public void deleteSurveyImage(String imageUrl) {
         s3Uploader.delete(imageUrl,DIRECTORY);
     }
+
+    @Transactional
+    public void deleteSurvey(Long member_id, Long survey_id) {
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+
+        //설문 대표 사진 삭제
+        String surveyImageURL = survey.getSImageURL();
+        if(!surveyImageURL.isEmpty()){
+            s3Uploader.delete(surveyImageURL,DIRECTORY);
+        }
+
+        //질문 항목에 사용되는 이미지 리스트 조회
+        List<String> imgUrlBySurveyId = surveyCustomRepository.findImgUrlBySurveyId(survey.getId());
+
+        //설문에서 사용되는 모든 이미지 삭제(survey 메인 사진 제외)
+        for (String img : imgUrlBySurveyId) {
+            s3Uploader.delete(img,DIRECTORY);
+        }
+
+        surveyRepository.delete(survey);
+
+    }
+
 
 
 }

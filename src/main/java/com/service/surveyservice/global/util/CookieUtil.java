@@ -36,11 +36,11 @@ public class CookieUtil {
      * @param maxAge
      * 사용자에게 보낼 응답에 쿠키를 실어서 보냄
      */
-    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
+    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge, boolean isHttpOnly) {
         Cookie cookie = new Cookie(name, value);
         // cookie의 path를 지정해줌. 매개변수로 지정된 디렉토리와 그 하위에서만 쿠키를 생성할 수 있음
         cookie.setPath("/");
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(isHttpOnly);
         cookie.setMaxAge(maxAge);
 
         // 응답에 쿠키를 추가

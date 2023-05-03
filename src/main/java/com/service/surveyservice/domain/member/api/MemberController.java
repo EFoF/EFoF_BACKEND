@@ -90,11 +90,11 @@ public class MemberController {
      * @return ResponseBody<Page<SurveyInfoDTO>>
      *  특정 사용자가 생성한 설문조사 조회 - 페이지네이션 적용
      */
-    @GetMapping(value = "/member/form/author/{memberId}")
-    public ResponseEntity<Page<SurveyInfoDTO>> getAuthorSurveyInfo(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        Page<SurveyInfoDTO> authorSurveyList = surveyService.getAuthorSurveyList(memberId, currentMemberId, pageable);
-        return new ResponseEntity<>(authorSurveyList, HttpStatus.OK);
-    }
+//    @GetMapping(value = "/member/form/author/{memberId}")
+//    public ResponseEntity<Page<SurveyInfoDTO>> getAuthorSurveyInfo(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
+//        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+//        Page<SurveyInfoDTO> authorSurveyList = surveyService.getAuthorSurveyList(memberId, currentMemberId, pageable);
+//        return new ResponseEntity<>(authorSurveyList, HttpStatus.OK);
+//    }
 
 }

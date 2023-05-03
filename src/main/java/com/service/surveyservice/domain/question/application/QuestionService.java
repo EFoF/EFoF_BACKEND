@@ -223,7 +223,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public void updateQuestionOptionImg(MultipartFile image,
+    public String updateQuestionOptionImg(MultipartFile image,
                                         Long member_id, Long question_option_id, Long survey_id) throws IOException {
 
 
@@ -253,6 +253,7 @@ public class QuestionService {
         else{ //이미 다른 optionImg 가 생성되어 있는 경우 이름만 바꿔줌
             questionOptionImg.setImgUrl(imageUrl);
         }
+        return imageUrl;
     }
 
     @Transactional

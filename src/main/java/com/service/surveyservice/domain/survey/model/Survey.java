@@ -28,11 +28,11 @@ public class Survey extends BaseTimeEntity {
 //    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 //    private List<Section> sections = new ArrayList<>();
 
-    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<Section> section;
 
     // FetchType.EAGER 고민중
-    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<ConstraintOptions> constraintOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)

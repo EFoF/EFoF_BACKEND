@@ -31,7 +31,7 @@ public class Question {
     @JoinColumn(name = "section_id")
     private Section section;
 
-    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<QuestionOption> questionOptions = new ArrayList<>();
 
     // question에서는 answer를 알 필요가 없어보여서 일단 단방향으로 설정하겠다.

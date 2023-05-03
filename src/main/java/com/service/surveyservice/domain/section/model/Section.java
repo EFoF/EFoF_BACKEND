@@ -20,14 +20,14 @@ public class Section {
     @ManyToOne
     private Section parentSection;
 
-    @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<Section> child = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "survey_id")
     private Survey survey;
 
-    @OneToMany(mappedBy = "section", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "section", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
 
     // 기존에 섹션에 있던 질문 순서 필드.

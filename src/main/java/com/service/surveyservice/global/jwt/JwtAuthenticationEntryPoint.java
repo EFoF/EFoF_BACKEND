@@ -41,13 +41,13 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         String result;
         if(authenticationException instanceof BadCredentialsException) {
             log.info("로그인 실패 - 이메일 비밀번호 일치하지 않음");
-            result =objectMapper.writeValueAsString(new ErrorResponse(HttpStatus.CONFLICT, INVALID_EMAIL_PASSWORD));
+            result =objectMapper.writeValueAsString(new ErrorResponse(BadCredentialsException.class.getSimpleName(), INVALID_EMAIL_PASSWORD));
             response.setStatus(response.SC_CONFLICT);
         } else if (authenticationException instanceof InternalAuthenticationServiceException) {
-            result = objectMapper.writeValueAsString(new ErrorResponse(HttpStatus.NOT_FOUND, NOT_FOUND_USER));
+            result = objectMapper.writeValueAsString(new ErrorResponse(InternalAuthenticationServiceException.class.getSimpleName(), NOT_FOUND_USER));
             response.setStatus(response.SC_NOT_FOUND);
         } else {
-            result = objectMapper.writeValueAsString(new ErrorResponse(HttpStatus.UNAUTHORIZED, INVALID_ACCESS_TOKEN));
+            result = objectMapper.writeValueAsString(new ErrorResponse(authenticationException.getClass().getSimpleName(), INVALID_ACCESS_TOKEN));
             response.setStatus(response.SC_UNAUTHORIZED);
         }
 

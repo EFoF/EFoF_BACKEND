@@ -8,6 +8,7 @@ import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionNotFoundException;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionOptionNotFoundException;
+import com.service.surveyservice.domain.question.exception.exceptions.QuestionSectionMisMatchException;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.question.model.QuestionOptionImg;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -109,14 +111,7 @@ public class QuestionService {
                                Long question_id,
                                Long survey_id) {
 
-        //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //질문이 존재하지 않는 경우
         Question question = questionRepository.findById(question_id)
@@ -124,6 +119,8 @@ public class QuestionService {
 
         question.updateQuestion(saveQuestionRequestDto);
     }
+
+
 
     /**
      * 질문 삭제하는 로직 - cascade.remove 로 연관된 데이터 다 삭제되고 S3의 이미지도 삭제된다.
@@ -135,13 +132,7 @@ public class QuestionService {
     public void deleteQuestion(Long question_id,Long survey_id,Long member_id) {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //질문이 존재하지 않는 경우
         Question question = questionRepository.findById(question_id)
@@ -171,13 +162,7 @@ public class QuestionService {
                                      Long member_id, Long question_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //질문이 존재하지 않는 경우
         Question question = questionRepository.findById(question_id)
@@ -200,13 +185,7 @@ public class QuestionService {
                                          Long member_id, Long question_option_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
                 .orElseThrow(QuestionOptionNotFoundException::new);
@@ -226,13 +205,7 @@ public class QuestionService {
                                                 Long member_id, Long question_option_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
         //다음 섹션 변경이면 옵션은 존재해야하는데 없는 경우
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
                 .orElseThrow(QuestionOptionNotFoundException::new);
@@ -258,13 +231,7 @@ public class QuestionService {
 
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //questionOption이 존재하지 않는 경우
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
@@ -299,13 +266,7 @@ public class QuestionService {
     public void deleteQuestionOptionImg(Long member_id, Long question_option_id, Long survey_id) throws IOException {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //questionOption이 존재하지 않는 경우
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
@@ -330,13 +291,7 @@ public class QuestionService {
 
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        checkSurveyOwner(member_id, survey_id);
 
         //questionOption이 존재하지 않는 경우
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
@@ -355,7 +310,32 @@ public class QuestionService {
     @Transactional
     public void updateQuestionOrder(Long survey_id, Long member_id,
                                     Long start_section_id, Long start_section_idx,
-                                    Long end_section_id, Long end_section_idx){
+                                    Long end_section_id, Long end_section_idx,
+                                    Long question_id){
+        //설문이 존재하지 않는경우
+        checkSurveyOwner(member_id, survey_id);
+
+        Question question = questionRepository.findById(question_id)
+                .orElseThrow(QuestionNotFoundException::new);
+
+        Section startSection = sectionRepository.findById(start_section_id)
+                .orElseThrow(SectionNotFoundException::new);
+
+        //시작 섹션이 원래 question의 section id 이므로 검사
+        if(!question.getSection().getId().equals(start_section_id)){
+            throw new QuestionSectionMisMatchException();
+        }
+
+        String startQuestionOrder = startSection.getQuestionOrder();
+
+
+
+        Section endSection = sectionRepository.findById(end_section_id)
+                .orElseThrow(SectionNotFoundException::new);
+        String endQuestionOrder = endSection.getQuestionOrder();
+    }
+
+    private void checkSurveyOwner(Long member_id, Long survey_id) {
         //설문이 존재하지 않는경우
         Survey survey = surveyRepository.findById(survey_id)
                 .orElseThrow(SurveyNotFoundException::new);
@@ -364,8 +344,5 @@ public class QuestionService {
         if(!survey.getAuthor().getId().equals(member_id)){
             throw new SurveyMemberMisMatchException();
         }
-
-
-
     }
 }

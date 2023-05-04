@@ -21,7 +21,7 @@ public class LocationConstraintOptions {
     @Column
     private Float longitude;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "constraintOptions_id")
     private ConstraintOptions constraintOptions;
 }

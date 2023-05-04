@@ -21,6 +21,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SectionService {
 
+    /**
+     * 추후 구현 내용
+     * 1. 임시저장 이후 섹션 생성
+     * 2. 섹션 삭제
+     */
     private final SectionRepository sectionRepository;
 
     private final SectionCustomRepository sectionCustomRepository;
@@ -31,6 +36,10 @@ public class SectionService {
         sectionCustomRepository.saveAll(sections, survey);
     }
 
+    @Transactional
+    public void addSection(Long survey_id){
+
+    }
     @Transactional
     public void updateSection(SurveyDTO.SaveSurveyRequestDto saveSurveyRequestDto, Survey survey) {
 
@@ -55,4 +64,6 @@ public class SectionService {
     public List<Section> findSectionListBySurveyId(Long surveyId){
         return sectionRepository.findBySurveyId(surveyId);
     }
+
+
 }

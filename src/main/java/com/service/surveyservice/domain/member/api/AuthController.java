@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import static com.service.surveyservice.domain.member.dto.MailDTO.*;
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
@@ -43,7 +44,7 @@ public class AuthController {
      */
 
     @PostMapping(value = "/auth/signup")
-    public ResponseEntity<String> signup(@RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<String> signup(@Valid @RequestBody SignUpRequest signUpRequest) {
         return new ResponseEntity<>(authService.signUp(signUpRequest), HttpStatus.CREATED);
     }
 

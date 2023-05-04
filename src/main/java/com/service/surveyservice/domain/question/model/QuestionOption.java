@@ -20,15 +20,15 @@ public class QuestionOption {
 
     private String optionText;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nextSection_id")
     private Section nextSection;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @OneToOne(cascade = CascadeType.REMOVE,orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     @Nullable
     @JoinColumn(name = "questionOptionImg_id")
     private QuestionOptionImg questionOptionImg;

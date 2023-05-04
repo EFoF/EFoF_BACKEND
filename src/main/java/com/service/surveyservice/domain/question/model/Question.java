@@ -27,7 +27,7 @@ public class Question {
 
     private boolean isNecessary;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")
     private Section section;
 
@@ -40,6 +40,10 @@ public class Question {
         this.questionText = saveQuestionRequestDto.getQuestionContent();
         this.questionType = QuestionType.fromId(saveQuestionRequestDto.getType());
         this.isNecessary = saveQuestionRequestDto.isNecessary();
+    }
+
+    public void updateSection(Section section){
+        this.section = section;
     }
 }
 

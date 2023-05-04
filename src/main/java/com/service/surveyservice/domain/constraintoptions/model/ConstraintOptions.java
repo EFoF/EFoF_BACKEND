@@ -16,11 +16,11 @@ public class ConstraintOptions {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 설정
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id")
     private Survey survey;
 
-    @OneToOne(mappedBy = "constraintOptions", cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "constraintOptions", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private LocationConstraintOptions locationConstraintOptions;
 
     @Column

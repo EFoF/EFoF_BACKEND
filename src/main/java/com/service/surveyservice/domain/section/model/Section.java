@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.section.model;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,13 +18,13 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 설정
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Section parentSection;
 
     @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<Section> child = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id")
     private Survey survey;
 
@@ -51,7 +52,7 @@ public class Section {
     public void setParentSection(Section parentSection){
         this.parentSection = parentSection;
     }
-    public void setQuestionOrder(String questionOrder){
+    public void setQuestionOrder(@Nullable String questionOrder){
         this.questionOrder = questionOrder;
     }
 }

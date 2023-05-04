@@ -8,6 +8,7 @@ import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionNotFoundException;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionOptionNotFoundException;
+import com.service.surveyservice.domain.question.exception.exceptions.QuestionOrderException;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionSectionMisMatchException;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
@@ -30,7 +31,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
 
@@ -93,6 +97,9 @@ public class QuestionService {
         }
 
         Question question = saveQuestionRequestDto.toEntity(section);
+    /**
+     * 추가시 section에 있는 question order 추가 예정
+     */
 
         questionRepository.save(question);
     }
@@ -145,6 +152,10 @@ public class QuestionService {
             s3Uploader.delete(img,DIRECTORY);
         }
 
+//        List<Question> questionList = question.getSection().getQuestions();
+/**
+ * 섹션에 있는 질문 순서 수정
+ */
         //cascade 를 통해 자동으로 questionOption , questionOptionImg 도 삭제된다.
         questionRepository.delete(question);
     }
@@ -303,14 +314,20 @@ public class QuestionService {
     }
 
 
-
     /**
-     * 질문 순서 바뀌는 경우 로직 추가 예정
+     * question 의 section 변경 및 section 의 question order 변경
+     * @param survey_id
+     * @param member_id
+     * @param start_section_id
+     * @param start_section_idx
+     * @param end_section_id
+     * @param end_section_idx
+     * @param question_id
      */
     @Transactional
     public void updateQuestionOrder(Long survey_id, Long member_id,
-                                    Long start_section_id, Long start_section_idx,
-                                    Long end_section_id, Long end_section_idx,
+                                    Long start_section_id, int start_section_idx,
+                                    Long end_section_id, int end_section_idx,
                                     Long question_id){
         //설문이 존재하지 않는경우
         checkSurveyOwner(member_id, survey_id);
@@ -321,20 +338,54 @@ public class QuestionService {
         Section startSection = sectionRepository.findById(start_section_id)
                 .orElseThrow(SectionNotFoundException::new);
 
+        Section endSection = sectionRepository.findById(end_section_id)
+                .orElseThrow(SectionNotFoundException::new);
+
         //시작 섹션이 원래 question의 section id 이므로 검사
         if(!question.getSection().getId().equals(start_section_id)){
             throw new QuestionSectionMisMatchException();
         }
 
+
         String startQuestionOrder = startSection.getQuestionOrder();
 
+        if(startQuestionOrder.length() == 1){//1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 그냥 지우면 된다.
+            startSection.setQuestionOrder(null);
+        } else if (startQuestionOrder.isEmpty()) {//비어있는 경우 삭제할 수가 없으므로 예외
+            throw new QuestionOrderException();
+        }
+        else {//question이 여러개인 경우
+            List<String> order = new ArrayList<>(Arrays.asList(startQuestionOrder.split(",")));
+            order.remove(start_section_idx);
+            startSection.setQuestionOrder(new StringBuilder(order.get(0))
+                    .append(order.stream().skip(1).map(s -> "," + s).collect(Collectors.joining())).toString());
+        }
 
-
-        Section endSection = sectionRepository.findById(end_section_id)
-                .orElseThrow(SectionNotFoundException::new);
         String endQuestionOrder = endSection.getQuestionOrder();
+
+        if(endQuestionOrder.length() == 1){ //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
+            endSection.setQuestionOrder(endQuestionOrder.concat(",").concat(String.valueOf(question_id)));
+        } else if (endQuestionOrder.isEmpty()) {//글자가 없는 경우 question이 0개인 경우
+            endSection.setQuestionOrder(String.valueOf(question.getId()));
+        }
+        else {//question이 여러개인 경우 1,2,3 이런식으로 되어있음
+            List<String> order = new ArrayList<>(Arrays.asList(endQuestionOrder.split(",")));
+            order.add(end_section_idx, String.valueOf(question_id));
+            endSection.setQuestionOrder(new StringBuilder(order.get(0))
+                    .append(order.stream().skip(1).map(s -> "," + s).collect(Collectors.joining())).toString());
+
+
+        }
+
+        question.updateSection(endSection);
     }
 
+
+    /**
+     * 설문 생성자가 요청한 것인지 확인
+     * @param member_id
+     * @param survey_id
+     */
     private void checkSurveyOwner(Long member_id, Long survey_id) {
         //설문이 존재하지 않는경우
         Survey survey = surveyRepository.findById(survey_id)

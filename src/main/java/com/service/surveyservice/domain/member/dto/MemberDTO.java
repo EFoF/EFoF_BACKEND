@@ -11,6 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
 
@@ -22,17 +26,19 @@ public class MemberDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SignUpRequest {
+
+        @NotEmpty(message = "이름을 입력해주세요.")
         private String userName;
 
+        @Size(min = 2, max = 8, message = "닉네임은 2글자 이상, 8글자 이하입니다.")
         private String nickname;
 
+        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "이메일 형식이 유효하지 않습니다.")
         private String email;
 
+        // 대문자 혹은 소문자 영어 1개 이상, 특수문자 1개 이상, 길이 8 이상
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[\\W])(?=.*[0-9]).{8,}$", message = "비밀번호가 조건에 부합하지 않습니다.")
         private String password;
-
-        private String organization;
-
-        private String organizationDetail;
 
         @Enumerated(value = EnumType.STRING)
         private MemberLoginType memberLoginType;
@@ -126,6 +132,7 @@ public class MemberDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateNicknameRequestDTO {
+
         private String email;
         private String oldNickname;
         private String newNickname;

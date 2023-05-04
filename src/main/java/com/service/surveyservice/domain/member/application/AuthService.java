@@ -29,6 +29,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.concurrent.TimeUnit;
 
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;

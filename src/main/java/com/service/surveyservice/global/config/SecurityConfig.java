@@ -26,6 +26,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
+import static com.service.surveyservice.global.common.constants.JwtConstants.TOKEN_PUBLISH_CONFIRM;
 
 @Configuration
 @RequiredArgsConstructor
@@ -83,7 +84,6 @@ public class SecurityConfig {
                 .logout()
                 .logoutUrl("/user/logout")
                 .logoutSuccessUrl("/logout-redirect")
-                .deleteCookies(ACCESS_TOKEN)
 
                 .and()
                 .oauth2Login()

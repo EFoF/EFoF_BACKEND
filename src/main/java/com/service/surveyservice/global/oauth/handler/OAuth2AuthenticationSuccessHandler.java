@@ -1,7 +1,11 @@
 package com.service.surveyservice.global.oauth.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
+import com.service.surveyservice.domain.member.dto.MemberDTO;
 import com.service.surveyservice.domain.token.dao.RefreshTokenDao;
 import com.service.surveyservice.domain.token.dto.TokenDTO;
+import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import com.service.surveyservice.global.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
 import com.service.surveyservice.global.util.CookieUtil;
@@ -10,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
@@ -19,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
 import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
 import static com.service.surveyservice.global.common.constants.AuthenticationConstants.REDIRECT_URI_PARAM_COOKIE_NAME;
 import static com.service.surveyservice.global.common.constants.JwtConstants.*;
@@ -32,6 +38,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final RefreshTokenDao refreshTokenDao;
 
+    private final MemberCustomRepositoryImpl memberCustomRepository;
 
     private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
 
@@ -47,6 +54,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
+    @Transactional(readOnly = true)
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
@@ -54,12 +62,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         //토큰 생성
         TokenInfoDTO tokenDTO = tokenProvider.generateTokenDTO(authentication);
-
         saveRefreshTokenInStorage(tokenDTO.getRefreshToken(), Long.valueOf(authentication.getName()));
         CookieUtil.deleteCookie(request,response,ACCESS_TOKEN);
         CookieUtil.addCookie(response,ACCESS_TOKEN,tokenDTO.getAccessToken(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
         // 여기에 사용자 정보를 받아올 수 있어야 함.
-        CookieUtil.addCookie(response,TOKEN_PUBLISH_CONFIRM,tokenDTO.getAccessToken(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
+        // 다른 곳에서 사용자의 정보를 저장할 방법이 도무지 없다. 여기서 DB에 다녀오겠다.
+        MemberTokenPublishConfirmDTO memberTokenPublishConfirmDTO = memberCustomRepository.getMemberTokenPublishConfirm(Long.valueOf(authentication.getName())).orElseThrow(NotFoundByIdException::new);
+        CookieUtil.addCookie(response,TOKEN_PUBLISH_CONFIRM, memberTokenPublishConfirmDTO.getNickname(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
         String uriString = UriComponentsBuilder.fromUriString(targetUrl)
 //                .queryParam("token", tokenDTO.getAccessToken())
                 .build().toUriString();

@@ -21,8 +21,7 @@ import java.util.Optional;
 
 import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
 import static com.service.surveyservice.global.common.constants.AuthenticationConstants.REDIRECT_URI_PARAM_COOKIE_NAME;
-import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
-import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN_COOKIE_EXPIRE_TIME;
+import static com.service.surveyservice.global.common.constants.JwtConstants.*;
 
 @Slf4j
 @Component
@@ -59,6 +58,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         saveRefreshTokenInStorage(tokenDTO.getRefreshToken(), Long.valueOf(authentication.getName()));
         CookieUtil.deleteCookie(request,response,ACCESS_TOKEN);
         CookieUtil.addCookie(response,ACCESS_TOKEN,tokenDTO.getAccessToken(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
+        // 여기에 사용자 정보를 받아올 수 있어야 함.
+        CookieUtil.addCookie(response,TOKEN_PUBLISH_CONFIRM,tokenDTO.getAccessToken(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
         String uriString = UriComponentsBuilder.fromUriString(targetUrl)
 //                .queryParam("token", tokenDTO.getAccessToken())
                 .build().toUriString();

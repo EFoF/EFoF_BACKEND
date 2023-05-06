@@ -1,7 +1,6 @@
 package com.service.surveyservice.domain.question.application;
 
 import com.service.surveyservice.domain.question.dao.QuestionCustomRepository;
-import com.service.surveyservice.domain.question.dao.QuestionOptionImgRepository;
 import com.service.surveyservice.domain.question.dao.QuestionOptionRepository;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.dto.QuestionDTO;
@@ -12,7 +11,6 @@ import com.service.surveyservice.domain.question.exception.exceptions.QuestionOr
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionSectionMisMatchException;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
-import com.service.surveyservice.domain.question.model.QuestionOptionImg;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
 import com.service.surveyservice.domain.section.exception.exceptions.SectionNotFoundException;
 import com.service.surveyservice.domain.section.exception.exceptions.SurveyMissMatchException;
@@ -27,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -51,7 +48,6 @@ public class QuestionService {
 
     private final QuestionOptionRepository questionOptionRepository;
 
-    private final QuestionOptionImgRepository questionOptionImgRepository;
     private final S3Config s3Uploader;
 
 
@@ -250,18 +246,15 @@ public class QuestionService {
 
         //이미지 전송 -> 저장 -> return 받은 url 로 업데이트
         String imageUrl = s3Uploader.upload(image,DIRECTORY);
-        QuestionOptionImg questionOptionImg = questionOption.getQuestionOptionImg();
 
-        if(questionOptionImg==null){//해당 option 에 대한 optionImg 가 생성되어 있지 않은 경우
+        String questionOptionImg = questionOption.getQuestionOptionImg();
 
-            QuestionOptionImg optionImg = QuestionOptionImg.builder()
-                    .imgUrl(imageUrl).build();
-            questionOptionImgRepository.save(optionImg);
+        if(!questionOptionImg.isEmpty()){//해당 option 에 대한 optionImg 가 생성되어 있는 경우
+
+            s3Uploader.delete(questionOptionImg,DIRECTORY);
+
         }
-        else{ //이미 다른 optionImg 가 생성되어 있는 경우 기존 이미지 삭제 후 이름 바꿔줌
-            s3Uploader.delete(questionOptionImg.getImgUrl(),DIRECTORY);
-            questionOptionImg.setImgUrl(imageUrl);
-        }
+        questionOption.setQuestionOptionImage(imageUrl);
         return imageUrl;
     }
 
@@ -283,10 +276,10 @@ public class QuestionService {
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
                 .orElseThrow(QuestionOptionNotFoundException::new);
 
-        String img = questionOption.getQuestionOptionImg().getImgUrl();
+        String img = questionOption.getQuestionOptionImg();
         s3Uploader.delete(img,DIRECTORY);
 
-        questionOption.setQuestionOptionImg(null);
+        questionOption.setQuestionOptionImage(null);
     }
 
 
@@ -308,9 +301,9 @@ public class QuestionService {
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
                 .orElseThrow(QuestionOptionNotFoundException::new);
 
-        String img = questionOption.getQuestionOptionImg().getImgUrl();
+        String img = questionOption.getQuestionOptionImg();
         s3Uploader.delete(img,DIRECTORY);
-        questionOptionRepository.delete(questionOption);
+        questionOption.setQuestionOptionImage(null);
     }
 
 

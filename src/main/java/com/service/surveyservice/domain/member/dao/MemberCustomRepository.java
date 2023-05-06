@@ -10,4 +10,5 @@ public interface MemberCustomRepository {
 
     MemberDetail getMemberDetail(Long userId);
     Optional<MemberDetail> getMemberDetailOptional(Long userId);
+    Optional<MemberTokenPublishConfirmDTO> getMemberTokenPublishConfirm(Long userId);
 }

@@ -60,6 +60,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // Swagger 의존성 추가 예정
+
+    // @Nullable 관련 QueryDSL error 해결
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 tasks.named('test') {

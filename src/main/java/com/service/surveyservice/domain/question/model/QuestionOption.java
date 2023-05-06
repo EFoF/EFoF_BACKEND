@@ -28,15 +28,15 @@ public class QuestionOption {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @OneToOne(cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+//    @OneToOne(cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     @Nullable
-    @JoinColumn(name = "questionOptionImg_id")
-    private QuestionOptionImg questionOptionImg;
+//    @JoinColumn(name = "questionOptionImg_id")
+    private String questionOptionImg;
 
 
-    public void setQuestionOptionImg(@Nullable QuestionOptionImg questionOptionImg) {
-        this.questionOptionImg = questionOptionImg;
-    }
+//    public void setQuestionOptionImg(@Nullable QuestionOptionImg questionOptionImg) {
+//        this.questionOptionImg = questionOptionImg;
+//    }
 
 
     public void setQuestionOptionText(String optionText) {
@@ -45,6 +45,11 @@ public class QuestionOption {
 
     public void setQuestionOptionNextSection(Section nextSection) {
         this.nextSection = nextSection;
+    }
+
+
+    public void setQuestionOptionImage(String image) {
+        this.questionOptionImg = image;
     }
 
 

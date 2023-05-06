@@ -3,7 +3,6 @@ package com.service.surveyservice.domain.question.dto;
 
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
-import com.service.surveyservice.domain.question.model.QuestionOptionImg;
 import com.service.surveyservice.domain.section.model.Section;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,14 +24,9 @@ public class QuestionOptionDTO {
         public QuestionOption toQuestionOptionEntity(Section nextSection,Question question){
             return QuestionOption.builder()
                     .nextSection(nextSection)
-                    .questionOptionImg(toQuestionOptionImgEntity())
+                    .questionOptionImg(this.image)
                     .optionText(this.option)
                     .question(question)
-                    .build();
-        }
-        public QuestionOptionImg toQuestionOptionImgEntity(){
-            return QuestionOptionImg.builder()
-                    .imgUrl(image)
                     .build();
         }
     }

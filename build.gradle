@@ -58,7 +58,7 @@ dependencies {
 
     // oauth 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     // Swagger 의존성 추가 예정
 
     // @Nullable 관련 QueryDSL error 해결

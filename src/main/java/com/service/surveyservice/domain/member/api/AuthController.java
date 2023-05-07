@@ -104,6 +104,7 @@ public class AuthController {
      */
     @PostMapping(value = "/auth/codeConfirm")
     public ResponseEntity<CodeConfirmDTO> codeConfirm(@RequestBody EmailConfirmCodeDTO emailConfirmCodeDTO) {
+        log.info("이메일 : {}, 코드 : {}", emailConfirmCodeDTO.getEmail(), emailConfirmCodeDTO.getCode());
         return new ResponseEntity<>(emailCertificationService.confirmCode(emailConfirmCodeDTO), HttpStatus.OK);
     }
 

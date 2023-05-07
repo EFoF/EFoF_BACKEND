@@ -139,6 +139,7 @@ public class AuthController {
     @GetMapping(value = "/logout-redirect")
     public ResponseEntity<String> loginRedirect(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
+        log.info("ASDfssafa");
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if(cookie.getName().equals(TOKEN_PUBLISH_CONFIRM) || cookie.getName().equals(ACCESS_TOKEN)) {

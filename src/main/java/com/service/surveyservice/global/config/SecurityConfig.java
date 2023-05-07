@@ -1,6 +1,7 @@
 package com.service.surveyservice.global.config;
 
 import com.service.surveyservice.domain.member.application.CustomOAuth2UserService;
+import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.token.dao.RefreshTokenDao;
 import com.service.surveyservice.global.jwt.CustomLogoutSuccessHandler;
 import com.service.surveyservice.global.jwt.JwtAccessDeniedHandler;
@@ -26,6 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
+import static com.service.surveyservice.global.common.constants.JwtConstants.TOKEN_PUBLISH_CONFIRM;
 
 @Configuration
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class SecurityConfig {
     private final RedisTemplate<String, String> redisTemplate;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final MemberCustomRepositoryImpl memberCustomRepository;
     private final RefreshTokenDao refreshTokenDao;
 
     @Bean
@@ -83,7 +86,6 @@ public class SecurityConfig {
                 .logout()
                 .logoutUrl("/user/logout")
                 .logoutSuccessUrl("/logout-redirect")
-                .deleteCookies(ACCESS_TOKEN)
 
                 .and()
                 .oauth2Login()
@@ -109,6 +111,7 @@ public class SecurityConfig {
         return new OAuth2AuthenticationSuccessHandler(
                 jwtTokenProvider,
                 refreshTokenDao,
+                memberCustomRepository,
                 oAuth2AuthorizationRequestBasedOnCookieRepository()
         );
     }

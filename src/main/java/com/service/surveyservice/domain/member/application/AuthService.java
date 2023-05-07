@@ -23,12 +23,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.concurrent.TimeUnit;
 
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
@@ -60,7 +61,7 @@ public class AuthService {
         return CREATED;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public MemberLoginDTO login(LoginRequestDTO loginRequestDto, HttpServletRequest request, HttpServletResponse response) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = loginRequestDto.toAuthentication();
         try {
@@ -69,13 +70,15 @@ public class AuthService {
             String refreshToken = tokenInfoDTO.getRefreshToken();
             saveRefreshTokenInStorage(refreshToken, Long.valueOf(authenticate.getName()));
             CookieUtil.deleteCookie(request, response, ACCESS_TOKEN);
-            //
-            CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-            CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, loginRequestDto.getEmail(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
 
-            return MemberLoginDTO.builder()
+            MemberLoginDTO memberLoginDTO = MemberLoginDTO.builder()
                     .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
                     .build();
+
+            CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
+            CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, memberLoginDTO.getMemberDetail().getEmail(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
+
+            return memberLoginDTO;
         } catch (BadCredentialsException e) {
             throw new InvalidEmailAndPasswordRequestException();
         }

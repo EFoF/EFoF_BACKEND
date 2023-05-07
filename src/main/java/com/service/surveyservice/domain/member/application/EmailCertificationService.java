@@ -58,15 +58,15 @@ public class EmailCertificationService {
         StringBuffer key = new StringBuffer();
         Random random = new Random();
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 6; i++) {
             int index = random.nextInt(3);
 
             switch (index) {
                 case 0:
-                    key.append((char) random.nextInt(26) + 97);
+                    key.append((char) (random.nextInt(26) + 97));
                     break;
                 case 1:
-                    key.append((char) random.nextInt(26) + 65);
+                    key.append((char) (random.nextInt(26) + 65));
                     break;
                 case 2:
                     key.append((random.nextInt(10)));

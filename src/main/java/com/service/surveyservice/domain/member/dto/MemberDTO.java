@@ -56,7 +56,7 @@ public class MemberDTO {
                     .email(email)
                     .password(password)
                     .username(userName)
-                    .nickname(nickname)
+                    .nickname(nickname=userName)
                     .authority(Authority.ROLE_USER)
                     .memberLoginType(MemberLoginType.DOKSEOL_LOGIN)
                     .build();

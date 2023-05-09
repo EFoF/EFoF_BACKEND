@@ -1,5 +1,6 @@
 package com.service.surveyservice.global.config;
 
+import com.service.surveyservice.domain.member.application.AuthService;
 import com.service.surveyservice.domain.member.application.CustomOAuth2UserService;
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.token.dao.RefreshTokenDao;
@@ -13,6 +14,7 @@ import com.service.surveyservice.global.oauth.repository.OAuth2AuthorizationRequ
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,9 +27,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-
-import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
-import static com.service.surveyservice.global.common.constants.JwtConstants.TOKEN_PUBLISH_CONFIRM;
 
 @Configuration
 @RequiredArgsConstructor
@@ -72,16 +71,17 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "**").permitAll()
-                .antMatchers(HttpMethod.GET, "/post/**").permitAll()
+//                .antMatchers(HttpMethod.GET, "/post/**").permitAll()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/logout-redirect").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/user/**").hasRole("USER")
-                .anyRequest().permitAll()
+                .antMatchers(HttpMethod.POST, "/form").access("hasRole('ADMIN') or hasRole('USER')")
+                .antMatchers("/user/**").access("hasRole('ADMIN') or hasRole('USER')")
+                .anyRequest().hasAnyRole()
 
                 .and()
-                .apply(new JwtSecurityConfig(jwtTokenProvider, redisTemplate))
+                .apply(new JwtSecurityConfig(jwtTokenProvider))
                 .and()
                 .logout()
                 .logoutUrl("/user/logout")

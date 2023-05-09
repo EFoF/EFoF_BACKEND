@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.member.api;
 import com.service.surveyservice.domain.member.application.AuthService;
 import com.service.surveyservice.domain.member.application.EmailCertificationService;
 import com.service.surveyservice.domain.member.application.MemberService;
+import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidRefreshTokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -140,7 +141,6 @@ public class AuthController {
     @GetMapping(value = "/logout-redirect")
     public ResponseEntity<String> loginRedirect(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
-        log.info("ASDfssafa");
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if(cookie.getName().equals(TOKEN_PUBLISH_CONFIRM) || cookie.getName().equals(ACCESS_TOKEN)) {
@@ -159,9 +159,11 @@ public class AuthController {
      * @return ResponseBody<String> (null)
      * 토큰 reissue
      */
-    @PostMapping(value = "/reissue")
+    @PostMapping(value = "/auth/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
-        authService.reissue(request, response);
+        if(!authService.reissue(request, response)) {
+            throw new InvalidRefreshTokenException();
+        }
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 

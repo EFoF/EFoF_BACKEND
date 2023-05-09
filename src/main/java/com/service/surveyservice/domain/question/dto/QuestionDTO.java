@@ -22,7 +22,8 @@ public class QuestionDTO {
         private String id;
         private int type;
         private String questionContent;
-        private boolean isNecessary;
+        private Boolean isNecessary;
+
         private List<QuestionOptionDTO.SaveQuestionOptionRequestDTOInit> options;
 
         public Question toEntity(Section section) {

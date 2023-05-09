@@ -1,8 +1,10 @@
 package com.service.surveyservice.global.config;
 
+import com.service.surveyservice.domain.member.application.AuthService;
 import com.service.surveyservice.global.filter.JwtFilter;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,12 +14,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
     private final JwtTokenProvider jwtTokenProvider;
-
-    private final RedisTemplate<String, String> redisTemplate;
+//    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void configure(HttpSecurity httpSecurity) {
-        JwtFilter jwtFilter = new JwtFilter(jwtTokenProvider, redisTemplate);
+        JwtFilter jwtFilter = new JwtFilter(jwtTokenProvider);
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

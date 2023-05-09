@@ -31,8 +31,9 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        log.error(String.valueOf(authException.getCause()));
-        log.error(authException.getMessage());
+//        log.error(String.valueOf(authException.getCause()));
+//        log.error(authException.getMessage());
+        log.error("{}", "인증 관련 에러 발생", this.getClass());
         sendResponse(response, authException);
     }
 

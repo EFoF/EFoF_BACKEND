@@ -1,9 +1,12 @@
 package com.service.surveyservice.global.filter;
 
+import com.service.surveyservice.domain.member.application.AuthService;
+import com.service.surveyservice.domain.token.exception.exceptions.ExpiredAccessTokenException;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import com.service.surveyservice.global.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,17 +27,18 @@ import static com.service.surveyservice.global.common.constants.JwtConstants.*;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-
-    private final RedisTemplate<String, String> redisTemplate;
+//    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String jwt = resolveToken(request);
-        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+        if(!jwtTokenProvider.validateToken(jwt)) {
+            throw new ExpiredAccessTokenException();
+        }
+        if (StringUtils.hasText(jwt)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         filterChain.doFilter(request, response);
     }
 

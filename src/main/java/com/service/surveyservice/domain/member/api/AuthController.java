@@ -159,7 +159,7 @@ public class AuthController {
      * @return ResponseBody<String> (null)
      * 토큰 reissue
      */
-    @PostMapping(value = "/reissue")
+    @PostMapping(value = "/auth/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
         authService.reissue(request, response);
         return new ResponseEntity<>(null, HttpStatus.OK);

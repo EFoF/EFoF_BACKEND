@@ -6,7 +6,7 @@ public class JwtConstants {
 
     public static final int ACCESS_TOKEN_COOKIE_EXPIRE_TIME = 60 * 60 * 24 * 7;
 
-    public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60*30;
+    public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
     public static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60*60*24*7;
 
     public static final String AUTHORIZATION_HEADER = "Authorization";

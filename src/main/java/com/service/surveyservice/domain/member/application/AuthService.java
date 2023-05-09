@@ -88,12 +88,12 @@ public class AuthService {
     public Boolean reissue(HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
         String accessToken;
-        // 쿠키가 없으면 로그인 조차 되어있지 않은 상태
+
         if(cookie == null) {
-            throw new NotSignInException();
-        } else {
-            accessToken = cookie.getValue();
+            return false;
         }
+
+        accessToken = cookie.getValue();
         Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
         Long memberId = Long.valueOf(authentication.getName());
         // 1. 사용자가 존재하는지 확인
@@ -103,19 +103,17 @@ public class AuthService {
         // 2. redis에서 사용자 정보로 refresh token 가져오기
         String refreshToken = refreshTokenDao.getRefreshToken(memberId);
 
-        // 쿠키는 있지만 refresh token이 없다면 로그아웃된 사용자
-        // 하지만 로그인이라는 같은 기능을 요구하기 때문에 쿠키가 없을 때와 같은 예외를 발생시키겠음
         if(refreshToken == null) {
-            throw new NotSignInException();
+            return false;
         }
+        log.error(refreshToken);
         // 3. refresh token 검증
-        if(jwtTokenProvider.validateToken(refreshToken)) {
-//            throw new InvalidRefreshTokenException();
-            // 예외를 핸들링하고 프론트에 전달할 방법이 없다.
+        if(!jwtTokenProvider.validateToken(refreshToken)) {
             return false;
         }
         // 4. 새로운 토큰 생성
         TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
+        log.error(tokenInfoDTO.getRefreshToken());
         // 5. 저장소에 저장
         saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
         // 6. 토큰 발급

@@ -60,7 +60,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 //            } else {
 //                result = "Access Token 만료, ReIssue 완료";
 //            }
-
+//            authService.reissue(request, response);
             result = objectMapper.writeValueAsString(new ErrorResponse(authenticationException.getClass().getSimpleName(), INVALID_ACCESS_TOKEN));
             log.error(result);
             response.setStatus(response.SC_UNAUTHORIZED);

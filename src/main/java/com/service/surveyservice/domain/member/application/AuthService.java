@@ -85,7 +85,7 @@ public class AuthService {
      * 쿠키가 모두 유효하지만 만료되어서 다시 발급받아야 하는 경우 호출
      */
     @Transactional
-    public void reissue(HttpServletRequest request, HttpServletResponse response) {
+    public Boolean reissue(HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
         String accessToken;
         // 쿠키가 없으면 로그인 조차 되어있지 않은 상태
@@ -110,7 +110,9 @@ public class AuthService {
         }
         // 3. refresh token 검증
         if(jwtTokenProvider.validateToken(refreshToken)) {
-            throw new InvalidRefreshTokenException();
+//            throw new InvalidRefreshTokenException();
+            // 예외를 핸들링하고 프론트에 전달할 방법이 없다.
+            return false;
         }
         // 4. 새로운 토큰 생성
         TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
@@ -118,6 +120,8 @@ public class AuthService {
         saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
         // 6. 토큰 발급
         CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
+
+        return true;
     }
 
 

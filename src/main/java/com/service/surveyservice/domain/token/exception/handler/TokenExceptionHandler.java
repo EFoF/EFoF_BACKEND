@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.token.exception.handler;
 
 import com.service.surveyservice.domain.member.application.AuthService;
 import com.service.surveyservice.domain.token.exception.exceptions.ExpiredAccessTokenException;
+import com.service.surveyservice.domain.token.exception.exceptions.ExpiredRefreshTokenException;
 import com.service.surveyservice.global.error.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,18 +15,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.service.surveyservice.domain.token.exception.response.TokenErrorResponse.ACCESS_TOKEN_EXPIRE;
+import static com.service.surveyservice.domain.token.exception.response.TokenErrorResponse.REFRESH_TOKEN_EXPIRE;
 
 @Slf4j
 @RestControllerAdvice
-@RequiredArgsConstructor
 public class TokenExceptionHandler {
 
-    private final AuthService authService;
-
     @ExceptionHandler(ExpiredAccessTokenException.class)
-    public final ResponseEntity<ErrorResponse> handleExpiredJwtException(ExpiredAccessTokenException ex, HttpServletRequest request, HttpServletResponse response) {
-
-        authService.reissue(request, response);
+    public final ResponseEntity<ErrorResponse> handleExpiredAccessTokenException(ExpiredAccessTokenException ex, WebRequest request) {
+        log.info(request.getDescription(false));
         return ACCESS_TOKEN_EXPIRE;
+    }
+
+    @ExceptionHandler(ExpiredRefreshTokenException.class)
+    public final ResponseEntity<ErrorResponse> handleExpiredRefreshTokenException(ExpiredRefreshTokenException ex, WebRequest request) {
+        log.info(request.getDescription(false));
+        return REFRESH_TOKEN_EXPIRE;
     }
 }

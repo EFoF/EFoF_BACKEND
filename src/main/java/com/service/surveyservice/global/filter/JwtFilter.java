@@ -32,10 +32,11 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String jwt = resolveToken(request);
-        if(!jwtTokenProvider.validateToken(jwt)) {
-            throw new ExpiredAccessTokenException();
-        }
-        if (StringUtils.hasText(jwt)) {
+//        if(!jwtTokenProvider.validateToken(jwt)) {
+//            throw new ExpiredAccessTokenException();
+//        }
+        // 토큰이 만료된 경우 EntryPoint의 commence에서 먼저 걸린다. 그래서 위 코드가 딱히 필요가 없다고 판단됨
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

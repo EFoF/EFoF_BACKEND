@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.member.api;
 import com.service.surveyservice.domain.member.application.AuthService;
 import com.service.surveyservice.domain.member.application.EmailCertificationService;
 import com.service.surveyservice.domain.member.application.MemberService;
+import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidRefreshTokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -161,7 +162,9 @@ public class AuthController {
      */
     @PostMapping(value = "/auth/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
-        authService.reissue(request, response);
+        if(!authService.reissue(request, response)) {
+            throw new InvalidRefreshTokenException();
+        }
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 

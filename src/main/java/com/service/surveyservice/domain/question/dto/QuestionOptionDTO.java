@@ -53,4 +53,17 @@ public class QuestionOptionDTO {
         private Long nextSection_id;
 
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResponseSaveQuestionOptionDto{
+        private Long id;
+        private String option;
+        private String imageUrl;
+        private Long nextSectionId;
+
+    }
+
 }

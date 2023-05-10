@@ -1,10 +1,14 @@
 package com.service.surveyservice.domain.question.model;
 
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
+import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -52,6 +56,20 @@ public class QuestionOption {
         this.questionOptionImg = image;
     }
 
+    public QuestionOptionDTO.ResponseSaveQuestionOptionDto toResponseDto(){
+        return QuestionOptionDTO.ResponseSaveQuestionOptionDto.builder()
+                .option(this.getOptionText())
+                .id(this.getId())
+                .imageUrl(this.getQuestionOptionImg())
+                .nextSectionId(this.getNextSection().getId())
+                .build();
+    }
+
+    public static List<QuestionOptionDTO.ResponseSaveQuestionOptionDto> toResponseDtoList(List<QuestionOption> dtoList) {
+        return dtoList.stream()
+                .map(dto -> dto.toResponseDto())
+                .collect(Collectors.toList());
+    }
 
 }
 

@@ -96,29 +96,25 @@ public class AuthService {
         accessToken = cookie.getValue();
         Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
         Long memberId = Long.valueOf(authentication.getName());
-        // 1. 사용자가 존재하는지 확인
-        if(!memberRepository.existsById(memberId)) {
-            throw new NotFoundByIdException();
-        }
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundByIdException::new);
+
         // 2. redis에서 사용자 정보로 refresh token 가져오기
         String refreshToken = refreshTokenDao.getRefreshToken(memberId);
 
         if(refreshToken == null) {
             return false;
         }
-        log.error(refreshToken);
         // 3. refresh token 검증
         if(!jwtTokenProvider.validateToken(refreshToken)) {
             return false;
         }
         // 4. 새로운 토큰 생성
         TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
-        log.error(tokenInfoDTO.getRefreshToken());
         // 5. 저장소에 저장
         saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
         // 6. 토큰 발급
         CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-
+        CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, member.getEmail(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
         return true;
     }
 

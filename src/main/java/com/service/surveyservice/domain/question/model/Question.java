@@ -25,7 +25,7 @@ public class Question {
 
     private String questionText;
 
-    private boolean isNecessary;
+    private Boolean isNecessary;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")
@@ -39,11 +39,22 @@ public class Question {
     public void updateQuestion(QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto){
         this.questionText = saveQuestionRequestDto.getQuestionContent();
         this.questionType = QuestionType.fromId(saveQuestionRequestDto.getType());
-        this.isNecessary = saveQuestionRequestDto.isNecessary();
+        this.isNecessary = saveQuestionRequestDto.getIsNecessary();
     }
 
     public void updateSection(Section section){
         this.section = section;
+    }
+
+    public QuestionDTO.ResponseSaveQuestionDto toResponseDto(){
+        return QuestionDTO.ResponseSaveQuestionDto
+                .builder()
+                .question_id(this.getId())
+                .section_id(this.section.getId())
+                .isNecessary(this.getIsNecessary())
+                .questionText(this.getQuestionText())
+                .questionType(this.getQuestionType())
+                .build();
     }
 }
 

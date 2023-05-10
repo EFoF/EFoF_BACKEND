@@ -72,12 +72,13 @@ public class QuestionService {
      * @param member_id
      * @param section_id
      * @param survey_id
+     * @return
      */
     @Transactional
-    public void createQuestion(QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
-                               Long member_id,
-                               Long section_id,
-                               Long survey_id) {
+    public QuestionDTO.ResponseSaveQuestionDto createQuestion(QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
+                                                              Long member_id,
+                                                              Long section_id,
+                                                              Long survey_id) {
 
         //섹션이 존재하지 않는 경우
         Section section = sectionRepository.findById(section_id)
@@ -96,16 +97,18 @@ public class QuestionService {
         Question question = saveQuestionRequestDto.toEntity(section);
         String questionOrder = section.getQuestionOrder();
 
+        Question savedQuestion = questionRepository.save(question);
+
         //section에 question order 수정 로직
         if (questionOrder.length() == 1) { //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
-            section.setQuestionOrder(questionOrder.concat(",").concat(String.valueOf(question.getId())));
+            section.setQuestionOrder(questionOrder.concat(",").concat(String.valueOf(savedQuestion.getId())));
         } else if (questionOrder.isEmpty()) {//글자가 없는 경우 question이 0개인 경우
-            section.setQuestionOrder(String.valueOf(question.getId()));
+            section.setQuestionOrder(String.valueOf(savedQuestion.getId()));
         } else {
-            section.setQuestionOrder(questionOrder.concat("," + question.getId()));
+            section.setQuestionOrder(questionOrder.concat("," + savedQuestion.getId()));
         }
 
-        questionRepository.save(question);
+        return savedQuestion.toResponseDto();
     }
 
 

@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.question.api;
 
 import com.service.surveyservice.domain.question.application.QuestionService;
 import com.service.surveyservice.domain.question.dto.QuestionDTO;
+import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,28 +27,39 @@ public class QuestionController {
     private final QuestionService questionService;
 
     /**
-     * 질문생성
+     * 질문생성 - 테스트 완료
      */
     @PostMapping(value = "/{survey_id}/section/{section_id}/question")
-    public ResponseEntity<String> createQuestion(
+    public ResponseEntity<QuestionDTO.ResponseSaveQuestionDto> createQuestion(
             @RequestBody QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
             @PathVariable Long section_id, @PathVariable Long survey_id) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
-        questionService.createQuestion(saveQuestionRequestDto,currentMemberId,section_id,survey_id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        QuestionDTO.ResponseSaveQuestionDto question = questionService.createQuestion(saveQuestionRequestDto, currentMemberId, section_id, survey_id);
+        return new ResponseEntity<>(question,HttpStatus.OK);
     }
 
 
     @PostMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}")
-    public ResponseEntity<String> createQuestionOption(
-            @RequestBody QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
+    public ResponseEntity createQuestionOption(
+            @RequestBody QuestionOptionDTO.SaveQuestionOptionTextRequestDTO saveQuestionOptionTextRequestDTO,
             @PathVariable Long question_id, @PathVariable Long section_id, @PathVariable Long survey_id) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
-//        questionService.createQuestionOption(saveQuestionRequestDto,currentMemberId,question_id,survey_id);
+        questionService.createQuestionOption(saveQuestionOptionTextRequestDTO,currentMemberId,question_id,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}/question_option/{question_option_id}")
+    public ResponseEntity updateQuestionOptionText(
+            @RequestBody QuestionOptionDTO.SaveQuestionOptionTextRequestDTO saveQuestionOptionTextRequestDTO,
+            @PathVariable Long question_id, @PathVariable Long section_id, @PathVariable Long survey_id,@PathVariable Long question_option_id) {
+
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+
+        questionService.updateQuestionOptionText(saveQuestionOptionTextRequestDTO,currentMemberId,question_option_id,survey_id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

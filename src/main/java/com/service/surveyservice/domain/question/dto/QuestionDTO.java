@@ -49,16 +49,29 @@ public class QuestionDTO {
     public static class SaveQuestionRequestDto {
         private int type;
         private String questionContent;
-        private boolean isNecessary;
+        private Boolean isNecessary;
 
 
         public Question toEntity(Section section){
             return Question.builder()
                     .section(section)
-                    .questionText(this.questionContent)
-                    .isNecessary(this.isNecessary)
-                    .questionType(QuestionType.fromId(this.type))
+                    .questionText(this.getQuestionContent())
+                    .isNecessary(this.getIsNecessary())
+                    .questionType(QuestionType.fromId(this.getType()))
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResponseSaveQuestionDto{
+        private Long question_id;
+        private QuestionType questionType;
+        private String questionText;
+        private Boolean isNecessary;
+        private Long section_id;
+    }
+
 }

@@ -105,13 +105,7 @@ public class SurveyService {
      */
     @Transactional
     public void deleteSurvey(Long member_id, Long survey_id) {
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        Survey survey = checkSurveyOwner(member_id, survey_id);
 
         //설문 대표 사진 삭제
         String surveyImageURL = survey.getSImageURL();
@@ -132,6 +126,7 @@ public class SurveyService {
     }
 
 
+
     /**
      * 최초 설문 작성 이후 임시저장 시 설문 대표 이미지 삭제 로직
      * @param member_id
@@ -142,13 +137,7 @@ public class SurveyService {
     public void deleteSurveyImg(Long member_id,  Long survey_id) throws IOException {
 
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        Survey survey = checkSurveyOwner(member_id, survey_id);
 
         String surveyImageURL = survey.getSImageURL();
         if(!surveyImageURL.isEmpty()){
@@ -169,13 +158,7 @@ public class SurveyService {
     public void updateSurveyImg(MultipartFile image,
             Long member_id,  Long survey_id) throws IOException {
         //설문이 존재하지 않는경우
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
-
-        //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
-            throw new SurveyMemberMisMatchException();
-        }
+        Survey survey = checkSurveyOwner(member_id, survey_id);
 
         String surveyImageURL = survey.getSImageURL();
         if(!surveyImageURL.isEmpty()){
@@ -196,5 +179,17 @@ public class SurveyService {
      * 3. 글자 등 색
      *
      */
+
+
+    private Survey checkSurveyOwner(Long member_id, Long survey_id) {
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+        return survey;
+    }
 
 }

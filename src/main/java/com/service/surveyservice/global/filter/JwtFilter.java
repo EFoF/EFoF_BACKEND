@@ -36,6 +36,12 @@ public class JwtFilter extends OncePerRequestFilter {
 //            throw new ExpiredAccessTokenException();
 //        }
         // 토큰이 만료된 경우 EntryPoint의 commence에서 먼저 걸린다. 그래서 위 코드가 딱히 필요가 없다고 판단됨
+//        Cookie confirmCookie = CookieUtil.getCookie(request, TOKEN_PUBLISH_CONFIRM).orElse(null);
+//        if(confirmCookie != null) {
+//            log.error(confirmCookie.getMaxAge() + " 초 남음");
+//            confirmCookie.setMaxAge(10);
+//            response.addCookie(confirmCookie);
+//        }
         if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -5,6 +5,7 @@ public class JwtConstants {
     public static final String BEARER_TYPE = "Bearer";
 
     public static final int ACCESS_TOKEN_COOKIE_EXPIRE_TIME = 60 * 60 * 24 * 7;
+    public static final int CONFIRM_TOKEN_COOKIE_EXPIRE_TIME = 3600;
 
     public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
 //    public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 10;

@@ -70,7 +70,7 @@ public class AuthService {
                     .build();
 
             CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-            CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, memberLoginDTO.getMemberDetail().getEmail(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
+            CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, memberLoginDTO.getMemberDetail().getEmail(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
 
             return memberLoginDTO;
         } catch (BadCredentialsException e) {
@@ -114,7 +114,7 @@ public class AuthService {
         saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
         // 6. 토큰 발급
         CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-        CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, member.getEmail(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
+        CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, member.getEmail(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
         return true;
     }
 

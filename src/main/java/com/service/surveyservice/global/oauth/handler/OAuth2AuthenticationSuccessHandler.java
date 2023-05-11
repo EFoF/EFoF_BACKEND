@@ -68,7 +68,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // 여기에 사용자 정보를 받아올 수 있어야 함.
         // 다른 곳에서 사용자의 정보를 저장할 방법이 도무지 없다. 여기서 DB에 다녀오겠다.
         MemberTokenPublishConfirmDTO memberTokenPublishConfirmDTO = memberCustomRepository.getMemberTokenPublishConfirm(Long.valueOf(authentication.getName())).orElseThrow(NotFoundByIdException::new);
-        CookieUtil.addCookie(response,TOKEN_PUBLISH_CONFIRM, memberTokenPublishConfirmDTO.getEmail(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
+        CookieUtil.addCookie(response,TOKEN_PUBLISH_CONFIRM, memberTokenPublishConfirmDTO.getEmail(),  CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
         String uriString = UriComponentsBuilder.fromUriString(targetUrl)
 //                .queryParam("token", tokenDTO.getAccessToken())
                 .build().toUriString();

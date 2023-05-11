@@ -18,10 +18,10 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
 
     //아직 구현 안 함
-    @Transactional(readOnly = true) // 사용자가 참여한 설문(MemberSurvey)의 질문에 대한 답 조회 로직
-    public void getAnwerDetail(AnswerDTO answerDTO, Long currentMemberId){
-        Optional<List<Answer>> answerDetail =
-                answerRepository.findByMemberSurveyAndQuestionAAndQuestionOption(); // 옘병이다.!!
-
-    }
+//    @Transactional(readOnly = true) // 사용자가 참여한 설문(MemberSurvey)의 질문에 대한 답 조회 로직
+//    public void getAnwerDetail(AnswerDTO answerDTO, Long currentMemberId){
+//        Optional<List<Answer>> answerDetail =
+//                answerRepository.findByMemberSurveyAndQuestionAAndQuestionOption(); // 옘병이다.!!
+//
+//    }
 }

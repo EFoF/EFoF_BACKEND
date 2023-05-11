@@ -20,9 +20,9 @@ public class AnswerController {
     private final AnswerRepository answerRepository;
 
     //아직 구현 안 함
-    @GetMapping(value = "/answer/memberSurvey/question") // 사용자가 참여한 설문(MemberSurvey)의 질문에 대한 답 조회
-    public void getAnswerDetail(){
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        answerService.getAnwerDetail(currentMemberId);
-    }
+//    @GetMapping(value = "/answer/memberSurvey/question") // 사용자가 참여한 설문(MemberSurvey)의 질문에 대한 답 조회
+//    public void getAnswerDetail(){
+//        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+//        answerService.getAnwerDetail(currentMemberId);
+//    }
 }

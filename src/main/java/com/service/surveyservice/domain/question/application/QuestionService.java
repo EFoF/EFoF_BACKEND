@@ -12,6 +12,7 @@ import com.service.surveyservice.domain.question.exception.exceptions.QuestionSe
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
+import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.section.exception.exceptions.SectionNotFoundException;
 import com.service.surveyservice.domain.section.exception.exceptions.SurveyMissMatchException;
 import com.service.surveyservice.domain.section.model.Section;
@@ -330,7 +331,7 @@ public class QuestionService {
 
         String img = questionOption.getQuestionOptionImg();
         s3Uploader.delete(img, DIRECTORY);
-        questionOption.setQuestionOptionImage(null);
+        questionOptionRepository.delete(questionOption);
     }
 
 
@@ -339,16 +340,11 @@ public class QuestionService {
      *
      * @param survey_id
      * @param member_id
-     * @param start_section_id
-     * @param start_section_idx
-     * @param end_section_id
-     * @param end_section_idx
      * @param question_id
      */
     @Transactional
-    public void updateQuestionOrder(Long survey_id, Long member_id,
-                                    Long start_section_id, int start_section_idx,
-                                    Long end_section_id, int end_section_idx,
+    public SectionDTO.UpdateSectionOrderResponseDto updateQuestionOrder(Long survey_id, Long member_id,
+                                    SectionDTO.UpdateSectionOrderRequestDto updateSectionOrderRequestDto,
                                     Long question_id) {
         //설문이 존재하지 않는경우
         checkSurveyOwner(member_id, survey_id);
@@ -356,14 +352,14 @@ public class QuestionService {
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
-        Section startSection = sectionRepository.findById(start_section_id)
+        Section startSection = sectionRepository.findById(updateSectionOrderRequestDto.getStartSectionId())
                 .orElseThrow(SectionNotFoundException::new);
 
-        Section endSection = sectionRepository.findById(end_section_id)
+        Section endSection = sectionRepository.findById(updateSectionOrderRequestDto.getEndSectionId())
                 .orElseThrow(SectionNotFoundException::new);
 
         //시작 섹션이 원래 question의 section id 이므로 검사
-        if (!question.getSection().getId().equals(start_section_id)) {
+        if (!question.getSection().getId().equals(updateSectionOrderRequestDto.getStartSectionId())) {
             throw new QuestionSectionMisMatchException();
         }
 
@@ -376,7 +372,7 @@ public class QuestionService {
             throw new QuestionOrderException();
         } else {//question이 여러개인 경우
             List<String> order = new ArrayList<>(Arrays.asList(startQuestionOrder.split(",")));
-            order.remove(start_section_idx);
+            order.remove(updateSectionOrderRequestDto.getStartSectionIdx());
             startSection.setQuestionOrder(new StringBuilder(order.get(0))
                     .append(order.stream().skip(1).map(s -> "," + s).collect(Collectors.joining())).toString());
         }
@@ -389,7 +385,7 @@ public class QuestionService {
             endSection.setQuestionOrder(String.valueOf(question.getId()));
         } else {//question이 여러개인 경우 1,2,3 이런식으로 되어있음
             List<String> order = new ArrayList<>(Arrays.asList(endQuestionOrder.split(",")));
-            order.add(end_section_idx, String.valueOf(question_id));
+            order.add(updateSectionOrderRequestDto.getEndSectionIdx(), String.valueOf(question_id));
             endSection.setQuestionOrder(new StringBuilder(order.get(0))
                     .append(order.stream().skip(1).map(s -> "," + s).collect(Collectors.joining())).toString());
 
@@ -397,6 +393,10 @@ public class QuestionService {
         }
 
         question.updateSection(endSection);
+        return SectionDTO.UpdateSectionOrderResponseDto.builder()
+                .questionSectionId(endSection.getId())
+                .startSectionOrder(startSection.getQuestionOrder())
+                .endSectionOrder(endSection.getQuestionOrder()).build();
     }
 
 

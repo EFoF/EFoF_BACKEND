@@ -72,6 +72,19 @@ public class MemberController {
 
     /**
      *
+     * @param updateMemberPasswordVisitorRequestDTO
+     * @return ResponseBody<String>
+     * 비밀번호 변경 - 로그인 안 된 상황
+     */
+    @PatchMapping(value = "/auth/update/password/visitor")
+    public ResponseEntity<String> updateMemberPasswordVisitor(@RequestBody UpdateMemberPasswordVisitorRequestDTO updateMemberPasswordVisitorRequestDTO) {
+        log.info("{}, {}", updateMemberPasswordVisitorRequestDTO.getEmail(), updateMemberPasswordVisitorRequestDTO.getNewPassword());
+        String result = memberService.updatePasswordVisitor(updateMemberPasswordVisitorRequestDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     *
      * @return ResponseBody<MemberDetail>
      * 특정 사용자 정보 조회
      */

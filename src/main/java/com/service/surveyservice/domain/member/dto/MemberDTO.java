@@ -212,4 +212,20 @@ public class MemberDTO {
             this.newPassword = passwordEncoder.encode(newPassword);
         }
     }
+
+    // 사용자의 요청으로 비밀번호를 변경하기 위한 DTO - 비 로그인 시
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateMemberPasswordVisitorRequestDTO {
+        private String email;
+        //        private String oldPassword;
+        private String newPassword;
+
+        public void encrypt(PasswordEncoder passwordEncoder) {
+//            this.oldPassword = passwordEncoder.encode(oldPassword);
+            this.newPassword = passwordEncoder.encode(newPassword);
+        }
+    }
 }

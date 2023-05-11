@@ -111,6 +111,28 @@ public class MemberService {
         return UPDATED;
     }
 
+    // 비밀번호 변경 - 로그인 안 된 상황
+    @Transactional
+    public String updatePasswordVisitor(UpdateMemberPasswordVisitorRequestDTO updateMemberPasswordVisitorRequestDTO) {
+        String email = updateMemberPasswordVisitorRequestDTO.getEmail();
+        String newPassword = updateMemberPasswordVisitorRequestDTO.getNewPassword();
+
+        // 해당 이메일로 사용자를 찾을 수 없다면 예외 발생
+        Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+
+        String oldPassword = member.getPassword();
+
+        // 기존 사용자의 비밀번호와 바꾸고자하는 비밀번호와 같다면 예외 발생
+        if(passwordEncoder.matches(newPassword, oldPassword)) {
+            throw new UpdateDuplicatedPasswordException();
+        }
+
+        // 비밀번호 변경
+        updateMemberPasswordVisitorRequestDTO.encrypt(passwordEncoder);
+        member.updatePasswordVisitorWithDTO(updateMemberPasswordVisitorRequestDTO);
+        return UPDATED;
+    }
+
     @Transactional
     public String updateMemberNickname(UpdateNicknameRequestDTO updateNicknameRequestDTO, Long currentMemberId) {
         String email = updateNicknameRequestDTO.getEmail();

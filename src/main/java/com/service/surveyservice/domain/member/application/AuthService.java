@@ -8,23 +8,29 @@ import com.service.surveyservice.domain.member.exception.exceptions.member.Inval
 import com.service.surveyservice.domain.member.exception.exceptions.member.NotSignInException;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.token.dao.RefreshTokenDao;
+import com.service.surveyservice.domain.token.exception.ExpiredRefreshTokenException;
 import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import com.service.surveyservice.global.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import java.util.concurrent.TimeUnit;
 
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
 import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
@@ -55,7 +61,7 @@ public class AuthService {
         return CREATED;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public MemberLoginDTO login(LoginRequestDTO loginRequestDto, HttpServletRequest request, HttpServletResponse response) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = loginRequestDto.toAuthentication();
         try {
@@ -64,15 +70,13 @@ public class AuthService {
             String refreshToken = tokenInfoDTO.getRefreshToken();
             saveRefreshTokenInStorage(refreshToken, Long.valueOf(authenticate.getName()));
             CookieUtil.deleteCookie(request, response, ACCESS_TOKEN);
+            //
+            CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
+            CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, loginRequestDto.getEmail(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
 
-            MemberLoginDTO memberLoginDTO = MemberLoginDTO.builder()
+            return MemberLoginDTO.builder()
                     .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
                     .build();
-
-            CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-            CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, memberLoginDTO.getMemberDetail().getEmail(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
-
-            return memberLoginDTO;
         } catch (BadCredentialsException e) {
             throw new InvalidEmailAndPasswordRequestException();
         }
@@ -85,28 +89,31 @@ public class AuthService {
      * 쿠키가 모두 유효하지만 만료되어서 다시 발급받아야 하는 경우 호출
      */
     @Transactional
-    public Boolean reissue(HttpServletRequest request, HttpServletResponse response) {
+    public void reissue(HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
         String accessToken;
-
+        // 쿠키가 없으면 로그인 조차 되어있지 않은 상태
         if(cookie == null) {
-            return false;
+            throw new NotSignInException();
+        } else {
+            accessToken = cookie.getValue();
         }
-
-        accessToken = cookie.getValue();
         Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
         Long memberId = Long.valueOf(authentication.getName());
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundByIdException::new);
-
+        // 1. 사용자가 존재하는지 확인
+        if(!memberRepository.existsById(memberId)) {
+            throw new NotFoundByIdException();
+        }
         // 2. redis에서 사용자 정보로 refresh token 가져오기
         String refreshToken = refreshTokenDao.getRefreshToken(memberId);
-
+        // 쿠키는 있지만 refresh token이 없다면 로그아웃된 사용자
+        // 하지만 로그인이라는 같은 기능을 요구하기 때문에 쿠키가 없을 때와 같은 예외를 발생시키겠음
         if(refreshToken == null) {
-            return false;
+            throw new NotSignInException();
         }
         // 3. refresh token 검증
-        if(!jwtTokenProvider.validateToken(refreshToken)) {
-            return false;
+        if(jwtTokenProvider.validateToken(refreshToken)) {
+            throw new InvalidRefreshTokenException();
         }
         // 4. 새로운 토큰 생성
         TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
@@ -114,8 +121,6 @@ public class AuthService {
         saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
         // 6. 토큰 발급
         CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-        CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, member.getEmail(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
-        return true;
     }
 
 

@@ -4,6 +4,7 @@ import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionOptionNotFoundException;
 import com.service.surveyservice.domain.question.model.QuestionOption;
+import com.service.surveyservice.domain.question.model.QuestionOptionImg;
 import com.service.surveyservice.domain.survey.dao.SurveyCustomRepositoryImpl;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;

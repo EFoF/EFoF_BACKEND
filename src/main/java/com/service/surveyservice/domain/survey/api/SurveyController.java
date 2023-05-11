@@ -42,14 +42,14 @@ public class SurveyController {
      */
 
     @PostMapping
-    public ResponseEntity<Long> createSurvey(@RequestBody SaveSurveyRequestDto saveSurveyRequestDto) {
+    public ResponseEntity<SurveyInfoDTO> createSurvey(@RequestBody SaveSurveyRequestDto saveSurveyRequestDto) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         Survey survey = surveyService.createSurvey(saveSurveyRequestDto, currentMemberId);
         sectionService.createSection(saveSurveyRequestDto, survey);
         questionService.createQuestionInit(saveSurveyRequestDto, survey);
 
-        return new ResponseEntity<>(survey.getId(),HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 //    @GetMapping(value = "/form/participate/{memberId}")

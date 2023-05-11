@@ -4,6 +4,7 @@ import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
+import com.service.surveyservice.domain.question.model.QuestionOptionImg;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
@@ -23,6 +24,7 @@ public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
 
     private final QuestionRepository questionRepository;
 
+    private final QuestionOptionImgRepository questionOptionImgRepository;
 
     private final QuestionOptionRepository questionOptionRepository;
 
@@ -59,6 +61,15 @@ public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
                     Section optionNextSection = sectionMap.get(requestSections.get(j).getQuestionList().get(k).getOptions().get(i).getNextSectionId());
                     QuestionOption questionOption = options.get(i).toQuestionOptionEntity(optionNextSection,questions.get(k));
 
+                    if(!options.get(i).getImage().isEmpty()){
+                        QuestionOptionImg questionOptionImg = options.get(i).toQuestionOptionImgEntity();
+                        questionOptionImgRepository.save(questionOptionImg);
+                        questionOption.setQuestionOptionImg(questionOptionImg);
+
+                    }
+                    else{
+                        questionOption.setQuestionOptionImg(null);
+                    }
                     questionOptionList.add(questionOption);
                 }
 

@@ -80,19 +80,13 @@ public class MemberExceptionHandler {
         return NOT_SIGN_IN;
     }
 
-    @ExceptionHandler(InvalidRefreshTokenException.class)
-    protected ResponseEntity<ErrorResponse> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex, WebRequest request) {
-        log.error(request.getDescription(false));
-        return INVALID_REFRESH_TOKEN;
-    }
-
     @ExceptionHandler(DuplicatedEmailException.class)
     protected final ResponseEntity<ErrorResponse> handleDuplicatedEmailException(DuplicatedEmailException ex, WebRequest request) {
         log.error(request.getDescription(false));
         return DUPLICATED_EMAIL;
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         List<ObjectError> allErrors = ex.getBindingResult().getAllErrors();
         String message = getMessage(allErrors.iterator());

@@ -3,7 +3,11 @@ package com.service.surveyservice.domain.member.api;
 import com.service.surveyservice.domain.member.application.AuthService;
 import com.service.surveyservice.domain.member.application.EmailCertificationService;
 import com.service.surveyservice.domain.member.application.MemberService;
-import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidRefreshTokenException;
+//import com.service.surveyservice.domain.member.application.OAuth2UserService;
+import com.service.surveyservice.domain.member.dto.MailDTO;
+import com.service.surveyservice.domain.member.dto.MemberDTO;
+import com.service.surveyservice.domain.member.dto.OAuthDTO;
+import com.service.surveyservice.domain.token.dto.TokenDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,10 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
-import static com.service.surveyservice.global.common.constants.JwtConstants.TOKEN_PUBLISH_CONFIRM;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -105,7 +106,6 @@ public class AuthController {
      */
     @PostMapping(value = "/auth/codeConfirm")
     public ResponseEntity<CodeConfirmDTO> codeConfirm(@RequestBody EmailConfirmCodeDTO emailConfirmCodeDTO) {
-        log.info("이메일 : {}, 코드 : {}", emailConfirmCodeDTO.getEmail(), emailConfirmCodeDTO.getCode());
         return new ResponseEntity<>(emailCertificationService.confirmCode(emailConfirmCodeDTO), HttpStatus.OK);
     }
 
@@ -139,16 +139,7 @@ public class AuthController {
      * 로그아웃 리디렉션
      */
     @GetMapping(value = "/logout-redirect")
-    public ResponseEntity<String> loginRedirect(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null) {
-            for (Cookie cookie : cookies) {
-                if(cookie.getName().equals(TOKEN_PUBLISH_CONFIRM) || cookie.getName().equals(ACCESS_TOKEN)) {
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                }
-            }
-        }
+    public ResponseEntity<String> loginRedirect() {
         return new ResponseEntity<>(LOGOUT, HttpStatus.OK);
     }
 
@@ -159,11 +150,9 @@ public class AuthController {
      * @return ResponseBody<String> (null)
      * 토큰 reissue
      */
-    @PostMapping(value = "/auth/reissue")
+    @PostMapping(value = "/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
-        if(!authService.reissue(request, response)) {
-            throw new InvalidRefreshTokenException();
-        }
+        authService.reissue(request, response);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 

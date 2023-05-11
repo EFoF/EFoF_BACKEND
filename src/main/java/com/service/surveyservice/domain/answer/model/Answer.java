@@ -26,7 +26,7 @@ public class Answer extends BaseTimeEntity {
     private Question question;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberSurvey_id")
+    @JoinColumn(name = "memberSurvey_id") // 특정 멤버가 참여한 특정 설문
     private MemberSurvey memberSurvey;
 
     // 객관식 답변

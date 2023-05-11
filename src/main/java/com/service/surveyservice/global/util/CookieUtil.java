@@ -1,6 +1,5 @@
 package com.service.surveyservice.global.util;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.SerializationUtils;
 
 import javax.servlet.http.Cookie;
@@ -9,9 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.Optional;
 
-import static com.service.surveyservice.global.common.constants.AuthenticationConstants.COOKIE_EXPIRE_SECONDS;
-
-@Slf4j
 public class CookieUtil {
 
     /**
@@ -60,7 +56,6 @@ public class CookieUtil {
                     cookie.setPath("/");
                     cookie.setMaxAge(0);
                     response.addCookie(cookie);
-                    log.error(name + " 쿠키 삭제됨");
                 }
             }
         }

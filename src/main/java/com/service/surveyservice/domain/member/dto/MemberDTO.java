@@ -56,9 +56,8 @@ public class MemberDTO {
                     .email(email)
                     .password(password)
                     .username(userName)
-                    .nickname(nickname=userName)
-                    .authority(Authority.ROLE_USER)
-                    .memberLoginType(MemberLoginType.DOKSEOL_LOGIN)
+                    .nickname(nickname)
+                    .authority(authority)
                     .build();
         }
     }
@@ -104,20 +103,6 @@ public class MemberDTO {
             this.username = username;
             this.nickname = nickname;
             this.email = email;
-        }
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    public static class MemberTokenPublishConfirmDTO {
-        private String email;
-        private String nickname;
-
-        @QueryProjection
-        public MemberTokenPublishConfirmDTO(String email, String nickname) {
-            this.email = email;
-            this.nickname = nickname;
         }
     }
 
@@ -209,22 +194,6 @@ public class MemberDTO {
 
         public void encrypt(PasswordEncoder passwordEncoder) {
             this.oldPassword = passwordEncoder.encode(oldPassword);
-            this.newPassword = passwordEncoder.encode(newPassword);
-        }
-    }
-
-    // 사용자의 요청으로 비밀번호를 변경하기 위한 DTO - 비 로그인 시
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UpdateMemberPasswordVisitorRequestDTO {
-        private String email;
-//        private String oldPassword;
-        private String newPassword;
-
-        public void encrypt(PasswordEncoder passwordEncoder) {
-//            this.oldPassword = passwordEncoder.encode(oldPassword);
             this.newPassword = passwordEncoder.encode(newPassword);
         }
     }

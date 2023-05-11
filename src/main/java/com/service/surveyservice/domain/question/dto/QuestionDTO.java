@@ -22,8 +22,7 @@ public class QuestionDTO {
         private String id;
         private int type;
         private String questionContent;
-        private Boolean isNecessary;
-
+        private boolean isNecessary;
         private List<QuestionOptionDTO.SaveQuestionOptionRequestDTOInit> options;
 
         public Question toEntity(Section section) {
@@ -49,29 +48,16 @@ public class QuestionDTO {
     public static class SaveQuestionRequestDto {
         private int type;
         private String questionContent;
-        private Boolean isNecessary;
+        private boolean isNecessary;
 
 
         public Question toEntity(Section section){
             return Question.builder()
                     .section(section)
-                    .questionText(this.getQuestionContent())
-                    .isNecessary(this.getIsNecessary())
-                    .questionType(QuestionType.fromId(this.getType()))
+                    .questionText(this.questionContent)
+                    .isNecessary(this.isNecessary)
+                    .questionType(QuestionType.fromId(this.type))
                     .build();
         }
     }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ResponseSaveQuestionDto{
-        private Long question_id;
-        private QuestionType questionType;
-        private String questionText;
-        private Boolean isNecessary;
-        private Long section_id;
-    }
-
 }

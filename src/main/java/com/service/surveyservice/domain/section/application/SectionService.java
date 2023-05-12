@@ -1,10 +1,15 @@
 package com.service.surveyservice.domain.section.application;
 
+import com.service.surveyservice.domain.question.dao.QuestionRepository;
+import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.section.dao.SectionCustomRepository;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.section.model.Section;
+import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +34,11 @@ public class SectionService {
     private final SectionRepository sectionRepository;
 
     private final SectionCustomRepository sectionCustomRepository;
+
+    private final QuestionRepository questionRepository;
+
+    private final SurveyRepository surveyRepository;
+
     @Transactional
     public void createSection(SurveyDTO.SaveSurveyRequestDto saveSurveyRequestDto, Survey survey) {
 
@@ -38,6 +48,10 @@ public class SectionService {
 
     @Transactional
     public void addSection(Long survey_id){
+
+        Section section = sectionRepository.save(Section.builder().build());
+        Question question = questionRepository.save(Question.builder().section(section).build());
+
 
     }
     @Transactional
@@ -63,6 +77,23 @@ public class SectionService {
     @Transactional
     public List<Section> findSectionListBySurveyId(Long surveyId){
         return sectionRepository.findBySurveyId(surveyId);
+    }
+
+    /**
+     * 설문 생성자가 요청한 것인지 확인
+     *
+     * @param member_id
+     * @param survey_id
+     */
+    private void checkSurveyOwner(Long member_id, Long survey_id) {
+        //설문이 존재하지 않는경우
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
+        //설문 생성자의 요청이 아닌 경우
+        if (!survey.getAuthor().getId().equals(member_id)) {
+            throw new SurveyMemberMisMatchException();
+        }
     }
 
 

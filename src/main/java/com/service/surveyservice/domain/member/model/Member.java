@@ -64,6 +64,10 @@ public class Member extends MemberBase {
         super.updatePassword(updateMemberPasswordRequestDTO.getNewPassword());
     }
 
+    // 사용자의 비밀번호 변경 요청을 수행할 때 사용됨 - 비 로그인 시
+    public void updatePasswordVisitorWithDTO(UpdateMemberPasswordVisitorRequestDTO updateMemberPasswordVisitorRequestDTO) {
+        super.updatePassword(updateMemberPasswordVisitorRequestDTO.getNewPassword());
+    }
 
 }
 

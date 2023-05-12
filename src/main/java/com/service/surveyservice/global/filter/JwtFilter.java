@@ -41,16 +41,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request) {
         // 여기서 헤더를 까야한다.
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            log.error(bearerToken.substring(7));
-            return bearerToken.substring(7);
-        }
-        return null;
-//        Cookie bearerToken = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
-//        if(bearerToken != null) {
-//            return bearerToken.getValue();
+//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+//        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+//            log.error(bearerToken.substring(7));
+//            return bearerToken.substring(7);
 //        }
 //        return null;
+        Cookie bearerToken = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
+        if(bearerToken != null) {
+            return bearerToken.getValue();
+        }
+        return null;
     }
 }

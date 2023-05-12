@@ -160,11 +160,8 @@ public class AuthController {
      * 토큰 reissue
      */
     @PostMapping(value = "/auth/reissue")
-    public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
-        if(!authService.reissue(request, response)) {
-            throw new InvalidRefreshTokenException();
-        }
-        return new ResponseEntity<>(null, HttpStatus.OK);
+    public ResponseEntity<TokenIssueDTO> reissue(HttpServletRequest request, HttpServletResponse response) {
+        return new ResponseEntity<>(authService.reissue(request,response), HttpStatus.OK);
     }
 
 }

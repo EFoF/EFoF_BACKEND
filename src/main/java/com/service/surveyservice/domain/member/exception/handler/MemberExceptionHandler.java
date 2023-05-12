@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.member.exception.handler;
 
+import com.service.surveyservice.domain.member.exception.exceptions.mail.EmailCertificationExpireException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.*;
 import com.service.surveyservice.global.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +91,12 @@ public class MemberExceptionHandler {
     protected final ResponseEntity<ErrorResponse> handleDuplicatedEmailException(DuplicatedEmailException ex, WebRequest request) {
         log.error(request.getDescription(false));
         return DUPLICATED_EMAIL;
+    }
+
+    @ExceptionHandler(EmailCertificationExpireException.class)
+    protected final ResponseEntity<ErrorResponse> handleEmailCertificationExpireException(EmailCertificationExpireException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return EMAIL_CERTIFICATE_EXPIRE;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

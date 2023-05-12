@@ -188,7 +188,7 @@ public class QuestionService {
      * @param survey_id
      */
     @Transactional
-    public void createQuestionOption(QuestionOptionDTO.SaveQuestionOptionTextRequestDTO saveQuestionOptionTextRequestDTO,
+    public Long createQuestionOption(QuestionOptionDTO.SaveQuestionOptionTextRequestDTO saveQuestionOptionTextRequestDTO,
                                      Long member_id, Long question_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
@@ -200,7 +200,8 @@ public class QuestionService {
 
         QuestionOption questionOption = saveQuestionOptionTextRequestDTO.toEntity(question);
 
-        questionOptionRepository.save(questionOption);
+        QuestionOption savedQuestionOption = questionOptionRepository.save(questionOption);
+        return savedQuestionOption.getId();
     }
 
     /**

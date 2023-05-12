@@ -69,14 +69,14 @@ public class QuestionController {
 
 
     @PostMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}")
-    public ResponseEntity createQuestionOption(
+    public ResponseEntity<Long> createQuestionOption(
             @RequestBody QuestionOptionDTO.SaveQuestionOptionTextRequestDTO saveQuestionOptionTextRequestDTO,
             @PathVariable Long question_id, @PathVariable Long section_id, @PathVariable Long survey_id) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
-        questionService.createQuestionOption(saveQuestionOptionTextRequestDTO,currentMemberId,question_id,survey_id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Long questionOptionId = questionService.createQuestionOption(saveQuestionOptionTextRequestDTO, currentMemberId, question_id, survey_id);
+        return new ResponseEntity<>(questionOptionId,HttpStatus.OK);
     }
 
     @PatchMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}/question_option/{question_option_id}")

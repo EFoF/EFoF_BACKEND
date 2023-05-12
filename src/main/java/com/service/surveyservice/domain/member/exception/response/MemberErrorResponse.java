@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.member.exception.response;
 
+import com.service.surveyservice.domain.member.exception.exceptions.mail.EmailCertificationExpireException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.*;
 import com.service.surveyservice.global.error.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -42,4 +43,7 @@ public class MemberErrorResponse {
 
     public static final ResponseEntity<ErrorResponse> DUPLICATED_EMAIL = new ResponseEntity<>(ErrorResponse.builder()
             .exceptionName(DuplicatedEmailException.class.getSimpleName()).message("다른 사용자가 사용 중인 이메일입니다.").build(), HttpStatus.CONFLICT);
+
+    public static final ResponseEntity<ErrorResponse> EMAIL_CERTIFICATE_EXPIRE = new ResponseEntity<>(ErrorResponse.builder()
+            .exceptionName(EmailCertificationExpireException.class.getSimpleName()).message("유효하지 않은 인증 코드입니다.").build(), HttpStatus.GONE);
 }

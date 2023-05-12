@@ -14,4 +14,7 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     @Query(value = "SELECT s FROM Section s WHERE s.survey.id = :survey_id")
     List<Section> findBySurveyId(@Param("survey_id")Long survey_id);
 
+    @Query(value = "SELECT s.id FROM Section s WHERE s.survey.id=:survey_id")
+    List<Long> findIdBySurveyId(@Param("survey_id")Long survey_id);
+
 }

@@ -1,13 +1,20 @@
 package com.service.surveyservice.domain.constraintoptions.model;
 
+import com.service.surveyservice.domain.answer.dto.AnswerDTO;
+import com.service.surveyservice.domain.constraintoptions.dto.ConstraintDTO;
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
+import com.service.surveyservice.domain.question.model.Question;
+import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
-@ToString
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConstraintOptions {
@@ -24,9 +31,25 @@ public class ConstraintOptions {
     private LocationConstraintOptions locationConstraintOptions;
 
     @Column
-    private String constraintType; //통계보기 허용, 수정 허용, GPS , PASSWORD , EMAIL, 익명
+    @Enumerated(value = EnumType.STRING)
+    private ConstraintType constraintType; //통계보기 허용, 수정 허용, GPS , PASSWORD , EMAIL, 익명
 
     @Column
     private String ConstraintValue; //GPS 나 PASSWORD, EMAIL 의 경우 값이 필요함
+
+
+    public ConstraintDTO.SurveyForStatisticConstraintResponseDto toResponseDto() {
+
+        return ConstraintDTO.SurveyForStatisticConstraintResponseDto.builder()
+                .id(this.getId())
+                .constraintType(this.getConstraintType())
+                .ConstraintValue(this.getConstraintValue())
+                .build();
+    }
+    public static List<ConstraintDTO.SurveyForStatisticConstraintResponseDto> toEntities(List<ConstraintOptions> constraintOptionsList) {
+        return constraintOptionsList.stream()
+                .map(dto -> dto.toResponseDto())
+                .collect(Collectors.toList());
+    }
 }
 

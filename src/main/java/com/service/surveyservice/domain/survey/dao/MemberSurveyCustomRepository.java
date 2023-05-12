@@ -9,4 +9,6 @@ import static com.service.surveyservice.domain.survey.dto.MemberSurveyDTO.*;
 public interface MemberSurveyCustomRepository {
 
     Page<MemberSurveyInfoDTO> findByMemberIdWithPage(Long id, Pageable pageable);
+
+
 }

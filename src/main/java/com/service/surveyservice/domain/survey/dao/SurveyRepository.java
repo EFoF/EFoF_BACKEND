@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.survey.dao;
 
+import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,6 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, SurveyCus
             ") AND qoi.img_url IS NOT NULL;"
             , nativeQuery = true)
     List<String> findImgUrlBySurveyId(@Param("survey_id")Long survey_id);
+
+
 }

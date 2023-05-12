@@ -67,10 +67,10 @@ public class AuthService {
 
             MemberLoginDTO memberLoginDTO = MemberLoginDTO.builder()
                     .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
+                    .tokenIssueDTO(tokenInfoDTO.toTokenIssueDTO())
                     .build();
 
             CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-            CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, memberLoginDTO.getMemberDetail().getEmail(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
 
             return memberLoginDTO;
         } catch (BadCredentialsException e) {
@@ -113,8 +113,7 @@ public class AuthService {
         // 5. 저장소에 저장
         saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
         // 6. 토큰 발급
-        CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-        CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, member.getEmail(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
+        CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
         return true;
     }
 

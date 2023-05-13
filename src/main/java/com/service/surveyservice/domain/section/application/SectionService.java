@@ -47,13 +47,15 @@ public class SectionService {
     }
 
     @Transactional
-    public void addSection(Long survey_id){
+    public SectionDTO.createSectionResponseDto addSection(Long survey_id){
 
         Section section = sectionRepository.save(Section.builder().build());
         Question question = questionRepository.save(Question.builder().section(section).build());
+        SectionDTO.createSectionResponseDto createSectionResponseDto = section.toResponseDto(question);
 
-
+        return createSectionResponseDto;
     }
+
     @Transactional
     public void updateSection(SurveyDTO.SaveSurveyRequestDto saveSurveyRequestDto, Survey survey) {
 

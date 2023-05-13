@@ -1,7 +1,11 @@
 package com.service.surveyservice.domain.section.model;
 
+import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.model.Question;
+import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
+import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
@@ -54,6 +58,16 @@ public class Section {
     }
     public void setQuestionOrder(@Nullable String questionOrder){
         this.questionOrder = questionOrder;
+    }
+
+    public SectionDTO.createSectionResponseDto toResponseDto(Question question) {
+        List<QuestionDTO.createSectionResponseQuestionDto> questionList = new ArrayList<>();
+        questionList.add(question.toCreateSectionResponseDto());
+
+        return SectionDTO.createSectionResponseDto.builder()
+                .questionList(questionList)
+                .id(this.getId())
+                .build();
     }
 }
 

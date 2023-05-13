@@ -56,5 +56,15 @@ public class Question {
                 .questionType(this.getQuestionType())
                 .build();
     }
+
+    public QuestionDTO.createSectionResponseQuestionDto toCreateSectionResponseDto(){
+        return QuestionDTO.createSectionResponseQuestionDto
+                .builder()
+                .questionContent(this.getQuestionText())
+                .id(this.getId())
+                .isNecessary(this.getIsNecessary())
+                .type(this.getQuestionType().getId())
+                .build();
+    }
 }
 

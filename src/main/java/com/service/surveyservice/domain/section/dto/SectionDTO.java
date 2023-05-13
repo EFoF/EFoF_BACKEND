@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static com.service.surveyservice.domain.question.dto.QuestionDTO.*;
+
 public class SectionDTO {
 
     @Getter
@@ -18,7 +20,7 @@ public class SectionDTO {
     public static class SaveSectionRequestDto{
         private String id;
         private String nextSectionId;
-        private List<QuestionDTO.SaveSurveyQuestionRequestDto> questionList;
+        private List<SaveSurveyQuestionRequestDto> questionList;
 
     }
 
@@ -46,6 +48,16 @@ public class SectionDTO {
 
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class createSectionResponseDto{
+        private Long id;
+        private Long nextSectionId;
+        private List<createSectionResponseQuestionDto> questionList;
+
+    }
 
 
 }

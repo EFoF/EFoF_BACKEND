@@ -74,4 +74,15 @@ public class QuestionDTO {
         private Long section_id;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class createSectionResponseQuestionDto{
+        private Long id;
+        private Long type;
+        private String questionContent;
+        private Boolean isNecessary;
+    }
+
 }

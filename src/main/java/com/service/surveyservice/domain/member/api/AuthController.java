@@ -160,7 +160,7 @@ public class AuthController {
      * 토큰 reissue
      */
     @PostMapping(value = "/auth/reissue")
-    public ResponseEntity<TokenIssueDTO> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<LoginLastDTO> reissue(HttpServletRequest request, HttpServletResponse response) {
         return new ResponseEntity<>(authService.reissue(request,response), HttpStatus.OK);
     }
 

@@ -32,6 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String jwt = resolveToken(request);
+        log.error("resolve 이후의 토큰" + jwt);
         if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -40,18 +41,18 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        // 여기서 헤더를 까야한다.
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
-        }
-        return null;
-
-        // 이전에 활용했던 쿠키 방식이다.
-//        Cookie bearerToken = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
-//        if(bearerToken != null) {
-//            return bearerToken.getValue();
+        // redux persist를 활용한 로직이다.
+//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+//        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+//            return bearerToken.substring(7);
 //        }
 //        return null;
+
+
+        Cookie bearerToken = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
+        if(bearerToken != null) {
+            return bearerToken.getValue();
+        }
+        return null;
     }
 }

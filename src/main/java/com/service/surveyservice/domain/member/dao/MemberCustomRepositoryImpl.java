@@ -41,7 +41,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     @Override
     public Optional<MemberTokenPublishConfirmDTO> getMemberTokenPublishConfirm(Long userId) {
         MemberTokenPublishConfirmDTO memberTokenPublishConfirmDTO = queryFactory
-                .select(new QMemberDTO_MemberTokenPublishConfirmDTO(member.email, member.nickname))
+                .select(new QMemberDTO_MemberTokenPublishConfirmDTO(member.memberLoginType))
                 .from(member)
                 .where(member.id.eq(userId)).fetchOne();
         return Optional.ofNullable(memberTokenPublishConfirmDTO);

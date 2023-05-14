@@ -7,9 +7,11 @@ import com.service.surveyservice.domain.member.exception.exceptions.member.Inval
 import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidRefreshTokenException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.NotSignInException;
 import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.member.model.MemberLoginType;
 import com.service.surveyservice.domain.token.dao.RefreshTokenDao;
 import com.service.surveyservice.domain.token.exception.exceptions.NoAuthorizationHeaderException;
 import com.service.surveyservice.domain.token.exception.exceptions.NoSuchAccessTokenException;
+import com.service.surveyservice.domain.token.exception.exceptions.NoSuchCookieException;
 import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import com.service.surveyservice.global.util.CookieUtil;
@@ -27,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.util.Date;
 
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
 import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
@@ -67,9 +71,15 @@ public class AuthService {
             saveRefreshTokenInStorage(refreshToken, Long.valueOf(authenticate.getName()));
             CookieUtil.deleteCookie(request, response, ACCESS_TOKEN);
 
+
+            long now = new Date().getTime();
+            Date loginExpire = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
             MemberLoginDTO memberLoginDTO = MemberLoginDTO.builder()
                     .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
-                    .tokenIssueDTO(tokenInfoDTO.toTokenIssueDTO())
+                    .loginLastDTO(LoginLastDTO.builder()
+                            .expiresAt(loginExpire.getTime()).build())
+//                            .loginType(MemberLoginType.DOKSEOL_LOGIN)
+//                              .tokenIssueDTO(tokenInfoDTO.toTokenIssueDTO())
                     .build();
 
             CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
@@ -120,13 +130,21 @@ public class AuthService {
 //    }
 
     @Transactional
-    public TokenIssueDTO reissue(HttpServletRequest request, HttpServletResponse response) {
-        String tokenOptional = request.getHeader(AUTHORIZATION_HEADER);
-        if(tokenOptional == null) {
-            throw new NoAuthorizationHeaderException();
+    public LoginLastDTO reissue(HttpServletRequest request, HttpServletResponse response) {
+//        String tokenOptional = request.getHeader(AUTHORIZATION_HEADER);
+//        if(tokenOptional == null) {
+//            throw new NoAuthorizationHeaderException();
+//        }
+//
+//        String token = tokenOptional.split(" ")[1];
+        Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
+        String accessToken;
+
+        if(cookie == null) {
+            throw new NoSuchCookieException();
         }
-        // header에서 토큰을 받아온 뒤 이전 쿠키 로직과 동일하게 처리한다. 근데 header가 없으면 여기서 어떻게 되는거지?
-        String token = tokenOptional.split(" ")[1];
+
+        String token = cookie.getValue();
 
         Authentication authentication = jwtTokenProvider.getAuthentication(token);
         Long memberId = Long.valueOf(authentication.getName());
@@ -146,7 +164,11 @@ public class AuthService {
         // 5. 저장소에 저장
         saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
 //        // 6. 토큰 발급
-        return tokenInfoDTO.toTokenIssueDTO();
+        log.info("토큰 재발급 성공");
+        CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
+        long now = new Date().getTime();
+        Date loginExpire = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+        return LoginLastDTO.builder().expiresAt(loginExpire.getTime()).build();
     }
 
 

@@ -112,13 +112,10 @@ public class MemberDTO {
     @Builder
     @NoArgsConstructor
     public static class MemberTokenPublishConfirmDTO {
-        private String email;
-        private String nickname;
-
+        private MemberLoginType memberLoginType;
         @QueryProjection
-        public MemberTokenPublishConfirmDTO(String email, String nickname) {
-            this.email = email;
-            this.nickname = nickname;
+        public MemberTokenPublishConfirmDTO(MemberLoginType memberLoginType) {
+            this.memberLoginType = memberLoginType;
         }
     }
 

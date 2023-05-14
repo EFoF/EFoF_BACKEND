@@ -86,7 +86,16 @@ public class MemberDTO {
     public static class MemberLoginDTO {
 
         private MemberDetail memberDetail;
-        private TokenIssueDTO tokenIssueDTO;
+        private LoginLastDTO loginLastDTO;
+//        private TokenIssueDTO tokenIssueDTO;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginLastDTO {
+        private Long expiresAt;
     }
 
 

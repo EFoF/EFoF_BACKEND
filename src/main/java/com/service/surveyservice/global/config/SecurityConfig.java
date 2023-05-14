@@ -78,7 +78,8 @@ public class SecurityConfig {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/form").access("hasRole('ADMIN') or hasRole('USER')")
                 .antMatchers("/user/**").access("hasRole('ADMIN') or hasRole('USER')")
-                .anyRequest().hasAnyRole()
+//                .anyRequest().hasAnyRole("USER")
+                .anyRequest().permitAll()
 
                 .and()
                 .apply(new JwtSecurityConfig(jwtTokenProvider))

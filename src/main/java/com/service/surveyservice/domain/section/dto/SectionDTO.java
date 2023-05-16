@@ -59,5 +59,14 @@ public class SectionDTO {
 
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class updateSectionDto{
+        private Long nextSectionId;
+
+    }
+
 
 }

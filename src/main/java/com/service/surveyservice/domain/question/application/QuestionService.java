@@ -14,6 +14,7 @@ import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.section.exception.exceptions.SectionNotFoundException;
+import com.service.surveyservice.domain.section.exception.exceptions.SectionQuestionMissMatchException;
 import com.service.surveyservice.domain.section.exception.exceptions.SurveyMissMatchException;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
@@ -101,11 +102,11 @@ public class QuestionService {
         Question savedQuestion = questionRepository.save(question);
 
         //section에 question order 수정 로직
-        if (questionOrder.length() == 1) { //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
-            section.setQuestionOrder(questionOrder.concat(",").concat(String.valueOf(savedQuestion.getId())));
-        } else if (questionOrder.isEmpty()) {//글자가 없는 경우 question이 0개인 경우
+         if (questionOrder==null||questionOrder.isBlank()) {//글자가 없는 경우 question이 0개인 경우
             section.setQuestionOrder(String.valueOf(savedQuestion.getId()));
-        } else {
+        } else if (questionOrder.length() == 1) { //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
+             section.setQuestionOrder(questionOrder.concat(",").concat(String.valueOf(savedQuestion.getId())));
+         } else {
             section.setQuestionOrder(questionOrder.concat("," + savedQuestion.getId()));
         }
 
@@ -125,7 +126,8 @@ public class QuestionService {
     public void updateQuestionContent(QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
                                       Long member_id,
                                       Long question_id,
-                                      Long survey_id) {
+                                      Long survey_id,
+                                      Long section_id) {
 
         checkSurveyOwner(member_id, survey_id);
 
@@ -133,6 +135,9 @@ public class QuestionService {
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
+        if(!question.getSection().getId().equals(section_id)){
+            throw new SectionQuestionMissMatchException();
+        }
         question.updateQuestion(saveQuestionRequestDto);
     }
 
@@ -169,8 +174,12 @@ public class QuestionService {
         if (questionOrder.length() == 1) { //1글자인 경우 즉 question 이 1개인 경우 모든 question 이 없어지는 것
             section.setQuestionOrder(null);
         } else {
-            String[] questionOrderList = questionOrder.split(",");
-            section.setQuestionOrder(String.join(",", Arrays.copyOfRange(questionOrderList, 0, questionOrderList.length - 1)));
+            List<String> questionOrderList =  new ArrayList<>(Arrays.asList(questionOrder.split(",")));
+            questionOrderList.remove(question.getId().toString());
+
+            section.setQuestionOrder(
+                    String.join(",",
+                            questionOrderList));
 
         }
 

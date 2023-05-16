@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.section.application;
 
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.model.Question;
+import com.service.surveyservice.domain.question.model.QuestionType;
 import com.service.surveyservice.domain.section.dao.SectionCustomRepository;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
@@ -55,10 +56,10 @@ public class SectionService {
     @Transactional
     public SectionDTO.createSectionResponseDto addSection(Long survey_id,Long member_id){
 
-        checkSurveyOwner(member_id,survey_id);
+        Survey survey = checkSurveyOwner(member_id, survey_id);
 
-        Section section = sectionRepository.save(Section.builder().build());
-        Question question = questionRepository.save(Question.builder().section(section).build());
+        Section section = sectionRepository.save(Section.builder().survey(survey).build());
+        Question question = questionRepository.save(Question.builder().section(section).questionType(QuestionType.ONE_CHOICE).isNecessary(false).build());
         SectionDTO.createSectionResponseDto createSectionResponseDto = section.toResponseDto(question);
 
         return createSectionResponseDto;
@@ -94,13 +95,34 @@ public class SectionService {
         return sectionRepository.findBySurveyId(surveyId);
     }
 
+
+    @Transactional
+    public void updateNextSection(SectionDTO.updateSectionDto updateSectionDto
+            ,Long surveyId,Long member_id,Long section_id){
+
+        checkSurveyOwner(member_id,surveyId);
+        Section section = sectionRepository.findById(section_id).orElse(null);
+        if(section==null){
+            throw new SectionNotFoundException();
+        }
+
+        Section nextSection =
+                sectionRepository.findById(updateSectionDto.getNextSectionId()).orElse(null);
+        if(nextSection==null){
+            throw new SectionNotFoundException();
+        }
+
+        section.setParentSection(nextSection);
+    }
+
+
     /**
      * 설문 생성자가 요청한 것인지 확인
      *
      * @param member_id
      * @param survey_id
      */
-    private void checkSurveyOwner(Long member_id, Long survey_id) {
+    private Survey checkSurveyOwner(Long member_id, Long survey_id) {
         //설문이 존재하지 않는경우
         Survey survey = surveyRepository.findById(survey_id)
                 .orElseThrow(SurveyNotFoundException::new);
@@ -109,6 +131,7 @@ public class SectionService {
         if (!survey.getAuthor().getId().equals(member_id)) {
             throw new SurveyMemberMisMatchException();
         }
+        return survey;
     }
 
 

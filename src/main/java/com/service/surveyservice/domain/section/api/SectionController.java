@@ -42,4 +42,14 @@ public class SectionController {
         sectionService.deleteSection(survey_id,currentMemberId,section_id);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @PatchMapping(value = "/survey/{survey_id}/section/{section_id}")
+    public ResponseEntity updateSection(
+            @RequestBody SectionDTO.updateSectionDto updateSectionDto,
+            @PathVariable Long survey_id, @PathVariable Long section_id) {
+
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        sectionService.updateNextSection(updateSectionDto,survey_id,currentMemberId,section_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

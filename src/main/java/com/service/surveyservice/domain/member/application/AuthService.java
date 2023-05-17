@@ -7,7 +7,11 @@ import com.service.surveyservice.domain.member.exception.exceptions.member.Inval
 import com.service.surveyservice.domain.member.exception.exceptions.member.InvalidRefreshTokenException;
 import com.service.surveyservice.domain.member.exception.exceptions.member.NotSignInException;
 import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.member.model.MemberLoginType;
 import com.service.surveyservice.domain.token.dao.RefreshTokenDao;
+import com.service.surveyservice.domain.token.exception.exceptions.NoAuthorizationHeaderException;
+import com.service.surveyservice.domain.token.exception.exceptions.NoSuchAccessTokenException;
+import com.service.surveyservice.domain.token.exception.exceptions.NoSuchCookieException;
 import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import com.service.surveyservice.global.jwt.JwtTokenProvider;
 import com.service.surveyservice.global.util.CookieUtil;
@@ -25,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.util.Date;
 
 import static com.service.surveyservice.domain.member.dto.MemberDTO.*;
 import static com.service.surveyservice.domain.token.dto.TokenDTO.*;
@@ -65,12 +71,18 @@ public class AuthService {
             saveRefreshTokenInStorage(refreshToken, Long.valueOf(authenticate.getName()));
             CookieUtil.deleteCookie(request, response, ACCESS_TOKEN);
 
+
+            long now = new Date().getTime();
+            Date loginExpire = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
             MemberLoginDTO memberLoginDTO = MemberLoginDTO.builder()
                     .memberDetail(memberCustomRepository.getMemberDetail(Long.parseLong(authenticate.getName())))
+                    .loginLastDTO(LoginLastDTO.builder()
+                            .expiresAt(loginExpire.getTime()).build())
+//                            .loginType(MemberLoginType.DOKSEOL_LOGIN)
+//                              .tokenIssueDTO(tokenInfoDTO.toTokenIssueDTO())
                     .build();
 
             CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-            CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, memberLoginDTO.getMemberDetail().getEmail(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
 
             return memberLoginDTO;
         } catch (BadCredentialsException e) {
@@ -84,40 +96,80 @@ public class AuthService {
      * @param response
      * 쿠키가 모두 유효하지만 만료되어서 다시 발급받아야 하는 경우 호출
      */
+//    @Transactional
+//    public Boolean reissue(HttpServletRequest request, HttpServletResponse response) {
+//        Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
+//        String accessToken;
+//
+//        if(cookie == null) {
+//            return false;
+//        }
+//
+//        accessToken = cookie.getValue();
+//        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+//        Long memberId = Long.valueOf(authentication.getName());
+//        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundByIdException::new);
+//
+//        // 2. redis에서 사용자 정보로 refresh token 가져오기
+//        String refreshToken = refreshTokenDao.getRefreshToken(memberId);
+//
+//        if(refreshToken == null) {
+//            return false;
+//        }
+//        // 3. refresh token 검증
+//        if(!jwtTokenProvider.validateToken(refreshToken)) {
+//            return false;
+//        }
+//        // 4. 새로운 토큰 생성
+//        TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
+//        // 5. 저장소에 저장
+//        saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
+//        // 6. 토큰 발급
+//        CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, false);
+//        return true;
+//    }
+
     @Transactional
-    public Boolean reissue(HttpServletRequest request, HttpServletResponse response) {
+    public LoginLastDTO reissue(HttpServletRequest request, HttpServletResponse response) {
+//        String tokenOptional = request.getHeader(AUTHORIZATION_HEADER);
+//        if(tokenOptional == null) {
+//            throw new NoAuthorizationHeaderException();
+//        }
+//
+//        String token = tokenOptional.split(" ")[1];
         Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
         String accessToken;
 
         if(cookie == null) {
-            return false;
+            throw new NoSuchCookieException();
         }
 
-        accessToken = cookie.getValue();
-        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+        String token = cookie.getValue();
+
+        Authentication authentication = jwtTokenProvider.getAuthentication(token);
         Long memberId = Long.valueOf(authentication.getName());
-        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundByIdException::new);
 
         // 2. redis에서 사용자 정보로 refresh token 가져오기
         String refreshToken = refreshTokenDao.getRefreshToken(memberId);
 
         if(refreshToken == null) {
-            return false;
+            throw new NoSuchAccessTokenException();
         }
         // 3. refresh token 검증
         if(!jwtTokenProvider.validateToken(refreshToken)) {
-            return false;
+            throw new InvalidRefreshTokenException();
         }
         // 4. 새로운 토큰 생성
         TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDTO(authentication);
         // 5. 저장소에 저장
         saveRefreshTokenInStorage(tokenInfoDTO.getRefreshToken(), memberId);
-        // 6. 토큰 발급
+//        // 6. 토큰 발급
+        log.info("토큰 재발급 성공");
         CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-        CookieUtil.addCookie(response, TOKEN_PUBLISH_CONFIRM, member.getEmail(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
-        return true;
+        long now = new Date().getTime();
+        Date loginExpire = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+        return LoginLastDTO.builder().expiresAt(loginExpire.getTime()).build();
     }
-
 
 
     /**

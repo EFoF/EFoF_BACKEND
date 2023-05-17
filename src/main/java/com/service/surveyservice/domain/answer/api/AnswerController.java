@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/survey")
+@RequestMapping("/form")
 @RequiredArgsConstructor
 public class AnswerController {
 

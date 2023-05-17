@@ -24,7 +24,7 @@ public class MemberErrorResponse {
             .exceptionName(NotMatchingUpdatingNicknameException.class.getSimpleName()).message("해당 이메일을 통해 찾은 사용자의 닉네임이 전달받은 닉네임과 일치하지 않습니다.").build(),HttpStatus.CONFLICT);
 
     public static final ResponseEntity<ErrorResponse> NOT_MATCHING_PASSWORD = new ResponseEntity<>(ErrorResponse.builder()
-            .exceptionName(NotMatchingPasswordException.class.getSimpleName()).message("해당 이메일을 통해 찾은 사용자의 비밀번호가 전달받은 비밀번호와 일치하지 않습니다.").build(), HttpStatus.CONFLICT);
+            .exceptionName(NotMatchingPasswordException.class.getSimpleName()).message("이전 비밀번호가 틀렸습니다").build(), HttpStatus.CONFLICT);
 
     public static final ResponseEntity<ErrorResponse> NOT_MATCHING_CURRENT_MEMBER_AND_REQUESTER = new ResponseEntity<>(ErrorResponse.builder()
             .exceptionName(NotMatchingCurrentMemberAndRequesterException.class.getSimpleName()).message("요청자와 현재 사용자가 일치하지 않습니다.").build(), HttpStatus.CONFLICT);

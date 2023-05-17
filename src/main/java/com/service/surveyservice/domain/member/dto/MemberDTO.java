@@ -86,6 +86,16 @@ public class MemberDTO {
     public static class MemberLoginDTO {
 
         private MemberDetail memberDetail;
+        private LoginLastDTO loginLastDTO;
+//        private TokenIssueDTO tokenIssueDTO;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginLastDTO {
+        private Long expiresAt;
     }
 
 
@@ -111,13 +121,10 @@ public class MemberDTO {
     @Builder
     @NoArgsConstructor
     public static class MemberTokenPublishConfirmDTO {
-        private String email;
-        private String nickname;
-
+        private MemberLoginType memberLoginType;
         @QueryProjection
-        public MemberTokenPublishConfirmDTO(String email, String nickname) {
-            this.email = email;
-            this.nickname = nickname;
+        public MemberTokenPublishConfirmDTO(MemberLoginType memberLoginType) {
+            this.memberLoginType = memberLoginType;
         }
     }
 

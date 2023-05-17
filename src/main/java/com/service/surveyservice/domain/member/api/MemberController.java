@@ -61,10 +61,11 @@ public class MemberController {
      *
      * @param updateMemberPasswordRequestDTO
      * @return ResponseBody<String>
-     * 비밀번호 변경
+     * 비밀번호 변경 - 로그인 된 상황
      */
-    @PatchMapping(value = "/member/update/password")
+    @PatchMapping(value = "/auth/update/password")
     public ResponseEntity<String> updateMemberPassword(@RequestBody UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO) {
+        log.info("{}, {}", updateMemberPasswordRequestDTO.getOldPassword(), updateMemberPasswordRequestDTO.getNewPassword());
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         String result = memberService.updatePassword(updateMemberPasswordRequestDTO, currentMemberId);
         return new ResponseEntity<>(result, HttpStatus.OK);

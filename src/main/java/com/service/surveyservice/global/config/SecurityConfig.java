@@ -78,6 +78,7 @@ public class SecurityConfig {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/form").access("hasRole('ADMIN') or hasRole('USER')")
                 .antMatchers("/user/**").access("hasRole('ADMIN') or hasRole('USER')")
+
                 .anyRequest().permitAll()
 
                 .and()

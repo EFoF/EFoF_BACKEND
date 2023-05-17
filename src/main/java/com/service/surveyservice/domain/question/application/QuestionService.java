@@ -5,10 +5,7 @@ import com.service.surveyservice.domain.question.dao.QuestionOptionRepository;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
-import com.service.surveyservice.domain.question.exception.exceptions.QuestionNotFoundException;
-import com.service.surveyservice.domain.question.exception.exceptions.QuestionOptionNotFoundException;
-import com.service.surveyservice.domain.question.exception.exceptions.QuestionOrderException;
-import com.service.surveyservice.domain.question.exception.exceptions.QuestionSectionMisMatchException;
+import com.service.surveyservice.domain.question.exception.exceptions.*;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
@@ -21,6 +18,7 @@ import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveySectionMisMatchException;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.global.config.S3Config;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
@@ -102,11 +101,11 @@ public class QuestionService {
         Question savedQuestion = questionRepository.save(question);
 
         //section에 question order 수정 로직
-         if (questionOrder==null||questionOrder.isBlank()) {//글자가 없는 경우 question이 0개인 경우
+        if (questionOrder == null || questionOrder.isBlank()) {//글자가 없는 경우 question이 0개인 경우
             section.setQuestionOrder(String.valueOf(savedQuestion.getId()));
         } else if (questionOrder.length() == 1) { //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
-             section.setQuestionOrder(questionOrder.concat(",").concat(String.valueOf(savedQuestion.getId())));
-         } else {
+            section.setQuestionOrder(questionOrder.concat(",").concat(String.valueOf(savedQuestion.getId())));
+        } else {
             section.setQuestionOrder(questionOrder.concat("," + savedQuestion.getId()));
         }
 
@@ -135,7 +134,7 @@ public class QuestionService {
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
-        if(!question.getSection().getId().equals(section_id)){
+        if (!question.getSection().getId().equals(section_id)) {
             throw new SectionQuestionMissMatchException();
         }
         question.updateQuestion(saveQuestionRequestDto);
@@ -174,7 +173,7 @@ public class QuestionService {
         if (questionOrder.length() == 1) { //1글자인 경우 즉 question 이 1개인 경우 모든 question 이 없어지는 것
             section.setQuestionOrder(null);
         } else {
-            List<String> questionOrderList =  new ArrayList<>(Arrays.asList(questionOrder.split(",")));
+            List<String> questionOrderList = new ArrayList<>(Arrays.asList(questionOrder.split(",")));
             questionOrderList.remove(question.getId().toString());
 
             section.setQuestionOrder(
@@ -285,10 +284,8 @@ public class QuestionService {
 
         String questionOptionImg = questionOption.getQuestionOptionImg();
 
-        if (!questionOptionImg.isEmpty()) {//해당 option 에 대한 optionImg 가 생성되어 있는 경우
-
+        if (!(questionOptionImg == null || questionOptionImg.isEmpty())) {//해당 option 에 대한 optionImg 가 생성되어 있는 경우
             s3Uploader.delete(questionOptionImg, DIRECTORY);
-
         }
         questionOption.setQuestionOptionImage(imageUrl);
         return imageUrl;
@@ -313,8 +310,11 @@ public class QuestionService {
         QuestionOption questionOption = questionOptionRepository.findById(question_option_id)
                 .orElseThrow(QuestionOptionNotFoundException::new);
 
-        String img = questionOption.getQuestionOptionImg();
-        s3Uploader.delete(img, DIRECTORY);
+        String questionOptionImg = questionOption.getQuestionOptionImg();
+
+        if (!(questionOptionImg == null || questionOptionImg.isEmpty())) {//해당 option 에 대한 optionImg 가 생성되어 있는 경우
+            s3Uploader.delete(questionOptionImg, DIRECTORY);
+        }
 
         questionOption.setQuestionOptionImage(null);
     }
@@ -340,7 +340,10 @@ public class QuestionService {
                 .orElseThrow(QuestionOptionNotFoundException::new);
 
         String img = questionOption.getQuestionOptionImg();
-        s3Uploader.delete(img, DIRECTORY);
+        if (!(img == null || img.isEmpty())) {
+            s3Uploader.delete(img, DIRECTORY);
+        }
+
         questionOptionRepository.delete(questionOption);
     }
 
@@ -354,8 +357,8 @@ public class QuestionService {
      */
     @Transactional
     public SectionDTO.UpdateSectionOrderResponseDto updateQuestionOrder(Long survey_id, Long member_id,
-                                    SectionDTO.UpdateSectionOrderRequestDto updateSectionOrderRequestDto,
-                                    Long question_id) {
+                                                                        SectionDTO.UpdateSectionOrderRequestDto updateSectionOrderRequestDto,
+                                                                        Long question_id) {
         //설문이 존재하지 않는경우
         checkSurveyOwner(member_id, survey_id);
 
@@ -365,8 +368,13 @@ public class QuestionService {
         Section startSection = sectionRepository.findById(updateSectionOrderRequestDto.getStartSectionId())
                 .orElseThrow(SectionNotFoundException::new);
 
+
         Section endSection = sectionRepository.findById(updateSectionOrderRequestDto.getEndSectionId())
                 .orElseThrow(SectionNotFoundException::new);
+
+        if (!(startSection.getSurvey().getId().equals(survey_id) && endSection.getSurvey().getId().equals(survey_id))) {
+            throw new SurveySectionMisMatchException();
+        }
 
         //시작 섹션이 원래 question의 section id 이므로 검사
         if (!question.getSection().getId().equals(updateSectionOrderRequestDto.getStartSectionId())) {
@@ -376,33 +384,57 @@ public class QuestionService {
 
         String startQuestionOrder = startSection.getQuestionOrder();
 
-        if (startQuestionOrder.length() == 1) {//1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 그냥 지우면 된다.
+        if (!startQuestionOrder.contains(",")) {//1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 그냥 지우면 된다.
             startSection.setQuestionOrder(null);
         } else if (startQuestionOrder.isEmpty()) {//비어있는 경우 삭제할 수가 없으므로 예외
             throw new QuestionOrderException();
         } else {//question이 여러개인 경우
             List<String> order = new ArrayList<>(Arrays.asList(startQuestionOrder.split(",")));
+
+            if (!order.get(updateSectionOrderRequestDto.getStartSectionIdx())
+                    .equals(question_id.toString())) {
+                throw new SectionQuestionMissMatchException();
+            }
+
             order.remove(updateSectionOrderRequestDto.getStartSectionIdx());
-            startSection.setQuestionOrder(new StringBuilder(order.get(0))
-                    .append(order.stream().skip(1).map(s -> "," + s).collect(Collectors.joining())).toString());
+
+            if (order.size() != 0) {
+                startSection.setQuestionOrder(new StringBuilder(order.get(0))
+                        .append(order.stream().skip(1).map(s -> "," + s).collect(Collectors.joining())).toString());
+            }
+        }
+        String endQuestionOrder;
+
+        if (startSection.getId().equals(endSection.getId())) {
+            endQuestionOrder =
+                    Optional.ofNullable(startSection.getQuestionOrder()).orElse(null);
+            if (endQuestionOrder == null) {
+                throw new QuestionOrderException();
+            }
+
+        } else {
+            endQuestionOrder = Optional.ofNullable(endSection.getQuestionOrder()).orElse(null);
         }
 
-        String endQuestionOrder = endSection.getQuestionOrder();
 
-        if (endQuestionOrder.length() == 1) { //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
-            endSection.setQuestionOrder(endQuestionOrder.concat(",").concat(String.valueOf(question_id)));
-        } else if (endQuestionOrder.isEmpty()) {//글자가 없는 경우 question이 0개인 경우
+        if (endQuestionOrder.isEmpty() || endQuestionOrder == null) {//글자가 없는 경우 question이 0개인 경우
             endSection.setQuestionOrder(String.valueOf(question.getId()));
+        } else if (!endQuestionOrder.contains(",")) { //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
+            if (updateSectionOrderRequestDto.getEndSectionIdx() == 0) {
+                endSection.setQuestionOrder(String.valueOf(question_id).concat(",").concat(endQuestionOrder));
+            } else {
+                endSection.setQuestionOrder(endQuestionOrder.concat(",").concat(String.valueOf(question_id)));
+            }
+
         } else {//question이 여러개인 경우 1,2,3 이런식으로 되어있음
             List<String> order = new ArrayList<>(Arrays.asList(endQuestionOrder.split(",")));
             order.add(updateSectionOrderRequestDto.getEndSectionIdx(), String.valueOf(question_id));
             endSection.setQuestionOrder(new StringBuilder(order.get(0))
                     .append(order.stream().skip(1).map(s -> "," + s).collect(Collectors.joining())).toString());
-
-
         }
 
         question.updateSection(endSection);
+
         return SectionDTO.UpdateSectionOrderResponseDto.builder()
                 .questionSectionId(endSection.getId())
                 .startSectionOrder(startSection.getQuestionOrder())
@@ -423,6 +455,7 @@ public class QuestionService {
 
         //설문 생성자의 요청이 아닌 경우
         if (!survey.getAuthor().getId().equals(member_id)) {
+            System.out.println("asdfasfdadsfads");
             throw new SurveyMemberMisMatchException();
         }
     }

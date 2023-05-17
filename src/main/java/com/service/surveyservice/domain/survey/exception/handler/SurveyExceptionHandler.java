@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.survey.exception.handler;
 
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveySectionMisMatchException;
 import com.service.surveyservice.global.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,9 @@ public class SurveyExceptionHandler {
         log.error(request.getDescription(false));
         return SURVEY_MEMBER_MISMATCH;
     }
-
+    @ExceptionHandler(SurveySectionMisMatchException.class)
+    protected final ResponseEntity<ErrorResponse> handleSurveySectionMisMatchException(SurveySectionMisMatchException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return SURVEY_SECTION_MISMATCH;
+    }
 }

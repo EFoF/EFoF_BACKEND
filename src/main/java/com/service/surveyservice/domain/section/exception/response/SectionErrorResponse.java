@@ -16,13 +16,13 @@ public class SectionErrorResponse {
             .build(),HttpStatus.NOT_FOUND);
 
     public static final ResponseEntity<ErrorResponse> SURVEY_NOT_MATCH_SECTION = new ResponseEntity<>(ErrorResponse.builder()
-            .exceptionName(SurveyMemberMisMatchException.class.getSimpleName())
+            .exceptionName(SectionQuestionMissMatchException.class.getSimpleName())
             .message("요청한 설문과 다른 섹션입니다.")
             .build(),HttpStatus.BAD_REQUEST);
 
     public static final ResponseEntity<ErrorResponse> QUESTION_NOT_MATCH_SECTION = new ResponseEntity<>(ErrorResponse.builder()
             .exceptionName(SectionQuestionMissMatchException.class.getSimpleName())
-            .message("요청한 질문문과 다른 섹션입니다.")
+            .message("요청한 질문과 다른 섹션입니다.")
             .build(),HttpStatus.BAD_REQUEST);
 
 

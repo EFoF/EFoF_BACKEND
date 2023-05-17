@@ -32,7 +32,7 @@ public class SectionExceptionHandler {
     @ExceptionHandler(SectionQuestionMissMatchException.class)
     protected final ResponseEntity<ErrorResponse> handleSectionQuestionMismatchException(SectionQuestionMissMatchException ex, WebRequest request) {
         log.error(request.getDescription(false));
-        return SURVEY_NOT_MATCH_SECTION;
+        return QUESTION_NOT_MATCH_SECTION;
     }
 
 }

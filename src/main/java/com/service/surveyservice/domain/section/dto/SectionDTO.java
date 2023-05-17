@@ -1,12 +1,8 @@
 package com.service.surveyservice.domain.section.dto;
 
 
-import com.service.surveyservice.domain.question.dto.QuestionDTO;
-import com.service.surveyservice.domain.question.model.Question;
-import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.service.surveyservice.domain.question.dto.QuestionDTO.*;
@@ -76,7 +72,7 @@ public class SectionDTO {
         private Long id;
         private Long nextSectionId;
         private String questionOrder;
-        private List<QuestionQueryDto> questions;
+        private List<QuestionQueryDto> questionList;
 
 
         public SectionQuestionQueryDto(Long id, Long nextSectionId, String questionOrder) {
@@ -85,8 +81,8 @@ public class SectionDTO {
             this.questionOrder = questionOrder;
         }
 
-        public void setQuestions(List<QuestionQueryDto> questions) {
-            this.questions = questions;
+        public void setQuestionList(List<QuestionQueryDto> questionList) {
+            this.questionList = questionList;
         }
     }
 

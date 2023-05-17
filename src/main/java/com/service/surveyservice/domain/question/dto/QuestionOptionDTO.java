@@ -73,7 +73,7 @@ public class QuestionOptionDTO {
     public static class QuestionOptionQueryDto{
         private Long id;
         private String option;
-        private String imageUrl;
+        private String image;
         private Long nextSectionId;
         private Long questionId;
     }

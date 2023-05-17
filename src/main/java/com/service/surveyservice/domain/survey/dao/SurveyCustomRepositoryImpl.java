@@ -3,8 +3,6 @@ package com.service.surveyservice.domain.survey.dao;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.service.surveyservice.domain.question.dto.QuestionDTO;
-import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.survey.dto.QSurveyDTO_SurveyInfoDTO;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +57,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
                 .collect(Collectors.toList());
         Map<Long, List<QuestionQueryDto>> questionInfo = findQuestionInfo(sectionIdList);
 
-        surveySectionInfo.forEach(sS -> sS.setQuestions(questionInfo.get(sS.getId())));
+        surveySectionInfo.forEach(sS -> sS.setQuestionList(questionInfo.get(sS.getId())));
         surveySectionQueryDTO.setSectionList(surveySectionInfo);
 
 
@@ -108,7 +106,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
 
         Map<Long, List<QuestionOptionQueryDto>> questionOptionInfo = findQuestionOptionInfo(questionIdList);
 
-        questionList.forEach(ql -> ql.setQuestionOptions(questionOptionInfo.get(ql.getId())));
+        questionList.forEach(ql -> ql.setOptions(questionOptionInfo.get(ql.getId())));
 
         Map<Long, List<QuestionQueryDto>> questionMap = questionList.stream()
                 .collect(Collectors.groupingBy(questionListDto -> questionListDto.getSectionId()));

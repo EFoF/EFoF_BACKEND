@@ -50,18 +50,10 @@ public class SurveyController {
         return new ResponseEntity<>(survey.getId(),HttpStatus.CREATED);
     }
 
-//    @GetMapping(value = "/form/participate/{memberId}")
-//    public ResponseEntity<Page<SurveyInfoDTO>> getParticipatedSurveyList(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
-//        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-//        Page<MemberSurveyInfoDTO> infos = memberSurveyService.getInfoPagination(currentMemberId, memberId, pageable);
-//        Page<SurveyInfoDTO> participatedSurveyInfo = surveyService.getParticipatedSurveyInfo(infos);
-//        return new ResponseEntity<>(participatedSurveyInfo, HttpStatus.OK);
-//    }
-
     /**
      *
      * @param image
-     * @return 설문조사 대표 이미지 생성
+     * @return 임시저장 전 -  설문조사 대표 이미지 생성
      * @throws IOException
      */
     @PostMapping(value = "/image")
@@ -71,7 +63,7 @@ public class SurveyController {
     }
 
     /**
-     * 설문조사 대표 이미지 삭제
+     * 임시저장 전 - 설문조사 대표 이미지 삭제
      * @param imageUrl
      */
     @DeleteMapping(value = "/image")
@@ -81,24 +73,103 @@ public class SurveyController {
 
 
     /**
-     * 추후 구현 계획
-     * <p>
-     * 1. 임시 저장(수정)을 위한 survey 테이블 관련 데이터 변경
-     * 2. 설문조사 대표 이미지 변경 - S3 데이터 삭제 및 추가 후 S3 url로 db column update
-     * 3. 날짜 및 제약 사항 추가(배포 페이지에서 하는 것)
-     * 4. 설문조사 삭제 - 설문 관련 정보 모두 삭제
-     * 5. 설문조사 내용 조회 - 설문조사 참여 페이지에 띄워줄 데이터 조회
-     * 6. 설문조사 리스트 조회 - survey 테이블의 데이터 조회정도(어떤 설문이 있는지의 리스트를 보여주기 위함이므로 질문과 같은 데이터는 필요 없음)
-     *
+     * 임시 저장 이후 설문 삭제
+     * @param survey_id
+     * @return
+     * @throws IOException
+     */
+    @DeleteMapping(value = "/{survey_id}")
+    public ResponseEntity deleteSurvey(@PathVariable Long survey_id) throws IOException {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.deleteSurvey(currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+
+    /**
+     * 임시저장 이후 제목 변경
+     * @param updateSurveyTextDto
+     * @param survey_id
+     * @return
+     * @throws IOException
+     */
+    @PatchMapping(value = "/{survey_id}/title")
+    public ResponseEntity updateSurveyTitle(@RequestBody UpdateSurveyTextDto updateSurveyTextDto,@PathVariable Long survey_id) throws IOException {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyTitle(updateSurveyTextDto,currentMemberId, survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    /**
+     * 임시저장 이후 설명 변경
+     * @param updateSurveyTextDto
+     * @param survey_id
+     * @return
+     * @throws IOException
+     */
+    @PatchMapping(value = "/{survey_id}/description")
+    public ResponseEntity updateSurveyDescription(@RequestBody UpdateSurveyTextDto updateSurveyTextDto,@PathVariable Long survey_id) throws IOException {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyDescription(updateSurveyTextDto, currentMemberId, survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    /**
+     * 임시저장 이후 색상 변경
+     * @param updateSurveyColorDto
+     * @param survey_id
+     * @return
+     * @throws IOException
+     */
+    @PatchMapping(value = "/{survey_id}/color")
+    public ResponseEntity updateSurveyColor(@RequestBody UpdateSurveyColorDto updateSurveyColorDto,@PathVariable Long survey_id) throws IOException {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyColor(updateSurveyColorDto, currentMemberId, survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * 임시저장 이후 이미지 변경
+     * @param image
+     * @param survey_id
+     * @return
+     * @throws IOException
+     */
+    @PatchMapping(value = "/{survey_id}/image")
+    public ResponseEntity<String> updateSurveyImg(@RequestBody MultipartFile image,@PathVariable Long survey_id) throws IOException {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        String surveyImg = surveyService.updateSurveyImg(image, currentMemberId, survey_id);
+        return new ResponseEntity<>(surveyImg,HttpStatus.OK);
+    }
+
+    /**
+     * 임시저장 이후 이미지 삭제
+     * @param survey_id
+     * @return
+     * @throws IOException
+     */
+    @DeleteMapping(value = "/{survey_id}/image")
+    public ResponseEntity deleteSurveyImg(@PathVariable Long survey_id) throws IOException {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.deleteSurveyImg(currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * 임시 저장 중인 데이터 조회
+     * @param survey_id
      * @return
      */
-
-
     @GetMapping(value = "/{survey_id}/pre_release")
     public ResponseEntity<SurveySectionQueryDTO> getSurveyDataPreRelease(@PathVariable Long survey_id){
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        return new ResponseEntity<>(
-                surveyService.getSurveyDataPreRelease(currentMemberId,survey_id),
-                HttpStatus.CREATED);
+        return new ResponseEntity<>(surveyService.getSurveyDataPreRelease(currentMemberId,survey_id),HttpStatus.OK);
     }
+
+
+
+
 }

@@ -2,12 +2,10 @@ package com.service.surveyservice.domain.question.dto;
 
 
 import com.service.surveyservice.domain.question.model.Question;
-import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.question.model.QuestionType;
 import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,22 +89,22 @@ public class QuestionDTO {
     @ToString
     public static class QuestionQueryDto{
         private Long id;
-        private QuestionType type;
+        private long type;
         private String questionContent;
         private Boolean isNecessary;
         private Long sectionId;
-        private List<QuestionOptionDTO.QuestionOptionQueryDto> questionOptions;
+        private List<QuestionOptionDTO.QuestionOptionQueryDto> options;
 
         public QuestionQueryDto(Long id, QuestionType type, String questionContent, Boolean isNecessary, Long sectionId) {
             this.id = id;
-            this.type = type;
+            this.type = type.getId();
             this.questionContent = questionContent;
             this.isNecessary = isNecessary;
             this.sectionId = sectionId;
         }
 
-        public void setQuestionOptions(List<QuestionOptionDTO.QuestionOptionQueryDto> questionOptions) {
-            this.questionOptions = questionOptions;
+        public void setOptions(List<QuestionOptionDTO.QuestionOptionQueryDto> options) {
+            this.options = options;
         }
     }
 

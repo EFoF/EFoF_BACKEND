@@ -30,12 +30,12 @@ public class Survey extends BaseTimeEntity {
 //    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 //    private List<Section> sections = new ArrayList<>();
 
-    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
+    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @BatchSize(size = 10)
     private List<Section> section;
 
     // FetchType.EAGER 고민중
-    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
+    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ConstraintOptions> constraintOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
@@ -78,7 +78,26 @@ public class Survey extends BaseTimeEntity {
         this.expireDate = expireDate;
     }
 
-    public void setImageURL(@Nullable String sImageURL){
-        this.sImageURL=sImageURL;
+    public void setImageURL(@Nullable String sImageURL) {
+        this.sImageURL = sImageURL;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void updateColor(SurveyDTO.UpdateSurveyColorDto updateSurveyColorDto) {
+        this.fontColor = updateSurveyColorDto.getFontColor();
+        this.bgColor = updateSurveyColorDto.getBgColor();
+        this.btColor = updateSurveyColorDto.getBtColor();
+    }
+
+    public void updateDate(SurveyDTO.UpdateSurveyDateDto updateSurveyDateDto) {
+        this.openDate = updateSurveyDateDto.getOpenDate();
+        this.expireDate = updateSurveyDateDto.getExpireDate();
     }
 }

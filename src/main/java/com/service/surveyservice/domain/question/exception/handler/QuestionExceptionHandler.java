@@ -1,7 +1,6 @@
 package com.service.surveyservice.domain.question.exception.handler;
 
-import com.service.surveyservice.domain.question.exception.exceptions.QuestionNotFoundException;
-import com.service.surveyservice.domain.question.exception.exceptions.QuestionOptionNotFoundException;
+import com.service.surveyservice.domain.question.exception.exceptions.*;
 import com.service.surveyservice.global.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +25,23 @@ public class QuestionExceptionHandler {
         log.error(request.getDescription(false));
         return QUESTION_OPTION_NOT_FOUND;
     }
+
+    @ExceptionHandler(QuestionOptionImageNotFoundException.class)
+    protected final ResponseEntity<ErrorResponse> handleQuestionOptionImageNotFoundException(QuestionOptionImageNotFoundException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return QUESTION_OPTION_IMAGE_NOT_FOUND;
+    }
+    @ExceptionHandler(QuestionOrderException.class)
+    protected final ResponseEntity<ErrorResponse> handleQuestionOrderException(QuestionOrderException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return QUESTION_ORDER_EXCEPTION;
+    }
+    @ExceptionHandler(QuestionSectionMisMatchException.class)
+    protected final ResponseEntity<ErrorResponse> handleQuestionSectionMisMatchException(QuestionSectionMisMatchException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return QUESTION_SECTION_MISMATCH;
+    }
+
 
 
 }

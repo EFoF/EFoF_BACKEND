@@ -56,8 +56,8 @@ public class QuestionDTO {
             return Question.builder()
                     .section(section)
                     .questionText(this.getQuestionContent())
-                    .isNecessary(this.getIsNecessary())
-                    .questionType(QuestionType.fromId(this.getType()))
+                    .isNecessary(false)
+                    .questionType(QuestionType.ONE_CHOICE)
                     .build();
         }
     }

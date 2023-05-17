@@ -17,4 +17,9 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     @Query(value = "SELECT s.id FROM Section s WHERE s.survey.id=:survey_id")
     List<Long> findIdBySurveyId(@Param("survey_id")Long survey_id);
 
+    @Query(value = "SELECT qo.question_option_img FROM question_option as qo  WHERE qo.question_id in(\n" +
+            "SELECT q.question_id FROM QUESTION as q WHERE q.section_id = 8) AND (\n" +
+            "  qo.question_option_img IS NOT NULL AND qo.question_option_img <> '');",nativeQuery = true)
+    List<String> findOptionImgBySectionId(Long section_id);
+
 }

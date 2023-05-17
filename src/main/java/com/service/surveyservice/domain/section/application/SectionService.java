@@ -2,15 +2,18 @@ package com.service.surveyservice.domain.section.application;
 
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.model.Question;
+import com.service.surveyservice.domain.question.model.QuestionType;
 import com.service.surveyservice.domain.section.dao.SectionCustomRepository;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
+import com.service.surveyservice.domain.section.exception.exceptions.SectionNotFoundException;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
 import com.service.surveyservice.domain.survey.model.Survey;
+import com.service.surveyservice.global.config.S3Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
 
 
 @Slf4j
@@ -39,6 +44,8 @@ public class SectionService {
 
     private final SurveyRepository surveyRepository;
 
+    private final S3Config s3Uploader;
+
     @Transactional
     public void createSection(SurveyDTO.SaveSurveyRequestDto saveSurveyRequestDto, Survey survey) {
 
@@ -47,39 +54,67 @@ public class SectionService {
     }
 
     @Transactional
-    public SectionDTO.createSectionResponseDto addSection(Long survey_id){
+    public SectionDTO.createSectionResponseDto addSection(Long survey_id,Long member_id){
 
-        Section section = sectionRepository.save(Section.builder().build());
-        Question question = questionRepository.save(Question.builder().section(section).build());
+        Survey survey = checkSurveyOwner(member_id, survey_id);
+
+        Section section = sectionRepository.save(Section.builder().survey(survey).build());
+        Question question = questionRepository.save(Question.builder().section(section).questionType(QuestionType.ONE_CHOICE).isNecessary(false).build());
         SectionDTO.createSectionResponseDto createSectionResponseDto = section.toResponseDto(question);
 
         return createSectionResponseDto;
     }
 
     @Transactional
-    public void updateSection(SurveyDTO.SaveSurveyRequestDto saveSurveyRequestDto, Survey survey) {
+    public void deleteSection(Long survey_id, Long member_id, Long section_id){
+        checkSurveyOwner(member_id,survey_id);
 
-        List<SectionDTO.SaveSectionRequestDto> requestSections = saveSurveyRequestDto.getSections();
-        List<Section> sections = sectionRepository.findBySurveyId(survey.getId());
-        Map<String, Section> sectionMap = new HashMap<>();
-
-        for(int i=0; i<requestSections.size(); i++){
-            sectionMap.put(requestSections.get(i).getId(),sections.get(i));
+        if(!sectionRepository.existsById(section_id)){
+            throw new SectionNotFoundException();
         }
 
-        for(int i=0; i<requestSections.size(); i++){
-            Section nextSection = sectionMap.get(requestSections.get(i).getNextSectionId());
-            sections.set(i,Section.builder()
-                    .id(sections.get(i).getId())
-                    .survey(sections.get(i).getSurvey())
-                    .parentSection(sectionMap.get(nextSection)).build());
+        //section 에 포함되는 img url 리스트
+        List<String> optionImgList = sectionRepository.findOptionImgBySectionId(section_id);
+
+        for (String img : optionImgList) {
+            s3Uploader.delete(img,DIRECTORY);
         }
+        sectionRepository.deleteById(section_id);
+
+        /**
+         * 삭제로직 추가 예정
+         * 먼저 섹션에 포함되는 질문 조회해서 각 질문에 대해 질문과 옵션 조인시켜서 섹션에 포함되는 옵션 리스트를 가져오고
+         * 옵션 리스트에서 img 가 null 이 아닌 list 를 가지고 와서 List<String>으로 매핑 시키고 해당 List의 값들을 S3에서 삭제
+         * 이 이후에 섹션을 삭제하면 자동으로 질문이 삭제 될 것
+         */
     }
+
 
     @Transactional
     public List<Section> findSectionListBySurveyId(Long surveyId){
         return sectionRepository.findBySurveyId(surveyId);
     }
+
+
+    @Transactional
+    public void updateNextSection(SectionDTO.updateSectionDto updateSectionDto
+            ,Long surveyId,Long member_id,Long section_id){
+
+        checkSurveyOwner(member_id,surveyId);
+        Section section = sectionRepository.findById(section_id).orElse(null);
+        if(section==null){
+            throw new SectionNotFoundException();
+        }
+
+        Section nextSection =
+                sectionRepository.findById(updateSectionDto.getNextSectionId()).orElse(null);
+        if(nextSection==null){
+            throw new SectionNotFoundException();
+        }
+
+        section.setParentSection(nextSection);
+    }
+
 
     /**
      * 설문 생성자가 요청한 것인지 확인
@@ -87,7 +122,7 @@ public class SectionService {
      * @param member_id
      * @param survey_id
      */
-    private void checkSurveyOwner(Long member_id, Long survey_id) {
+    private Survey checkSurveyOwner(Long member_id, Long survey_id) {
         //설문이 존재하지 않는경우
         Survey survey = surveyRepository.findById(survey_id)
                 .orElseThrow(SurveyNotFoundException::new);
@@ -96,6 +131,7 @@ public class SectionService {
         if (!survey.getAuthor().getId().equals(member_id)) {
             throw new SurveyMemberMisMatchException();
         }
+        return survey;
     }
 
 

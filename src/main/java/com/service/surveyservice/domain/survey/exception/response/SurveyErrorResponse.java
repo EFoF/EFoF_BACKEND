@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.survey.exception.response;
 import com.service.surveyservice.domain.member.exception.exceptions.member.UserNotFoundException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveySectionMisMatchException;
 import com.service.surveyservice.global.error.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,11 @@ public class SurveyErrorResponse {
 
     public static final ResponseEntity<ErrorResponse> SURVEY_MEMBER_MISMATCH = new ResponseEntity<>(ErrorResponse.builder()
             .exceptionName(SurveyMemberMisMatchException.class.getSimpleName())
-            .message("설문 생성자만 추가할 수 있습니다.")
-            .build(),HttpStatus.NOT_FOUND);
+            .message("설문 생성자와 일치하지 않습니다.")
+            .build(),HttpStatus.BAD_REQUEST);
 
+    public static final ResponseEntity<ErrorResponse> SURVEY_SECTION_MISMATCH = new ResponseEntity<>(ErrorResponse.builder()
+            .exceptionName(SurveySectionMisMatchException.class.getSimpleName())
+            .message("섹션의 설문이 잘못되었습니다.")
+            .build(),HttpStatus.BAD_REQUEST);
 }

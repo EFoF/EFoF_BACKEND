@@ -40,7 +40,7 @@ public class QuestionController {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
         QuestionDTO.ResponseSaveQuestionDto question = questionService.createQuestion(saveQuestionRequestDto, currentMemberId, section_id, survey_id);
-        return new ResponseEntity<>(question,HttpStatus.OK);
+        return new ResponseEntity<>(question,HttpStatus.CREATED);
     }
 
     /**
@@ -53,7 +53,7 @@ public class QuestionController {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
-        questionService.updateQuestionContent(saveQuestionRequestDto, currentMemberId, question_id, survey_id);
+        questionService.updateQuestionContent(saveQuestionRequestDto, currentMemberId, question_id, survey_id,section_id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -76,7 +76,7 @@ public class QuestionController {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
         Long questionOptionId = questionService.createQuestionOption(saveQuestionOptionTextRequestDTO, currentMemberId, question_id, survey_id);
-        return new ResponseEntity<>(questionOptionId,HttpStatus.OK);
+        return new ResponseEntity<>(questionOptionId,HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}/question_option/{question_option_id}")

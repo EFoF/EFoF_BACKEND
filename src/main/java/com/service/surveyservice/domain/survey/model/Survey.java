@@ -6,6 +6,7 @@ import com.service.surveyservice.domain.model.BaseTimeEntity;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -30,6 +31,7 @@ public class Survey extends BaseTimeEntity {
 //    private List<Section> sections = new ArrayList<>();
 
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
+    @BatchSize(size = 10)
     private List<Section> section;
 
     // FetchType.EAGER 고민중

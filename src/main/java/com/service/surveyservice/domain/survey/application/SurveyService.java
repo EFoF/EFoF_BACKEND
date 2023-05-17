@@ -172,6 +172,18 @@ public class SurveyService {
     }
 
 
+    @Transactional
+    public SurveySectionQueryDTO getSurveyDataPreRelease(Long member_id,  Long survey_id){
+
+
+        if(!surveyRepository.existsById(survey_id)){
+            throw new SurveyNotFoundException();
+        }
+
+        SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyId(survey_id);
+        return surveyBySurveyId;
+    }
+
     /**
      * survey 수정 관련 로직 추가 예정
      * 1.날짜

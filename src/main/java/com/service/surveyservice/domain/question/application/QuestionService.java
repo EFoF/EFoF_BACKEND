@@ -455,7 +455,6 @@ public class QuestionService {
 
         //설문 생성자의 요청이 아닌 경우
         if (!survey.getAuthor().getId().equals(member_id)) {
-            System.out.println("asdfasfdadsfads");
             throw new SurveyMemberMisMatchException();
         }
     }

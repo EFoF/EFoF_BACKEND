@@ -1,24 +1,29 @@
 package com.service.surveyservice.domain.survey.dao;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.service.surveyservice.domain.section.model.Section;
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
+import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
+import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.survey.dto.QSurveyDTO_SurveyInfoDTO;
-import com.service.surveyservice.domain.survey.dto.SurveyDTO;
-import com.service.surveyservice.domain.survey.model.QSurvey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import static com.querydsl.jpa.JPAExpressions.select;
+import static com.service.surveyservice.domain.question.dto.QuestionDTO.*;
+import static com.service.surveyservice.domain.question.dto.QuestionOptionDTO.*;
+import static com.service.surveyservice.domain.question.model.QQuestion.question;
+import static com.service.surveyservice.domain.question.model.QQuestionOption.questionOption;
+import static com.service.surveyservice.domain.section.model.QSection.section;
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 import static com.service.surveyservice.domain.survey.model.QSurvey.*;
 
@@ -27,7 +32,7 @@ import static com.service.surveyservice.domain.survey.model.QSurvey.*;
 public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
 
 
-
+    private final EntityManager em;
     private final JPAQueryFactory queryFactory;
 
     // 페이지네이션을 구현할 때 최적화를 위해서 카운트 쿼리와 실제 쿼리를 분리해서 2번 보낸다.
@@ -43,6 +48,89 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
     }
 
+
+    @Override
+    public SurveySectionQueryDTO findSurveyBySurveyId(Long survey_id) {
+
+        SurveySectionQueryDTO surveySectionQueryDTO = findSurveyInfo(survey_id);
+        List<SectionDTO.SectionQuestionQueryDto> surveySectionInfo = findSurveySectionInfo(survey_id);
+        List<Long> sectionIdList = surveySectionInfo.stream()
+                .map(SectionDTO.SectionQuestionQueryDto::getId)
+                .collect(Collectors.toList());
+        Map<Long, List<QuestionQueryDto>> questionInfo = findQuestionInfo(sectionIdList);
+
+        surveySectionInfo.forEach(sS -> sS.setQuestions(questionInfo.get(sS.getId())));
+        surveySectionQueryDTO.setSectionList(surveySectionInfo);
+
+
+        return surveySectionQueryDTO;
+    }
+
+    private SurveySectionQueryDTO findSurveyInfo(Long survey_id) {
+        SurveySectionQueryDTO surveySectionQueryDTO = queryFactory
+                .select(Projections.constructor(SurveySectionQueryDTO.class,
+                        survey.id,
+                        survey.title,
+                        survey.description,
+                        survey.sImageURL,
+                        survey.fontColor,
+                        survey.bgColor,
+                        survey.btColor,
+                        survey.openDate,
+                        survey.expireDate
+               ) )
+                .from(survey)
+                .where(survey.id.eq(survey_id)).fetchOne();
+        return surveySectionQueryDTO;
+    }
+
+    private  List<SectionDTO.SectionQuestionQueryDto> findSurveySectionInfo(Long survey_id) {
+        return queryFactory.select(Projections.constructor(SectionDTO.SectionQuestionQueryDto.class,
+                section.id,
+                section.parentSection.id,
+                section.questionOrder)).from(section).where(section.survey.id.eq(survey_id)).fetch();
+    }
+
+
+    private Map<Long, List<QuestionQueryDto>> findQuestionInfo(List<Long> sectionIdList) {
+        List<QuestionQueryDto> questionList = queryFactory.select(Projections.constructor(QuestionQueryDto.class,
+                        question.id,
+                        question.questionType,
+                        question.questionText,
+                        question.isNecessary,
+                        question.section.id)).
+                from(question).
+                where(question.section.id.in(sectionIdList)).fetch();
+
+        List<Long> questionIdList = questionList.stream()
+                .map(QuestionQueryDto::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, List<QuestionOptionQueryDto>> questionOptionInfo = findQuestionOptionInfo(questionIdList);
+
+        questionList.forEach(ql -> ql.setQuestionOptions(questionOptionInfo.get(ql.getId())));
+
+        Map<Long, List<QuestionQueryDto>> questionMap = questionList.stream()
+                .collect(Collectors.groupingBy(questionListDto -> questionListDto.getSectionId()));
+
+        return questionMap;
+    }
+
+    private Map<Long, List<QuestionOptionQueryDto>> findQuestionOptionInfo(List<Long> questionIdList) {
+        List<QuestionOptionQueryDto> questionOptionList = queryFactory.select(Projections.constructor(QuestionOptionQueryDto.class,
+                        questionOption.id,
+                        questionOption.optionText,
+                        questionOption.questionOptionImg,
+                        questionOption.nextSection.id,
+                        questionOption.question.id)).
+                from(questionOption).
+                where(questionOption.question.id.in(questionIdList)).fetch();
+
+        Map<Long, List<QuestionOptionQueryDto>> questionOptionMap = questionOptionList.stream()
+                .collect(Collectors.groupingBy(questionOptionListDto -> questionOptionListDto.getQuestionId()));
+
+        return questionOptionMap;
+    }
     private List<SurveyInfoDTO> findSurveyInfoDTOByAuthorIdQuery(Long authorId) {
         List<SurveyInfoDTO> results = queryFactory
                 .select(new QSurveyDTO_SurveyInfoDTO(survey.title, survey.description, survey.author.id, survey.sImageURL, survey.surveyStatus))

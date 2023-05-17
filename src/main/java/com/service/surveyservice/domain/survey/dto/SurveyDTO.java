@@ -3,7 +3,6 @@ package com.service.surveyservice.domain.survey.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.service.surveyservice.domain.member.model.Member;
-import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.*;
@@ -98,9 +97,39 @@ public class SurveyDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SurveyIdDto {
+    public static class SurveySectionQueryDTO {
         private Long id;
+        private String title;
+        private String description;
+        private String sImageURL;
 
+        private String fontColor;
+
+        private String bgColor;
+
+        private String btColor;
+        private LocalDateTime openDate;
+
+        private LocalDateTime expireDate;
+
+        private List<SectionQuestionQueryDto> sectionList;
+
+        public SurveySectionQueryDTO(Long id, String title, String description, String sImageURL, String fontColor, String bgColor, String btColor, LocalDateTime openDate, LocalDateTime expireDate) {
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.sImageURL = sImageURL;
+            this.fontColor = fontColor;
+            this.bgColor = bgColor;
+            this.btColor = btColor;
+            this.openDate = openDate;
+            this.expireDate = expireDate;
+        }
+
+        public void setSectionList(List<SectionQuestionQueryDto> sectionList) {
+            this.sectionList = sectionList;
+        }
     }
+
 
 }

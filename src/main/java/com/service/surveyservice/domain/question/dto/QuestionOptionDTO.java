@@ -66,4 +66,16 @@ public class QuestionOptionDTO {
 
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestionOptionQueryDto{
+        private Long id;
+        private String option;
+        private String imageUrl;
+        private Long nextSectionId;
+        private Long questionId;
+    }
+
 }

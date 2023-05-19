@@ -139,7 +139,7 @@ public class SurveyService {
         Survey survey = checkSurveyOwner(member_id, survey_id);
 
         String surveyImageURL = survey.getSImageURL();
-        if(!surveyImageURL.isEmpty()){
+        if(!(surveyImageURL==null||surveyImageURL.isEmpty())){
             s3Uploader.delete(surveyImageURL,DIRECTORY); //기존 image 삭제
         }
 

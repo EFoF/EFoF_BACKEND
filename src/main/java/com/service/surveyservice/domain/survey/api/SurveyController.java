@@ -21,7 +21,7 @@ import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/form")
+@RequestMapping("/survey")
 @RequiredArgsConstructor
 public class SurveyController {
 
@@ -67,7 +67,7 @@ public class SurveyController {
      * @param imageUrl
      */
     @DeleteMapping(value = "/image")
-    public void deleteImage(@RequestBody String imageUrl) {
+    public void deleteImage(@RequestParam String imageUrl) {
         surveyService.deleteSurveyImage(imageUrl);
     }
 

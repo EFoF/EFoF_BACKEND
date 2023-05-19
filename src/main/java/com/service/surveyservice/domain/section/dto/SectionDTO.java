@@ -3,7 +3,10 @@ package com.service.surveyservice.domain.section.dto;
 
 import lombok.*;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.service.surveyservice.domain.question.dto.QuestionDTO.*;
 
@@ -51,6 +54,7 @@ public class SectionDTO {
     public static class createSectionResponseDto{
         private Long id;
         private Long nextSectionId;
+        private String questionOrder;
         private List<createSectionResponseQuestionDto> questionList;
 
     }
@@ -82,7 +86,16 @@ public class SectionDTO {
         }
 
         public void setQuestionList(List<QuestionQueryDto> questionList) {
-            this.questionList = questionList;
+            if(this.questionOrder==null||!this.questionOrder.contains(",")){
+                this.questionList = questionList;
+            }else{
+                List<String> orderList = Arrays.asList(this.questionOrder.split(","));
+                List<QuestionQueryDto> sortedList = questionList.stream()
+                        .sorted(Comparator.comparingLong(q -> orderList.indexOf(String.valueOf(q.getId()))))
+                        .collect(Collectors.toList());
+                this.questionList = sortedList;
+            }
+
         }
     }
 

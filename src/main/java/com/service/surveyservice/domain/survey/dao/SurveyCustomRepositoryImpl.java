@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,7 +58,16 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
                 .collect(Collectors.toList());
         Map<Long, List<QuestionQueryDto>> questionInfo = findQuestionInfo(sectionIdList);
 
-        surveySectionInfo.forEach(sS -> sS.setQuestionList(questionInfo.get(sS.getId())));
+        surveySectionInfo.forEach(sS ->
+        {
+            if (questionInfo.containsKey(sS.getId())) {
+                sS.setQuestionList(questionInfo.get(sS.getId()));
+            }else {
+                // 키가 존재하지 않는 경우에 대한 처리
+                // 예를 들어, 빈 리스트로 설정하거나 기본값을 할당할 수 있습니다.
+                sS.setQuestionList(new ArrayList<>()); // 빈 리스트로 설정
+            }
+        });
         surveySectionQueryDTO.setSectionList(surveySectionInfo);
 
 

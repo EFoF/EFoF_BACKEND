@@ -417,7 +417,7 @@ public class QuestionService {
         }
 
 
-        if (endQuestionOrder.isEmpty() || endQuestionOrder == null) {//글자가 없는 경우 question이 0개인 경우
+        if ( endQuestionOrder == null||endQuestionOrder.isEmpty()) {//글자가 없는 경우 question이 0개인 경우
             endSection.setQuestionOrder(String.valueOf(question.getId()));
         } else if (!endQuestionOrder.contains(",")) { //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
             if (updateSectionOrderRequestDto.getEndSectionIdx() == 0) {

@@ -76,9 +76,8 @@ public class SecurityConfig {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/logout-redirect").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.POST, "/form").access("hasRole('ADMIN') or hasRole('USER')")
+                .antMatchers("/survey/**").access("hasRole('ADMIN') or hasRole('USER')")
                 .antMatchers("/user/**").access("hasRole('ADMIN') or hasRole('USER')")
-
                 .anyRequest().permitAll()
 
                 .and()

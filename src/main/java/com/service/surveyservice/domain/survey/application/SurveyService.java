@@ -8,6 +8,7 @@ import com.service.surveyservice.domain.survey.dao.SurveyCustomRepositoryImpl;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveyPreMisMatchException;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import com.service.surveyservice.global.config.S3Config;
@@ -53,29 +54,6 @@ public class SurveyService {
 
     }
 
-//    public Page<SurveyInfoDTO> getAuthorSurveyList(Long memberId, Long currentMemberId, Pageable pageable) {
-//        // 아이디 검증
-//        if(!memberId.equals(currentMemberId)) {
-//            throw new NotMatchingCurrentMemberAndRequesterException();
-//        }
-//        Page<SurveyInfoDTO> surveyInfoDTOPage = surveyCustomRepository.findSurveyInfoDTOByAuthorId(memberId, pageable);
-//        return surveyInfoDTOPage;
-//    }
-//
-//    // MemberSurveyService에서 받아온 MemberSurveyInfoDTO의 page를 api에서 사용하기 위해 SurveyInfoDTO로 변환 시켜주는 작업
-//    public Page<SurveyInfoDTO> getParticipatedSurveyInfo(Page<MemberSurveyInfoDTO> infoPage) {
-//        Page<SurveyInfoDTO> surveyInfoDTOPage = infoPage.map(element -> {
-//            Long id = element.getId();
-//            return _findSurveyInfoById(id);
-//        });
-//        return surveyInfoDTOPage;
-//    }
-//
-//    // 내부적으로 사용되는 메서드. id로 SurveyInfoDTO를 찾아온다.
-//    private SurveyInfoDTO _findSurveyInfoById (Long surveyId) {
-//        SurveyInfoDTO surveyInfoDTO = surveyRepository.findSurveyInfoDTOById(surveyId).orElseThrow(SurveyConvertException::new);
-//        return surveyInfoDTO;
-//    }
 
     /**
      * 이미지 업로드
@@ -155,43 +133,76 @@ public class SurveyService {
      * @throws IOException
      */
     @Transactional
-    public void updateSurveyImg(MultipartFile image,
+    public String updateSurveyImg(MultipartFile image,
             Long member_id,  Long survey_id) throws IOException {
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
 
         String surveyImageURL = survey.getSImageURL();
-        if(!surveyImageURL.isEmpty()){
+        if(!(surveyImageURL==null||surveyImageURL.isEmpty())){
             s3Uploader.delete(surveyImageURL,DIRECTORY); //기존 image 삭제
         }
 
         String imageUrl = s3Uploader.upload(image,DIRECTORY); //새로운 image 추가
 
         survey.setImageURL(imageUrl);
-
+        return imageUrl;
     }
 
 
     @Transactional
     public SurveySectionQueryDTO getSurveyDataPreRelease(Long member_id,  Long survey_id){
 
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
 
-        if(!surveyRepository.existsById(survey_id)){
-            throw new SurveyNotFoundException();
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+
+        //임시 저장 상태가 아닌 경우
+        if(!survey.getSurveyStatus().equals(SurveyStatus.PRE_RELEASE)){
+            throw new SurveyPreMisMatchException();
         }
 
         SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyId(survey_id);
         return surveyBySurveyId;
     }
 
-    /**
-     * survey 수정 관련 로직 추가 예정
-     * 1.날짜
-     * 2. 제목, 설문설명
-     * 3. 글자 등 색
-     *
-     */
 
+
+    @Transactional
+    public void updateSurveyTitle(UpdateSurveyTextDto updateSurveyTextDto,Long member_id,  Long survey_id){
+
+        //설문이 존재하지 않는경우
+        Survey survey = checkSurveyOwner(member_id, survey_id);
+
+        survey.setTitle(updateSurveyTextDto.getTitle());
+    }
+    @Transactional
+    public void updateSurveyDescription(UpdateSurveyTextDto updateSurveyTextDto,Long member_id,  Long survey_id){
+
+        //설문이 존재하지 않는경우
+        Survey survey = checkSurveyOwner(member_id, survey_id);
+
+        survey.setDescription(updateSurveyTextDto.getDescription());
+    }
+    @Transactional
+    public void updateSurveyColor(UpdateSurveyColorDto updateSurveyColorDto,Long member_id,  Long survey_id){
+
+        //설문이 존재하지 않는경우
+        Survey survey = checkSurveyOwner(member_id, survey_id);
+        survey.updateColor(updateSurveyColorDto);
+    }
+
+    @Transactional
+    public void updateSurveyDate(UpdateSurveyDateDto updateSurveyDateDto,Long member_id,  Long survey_id){
+
+        //설문이 존재하지 않는경우
+        Survey survey = checkSurveyOwner(member_id, survey_id);
+        survey.updateDate(updateSurveyDateDto);
+    }
 
     private Survey checkSurveyOwner(Long member_id, Long survey_id) {
         Survey survey = surveyRepository.findById(survey_id)

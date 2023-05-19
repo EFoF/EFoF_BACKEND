@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.section.application;
 
+import com.service.surveyservice.domain.question.dao.QuestionOptionRepository;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionType;
@@ -41,6 +42,7 @@ public class SectionService {
     private final SectionCustomRepository sectionCustomRepository;
 
     private final QuestionRepository questionRepository;
+    private final QuestionOptionRepository questionOptionRepository;
 
     private final SurveyRepository surveyRepository;
 
@@ -60,6 +62,7 @@ public class SectionService {
 
         Section section = sectionRepository.save(Section.builder().survey(survey).build());
         Question question = questionRepository.save(Question.builder().section(section).questionType(QuestionType.ONE_CHOICE).isNecessary(false).build());
+        section.setQuestionOrder(String.valueOf(question.getId()));
         SectionDTO.createSectionResponseDto createSectionResponseDto = section.toResponseDto(question);
 
         return createSectionResponseDto;
@@ -73,6 +76,8 @@ public class SectionService {
             throw new SectionNotFoundException();
         }
 
+        sectionRepository.updateNextSectionBySectionId(section_id);
+        questionOptionRepository.updateNextSectionBySectionId(section_id);
         //section 에 포함되는 img url 리스트
         List<String> optionImgList = sectionRepository.findOptionImgBySectionId(section_id);
 

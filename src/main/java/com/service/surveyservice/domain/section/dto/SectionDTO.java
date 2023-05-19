@@ -1,13 +1,12 @@
 package com.service.surveyservice.domain.section.dto;
 
 
-import com.service.surveyservice.domain.question.dto.QuestionDTO;
-import com.service.surveyservice.domain.question.model.Question;
-import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.service.surveyservice.domain.question.dto.QuestionDTO.*;
 
@@ -55,6 +54,7 @@ public class SectionDTO {
     public static class createSectionResponseDto{
         private Long id;
         private Long nextSectionId;
+        private String questionOrder;
         private List<createSectionResponseQuestionDto> questionList;
 
     }
@@ -76,7 +76,7 @@ public class SectionDTO {
         private Long id;
         private Long nextSectionId;
         private String questionOrder;
-        private List<QuestionQueryDto> questions;
+        private List<QuestionQueryDto> questionList;
 
 
         public SectionQuestionQueryDto(Long id, Long nextSectionId, String questionOrder) {
@@ -85,8 +85,17 @@ public class SectionDTO {
             this.questionOrder = questionOrder;
         }
 
-        public void setQuestions(List<QuestionQueryDto> questions) {
-            this.questions = questions;
+        public void setQuestionList(List<QuestionQueryDto> questionList) {
+            if(this.questionOrder==null||!this.questionOrder.contains(",")){
+                this.questionList = questionList;
+            }else{
+                List<String> orderList = Arrays.asList(this.questionOrder.split(","));
+                List<QuestionQueryDto> sortedList = questionList.stream()
+                        .sorted(Comparator.comparingLong(q -> orderList.indexOf(String.valueOf(q.getId()))))
+                        .collect(Collectors.toList());
+                this.questionList = sortedList;
+            }
+
         }
     }
 

@@ -2,6 +2,7 @@ package com.service.surveyservice.domain.survey.exception.handler;
 
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveyPreMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveySectionMisMatchException;
 import com.service.surveyservice.global.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -18,18 +19,28 @@ public class SurveyExceptionHandler {
 
     @ExceptionHandler(SurveyNotFoundException.class)
     protected final ResponseEntity<ErrorResponse> handleUserNotFoundException(SurveyNotFoundException ex, WebRequest request) {
-        log.error(request.getDescription(false));
+        log.error(request.getDescription(true));
+        log.error(String.valueOf(ex.getCause()));
         return SURVEY_NOT_FOUND;
     }
 
     @ExceptionHandler(SurveyMemberMisMatchException.class)
     protected final ResponseEntity<ErrorResponse> handleSurveyMemberMisMatchExceptionException(SurveyMemberMisMatchException ex, WebRequest request) {
-        log.error(request.getDescription(false));
+        log.error(request.getDescription(true));
+        log.error(String.valueOf(ex.getCause()));
         return SURVEY_MEMBER_MISMATCH;
     }
     @ExceptionHandler(SurveySectionMisMatchException.class)
     protected final ResponseEntity<ErrorResponse> handleSurveySectionMisMatchException(SurveySectionMisMatchException ex, WebRequest request) {
-        log.error(request.getDescription(false));
+        log.error(request.getDescription(true));
+        log.error(String.valueOf(ex.getCause()));
         return SURVEY_SECTION_MISMATCH;
+    }
+
+    @ExceptionHandler(SurveyPreMisMatchException.class)
+    protected final ResponseEntity<ErrorResponse> handleSurveyPreMisMatchException(SurveyPreMisMatchException ex, WebRequest request) {
+        log.error(request.getDescription(true));
+        log.error(String.valueOf(ex.getCause()));
+        return SURVEY_PRE_MISMATCH;
     }
 }

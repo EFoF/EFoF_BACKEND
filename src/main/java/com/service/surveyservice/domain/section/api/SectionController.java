@@ -35,12 +35,12 @@ public class SectionController {
     }
 
     @DeleteMapping(value = "/survey/{survey_id}/section/{section_id}")
-    public ResponseEntity<SectionDTO.createSectionResponseDto> deleteSection(
+    public ResponseEntity deleteSection(
             @PathVariable Long survey_id, @PathVariable Long section_id) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         sectionService.deleteSection(survey_id,currentMemberId,section_id);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping(value = "/survey/{survey_id}/section/{section_id}")

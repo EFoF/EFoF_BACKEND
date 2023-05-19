@@ -40,9 +40,9 @@ public class AnswerDTO {
                     .title(survey.getTitle())
                     .description(survey.getDescription())
                     .sImageURL(survey.getSImageURL())
-                    .constraintList(ConstraintOptions.toEntities(constraintList))
                     .participantNum(participantNum)
                     .SectionList(sectionList)
+                    .constraintList(ConstraintOptions.toEntities(constraintList))
                     .build();
         }
     }

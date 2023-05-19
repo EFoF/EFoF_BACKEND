@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/form")
+@RequestMapping("/survey")
 @RequiredArgsConstructor
 public class AnswerController {
 
@@ -26,13 +26,14 @@ public class AnswerController {
     public ResponseEntity<AnswerDTO.SurveyForStatisticResponseDto> getSurveyForStatistic(
             @PathVariable Long survey_id) {
 
+        // 현재 로그인한 사람의 member id를 받는 변수
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
+        // survey에 대한 정보를 SurveyForStatisticResponseDto 형태로 받아옴
         AnswerDTO.SurveyForStatisticResponseDto surveyForStatistic =
                 answerService.getSurveyForStatistic(survey_id, currentMemberId);
 
         return new ResponseEntity<>(surveyForStatistic,HttpStatus.CREATED);
     }
-
 
 }

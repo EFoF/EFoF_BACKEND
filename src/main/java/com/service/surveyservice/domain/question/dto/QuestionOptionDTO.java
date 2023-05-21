@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class QuestionOptionDTO {
 
     @Getter
@@ -43,6 +45,14 @@ public class QuestionOptionDTO {
                     .question(question)
                     .optionText(this.optionText).build();
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SaveQuestionOptionTextByBotRequestDTO {
+        private List<String> optionText;
     }
 
     @Getter

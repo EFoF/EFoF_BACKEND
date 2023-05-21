@@ -1,6 +1,7 @@
 package com.service.surveyservice.domain.question.application;
 
 import com.service.surveyservice.domain.question.dao.QuestionCustomRepository;
+import com.service.surveyservice.domain.question.dao.QuestionOptionCustomRepository;
 import com.service.surveyservice.domain.question.dao.QuestionOptionRepository;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.dto.QuestionDTO;
@@ -46,6 +47,7 @@ public class QuestionService {
     private final SectionRepository sectionRepository;
     private final QuestionCustomRepository questionCustomRepository;
 
+    private final QuestionOptionCustomRepository questionOptionCustomRepository;
     private final QuestionRepository questionRepository;
 
     private final QuestionOptionRepository questionOptionRepository;
@@ -237,7 +239,8 @@ public class QuestionService {
      * @param survey_id
      */
     @Transactional
-    public Long createQuestionOption(Long member_id, Long question_id, Long survey_id) {
+    public Long createQuestionOption(QuestionOptionDTO.SaveQuestionOptionTextRequestDTO saveQuestionOptionTextRequestDTO,
+                                     Long member_id, Long question_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
         checkSurveyOwner(member_id, survey_id);
@@ -246,12 +249,24 @@ public class QuestionService {
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
-        QuestionOption questionOption =QuestionOption.builder()
-                .question(question)
-                .optionText("옵션").build();
+        QuestionOption questionOption =saveQuestionOptionTextRequestDTO.toEntity(question);
 
         QuestionOption savedQuestionOption = questionOptionRepository.save(questionOption);
         return savedQuestionOption.getId();
+    }
+
+    @Transactional
+    public void addAllQuestionOptionByBot(QuestionOptionDTO.SaveQuestionOptionTextByBotRequestDTO saveQuestionOptionTextByBotRequestDTO,
+                                     Long member_id, Long question_id, Long survey_id) {
+
+        //설문이 존재하지 않는경우
+        checkSurveyOwner(member_id, survey_id);
+
+        //질문이 존재하지 않는 경우
+        Question question = questionRepository.findById(question_id)
+                .orElseThrow(QuestionNotFoundException::new);
+
+        questionOptionCustomRepository.saveAll(saveQuestionOptionTextByBotRequestDTO.getOptionText(),question_id);
     }
 
     /**

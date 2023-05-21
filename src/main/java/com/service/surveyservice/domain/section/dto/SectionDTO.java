@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.section.dto;
 
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;

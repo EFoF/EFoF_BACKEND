@@ -79,6 +79,7 @@ public class QuestionDTO {
     public static class createSectionResponseQuestionDto{
         private Long id;
         private Long type;
+        private List<String> answers = new ArrayList<>();
         private String questionContent;
         private Boolean isNecessary;
     }

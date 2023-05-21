@@ -64,9 +64,9 @@ public class QuestionDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ResponseSaveQuestionDto{
-        private Long question_id;
-        private QuestionType questionType;
-        private String questionText;
+        private Long id;
+        private QuestionType type;
+        private String questionContent;
         private Boolean isNecessary;
         private Long section_id;
     }

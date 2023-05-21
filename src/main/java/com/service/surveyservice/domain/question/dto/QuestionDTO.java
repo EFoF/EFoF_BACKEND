@@ -6,6 +6,7 @@ import com.service.surveyservice.domain.question.model.QuestionType;
 import com.service.surveyservice.domain.section.model.Section;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,6 +91,7 @@ public class QuestionDTO {
     public static class QuestionQueryDto{
         private Long id;
         private long type;
+        private List<String> answers;
         private String questionContent;
         private Boolean isNecessary;
         private Long sectionId;
@@ -101,6 +103,7 @@ public class QuestionDTO {
             this.questionContent = questionContent;
             this.isNecessary = isNecessary;
             this.sectionId = sectionId;
+            this.answers = new ArrayList<>();
         }
 
         public void setOptions(List<QuestionOptionDTO.QuestionOptionQueryDto> options) {

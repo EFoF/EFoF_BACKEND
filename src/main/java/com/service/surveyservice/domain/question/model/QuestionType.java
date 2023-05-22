@@ -11,8 +11,8 @@ public enum QuestionType {
     LONG_ANSWER(1,"long_answer"),
 
     MULTIPLE_CHOICE(2,"multiple_choice"),
-    TRUE_FALSE(3,"true_false"),
-    FILE_ANSWER(4,"file_answer");
+    TRUE_FALSE(3,"true_false");
+//    FILE_ANSWER(4,"file_answer");
 
     private long id;
     private String name;

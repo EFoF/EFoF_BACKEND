@@ -1,7 +1,9 @@
 package com.service.surveyservice.domain.answer.api;
 
+import com.amazonaws.Response;
 import com.service.surveyservice.domain.answer.application.AnswerService;
 import com.service.surveyservice.domain.answer.dto.AnswerDTO;
+import com.service.surveyservice.domain.section.application.SectionService;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AnswerController {
 
     private final AnswerService answerService;
+    private final SectionService sectionService;
 
     @GetMapping(value = "/{survey_id}/statistics")
     public ResponseEntity<AnswerDTO.SurveyForStatisticResponseDto> getSurveyForStatistic(
@@ -36,5 +39,15 @@ public class AnswerController {
 
         return new ResponseEntity<>(surveyForStatistic,HttpStatus.CREATED);
     }
+
+//    @GetMapping(value = "{survey_id}/statistics/{section_id}")
+//    public ResponseEntity<AnswerDTO.SectionForStatisticResponseDto> getSectionForStatistic(
+//            @PathVariable Long section_id) {
+//        log.info("section 정보 확인용");
+//
+//        AnswerDTO.SectionForStatisticResponseDto sectionForStatistic =
+//                answerService.getSectionForStatistic(section_id);
+//
+//    }
 
 }

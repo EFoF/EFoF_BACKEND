@@ -4,6 +4,7 @@ package com.service.surveyservice.domain.answer.dto;
 import com.service.surveyservice.domain.constraintoptions.dto.ConstraintDTO;
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
 import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.AllArgsConstructor;
@@ -23,18 +24,13 @@ public class AnswerDTO {
         private String title; //설문 제목
         private String description; //설문 설명
         private String sImageURL; //설문 이미지
-
         private int participantNum; //참여자 수
-
         private List<Long> SectionList; //설문의 리스트
-
-        private List<ConstraintDTO.SurveyForStatisticConstraintResponseDto> constraintList; //제약 조건 리스트
 
         public SurveyForStatisticResponseDto toResponseDto(
                 Survey survey,
                 int participantNum,
-                List<Long> sectionList,
-                List<ConstraintOptions> constraintList) {
+                List<Long> sectionList) {
 
             return SurveyForStatisticResponseDto.builder()
                     .title(survey.getTitle())
@@ -42,8 +38,25 @@ public class AnswerDTO {
                     .sImageURL(survey.getSImageURL())
                     .participantNum(participantNum)
                     .SectionList(sectionList)
-                    .constraintList(ConstraintOptions.toEntities(constraintList))
                     .build();
         }
     }
+
+//    @Getter
+//    @Builder
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class SectionForStatisticResponseDto {
+//        private String question_text;
+//        private String question_type;
+//
+//        public SurveyForStatisticResponseDto toResponseDto(
+//                Question question
+//        ) {
+//            return SectionForStatisticResponseDto.builder()
+//                    .question_text(question.getQuestionText())
+//                    .question_type(question.getQuestionType())
+//                    .build();
+//        }
+//    }
 }

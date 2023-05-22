@@ -94,12 +94,10 @@ public class SectionService {
          */
     }
 
-
     @Transactional
     public List<Section> findSectionListBySurveyId(Long surveyId) {
         return sectionRepository.findBySurveyId(surveyId);
     }
-
 
     @Transactional
     public void updateNextSection(SectionDTO.updateSectionDto updateSectionDto
@@ -145,5 +143,6 @@ public class SectionService {
         return survey;
     }
 
+//    private Question getSurveySection()
 
 }

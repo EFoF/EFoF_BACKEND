@@ -25,6 +25,7 @@ public class AnswerController {
     @GetMapping(value = "/{survey_id}/statistics")
     public ResponseEntity<AnswerDTO.SurveyForStatisticResponseDto> getSurveyForStatistic(
             @PathVariable Long survey_id) {
+        log.info("확인용");
 
         // 현재 로그인한 사람의 member id를 받는 변수
         Long currentMemberId = SecurityUtil.getCurrentMemberId();

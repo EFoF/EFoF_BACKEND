@@ -33,4 +33,6 @@ public interface MemberSurveyRepository extends JpaRepository<MemberSurvey, Long
     @Query(value = "Select count(*) from MemberSurvey ms where :member_id\n" +
             "        in (SELECT ms.member.id FROM MemberSurvey ms WHERE ms.survey.id= :survey_id)")
     int findMemberIdBySurveyId(Long survey_id, Long member_id);
+
+//    boolean existsByMemberAndSurvey(Member member, Survey survey); // findByMemberAndSurvey().isPresent 로 해결할 수 있을듯?
 }

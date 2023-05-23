@@ -9,6 +9,7 @@ import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
+import com.service.surveyservice.global.util.CookieUtil;
 import com.service.surveyservice.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,19 +17,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 import static com.service.surveyservice.domain.answer.dto.AnswerDTO.*;
+import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
 
 //import static jdk.internal.org.jline.reader.impl.LineReaderImpl.CompletionType.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/survey")
 @RequiredArgsConstructor
 public class AnswerController {
 
     private final AnswerService answerService;
 
-    @GetMapping(value = "/{survey_id}/statistics")
+    @GetMapping(value = "/survey/{survey_id}/statistics")
     public ResponseEntity<AnswerDTO.SurveyForStatisticResponseDto> getSurveyForStatistic(
             @PathVariable Long survey_id) {
         log.info("확인용");
@@ -49,14 +53,17 @@ public class AnswerController {
      * @return void
      * 설문 참여 응답 저장
      */
-    @PostMapping(value = "/participate")
-    public void formParticipate(@RequestBody ParticipateAnswerListDTO participateAnswerListDTO){
+    @PostMapping(value = "/answer/participate")
+    public void formParticipate(@RequestBody ParticipateAnswerListDTO participateAnswerListDTO,
+                                HttpServletRequest request){
         log.info("데이터 들어옴");
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        answerService.participateForm(participateAnswerListDTO, currentMemberId);
+
+        Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
+
+        answerService.participateForm(participateAnswerListDTO, cookie);
     }
 
-    @GetMapping(value = "{survey_id}/statistics/{section_id}")
+    @GetMapping(value = "/survey/{survey_id}/statistics/{section_id}")
     public ResponseEntity<AnswerDTO.QuestionBySectionForStatisticResponseDto> getQuestionBySectionForStatistic(
             @PathVariable Long survey_id, @PathVariable Long section_id) {
         log.info("section 정보 확인용");

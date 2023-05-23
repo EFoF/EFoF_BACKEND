@@ -169,6 +169,12 @@ public class SurveyController {
         return new ResponseEntity<>(surveyService.getSurveyDataPreRelease(currentMemberId,survey_id),HttpStatus.OK);
     }
 
+    @GetMapping(value = "/{survey_id}/in_progress")
+    public ResponseEntity<SurveySectionQueryDTO> getSurveyDataInProgress(@PathVariable Long survey_id) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        return new ResponseEntity<>(surveyService.getSurveyData(currentMemberId, survey_id), HttpStatus.OK);
+    }
+
 
 
 

@@ -3,10 +3,7 @@ package com.service.surveyservice.domain.survey.model;
 import com.service.surveyservice.domain.answer.model.Answer;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.model.Survey;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -33,5 +30,11 @@ public class MemberSurvey {
 
     @OneToMany(mappedBy = "memberSurvey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Answer> answers = new ArrayList<>();
+
+    @Builder
+    public MemberSurvey(Member member, Survey survey) {
+        this.member = member;
+        this.survey = survey;
+    }
 }
 

@@ -1,8 +1,10 @@
 package com.service.surveyservice.domain.survey.dao;
 
 
+import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.dto.MemberSurveyDTO;
 import com.service.surveyservice.domain.survey.model.MemberSurvey;
+import com.service.surveyservice.domain.survey.model.Survey;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +21,8 @@ public interface MemberSurveyRepository extends JpaRepository<MemberSurvey, Long
             "FROM MemberSurvey ms WHERE ms.member.id = :id", nativeQuery = true)
     List<MemberSurveyInfoDTO> findByMemberId(Long id);
     List<MemberSurvey> findBySurveyId(Long id);
+
+    Optional<MemberSurvey> findByMemberAndSurvey(Member member, Survey survey);
 
 
     @Query(value = "SELECT count(*) FROM MemberSurvey ms WHERE ms.survey.id=:survey_id")

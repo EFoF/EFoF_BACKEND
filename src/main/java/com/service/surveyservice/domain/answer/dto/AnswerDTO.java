@@ -3,9 +3,7 @@ package com.service.surveyservice.domain.answer.dto;
 
 import com.service.surveyservice.domain.constraintoptions.dto.ConstraintDTO;
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
-import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.model.Survey;
-import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,5 +43,33 @@ public class AnswerDTO {
                     .SectionList(sectionList)
                     .build();
         }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ParticipateAnswerDTO {
+        private Long questionId;
+        private String answerSentence;
+        private Long questionType;
+        private List<Long> questionChoiceId;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ParticipateAnswerListDTO {
+        private Long surveyId;
+        private List<ParticipateAnswerDTO> participateAnswerDTOList;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AnswerForBatch {
+        private Long questionId;
+        private Long questionOptionId;
+        private String answerSentence;
+        private Long memberSurveyId;
+        private Long questionType;
     }
 }

@@ -12,11 +12,11 @@ import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.service.surveyservice.domain.answer.dto.AnswerDTO.*;
 
 //import static jdk.internal.org.jline.reader.impl.LineReaderImpl.CompletionType.List;
 
@@ -43,6 +43,19 @@ public class AnswerController {
         return new ResponseEntity<>(surveyForStatistic,HttpStatus.CREATED);
     }
 
+    /**
+     *
+     * @param participateAnswerListDTO
+     * @return void
+     * 설문 참여 응답 저장
+     */
+    @PostMapping(value = "/participate")
+    public void formParticipate(@RequestBody ParticipateAnswerListDTO participateAnswerListDTO){
+        log.info("데이터 들어옴");
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        answerService.participateForm(participateAnswerListDTO, currentMemberId);
+    }
+
     @GetMapping(value = "{survey_id}/statistics/{section_id}")
     public ResponseEntity<AnswerDTO.QuestionBySectionForStatisticResponseDto> getQuestionBySectionForStatistic(
             @PathVariable Long survey_id, @PathVariable Long section_id) {
@@ -54,6 +67,7 @@ public class AnswerController {
 
 //        return new ResponseEntity<>(List<answerForQuestion>, HttpStatus.CREATED);
         return new ResponseEntity<>(answerForQuestion, HttpStatus.CREATED);
+
     }
 
 }

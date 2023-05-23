@@ -3,7 +3,9 @@ package com.service.surveyservice.domain.answer.api;
 import com.amazonaws.Response;
 import com.service.surveyservice.domain.answer.application.AnswerService;
 import com.service.surveyservice.domain.answer.dto.AnswerDTO;
+import com.service.surveyservice.domain.question.application.QuestionService;
 import com.service.surveyservice.domain.section.application.SectionService;
+import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
@@ -16,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+//import static jdk.internal.org.jline.reader.impl.LineReaderImpl.CompletionType.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/survey")
@@ -23,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class AnswerController {
 
     private final AnswerService answerService;
-    private final SectionService sectionService;
 
     @GetMapping(value = "/{survey_id}/statistics")
     public ResponseEntity<AnswerDTO.SurveyForStatisticResponseDto> getSurveyForStatistic(
@@ -40,14 +43,17 @@ public class AnswerController {
         return new ResponseEntity<>(surveyForStatistic,HttpStatus.CREATED);
     }
 
-//    @GetMapping(value = "{survey_id}/statistics/{section_id}")
-//    public ResponseEntity<AnswerDTO.SectionForStatisticResponseDto> getSectionForStatistic(
-//            @PathVariable Long section_id) {
-//        log.info("section 정보 확인용");
-//
-//        AnswerDTO.SectionForStatisticResponseDto sectionForStatistic =
-//                answerService.getSectionForStatistic(section_id);
-//
-//    }
+    @GetMapping(value = "{survey_id}/statistics/{section_id}")
+    public ResponseEntity<AnswerDTO.QuestionBySectionForStatisticResponseDto> getQuestionBySectionForStatistic(
+            @PathVariable Long survey_id, @PathVariable Long section_id) {
+        log.info("section 정보 확인용");
+
+        AnswerDTO.QuestionBySectionForStatisticResponseDto answerForQuestion =
+                answerService.getQuestionBySectionForStatistic(survey_id, section_id);
+
+
+//        return new ResponseEntity<>(List<answerForQuestion>, HttpStatus.CREATED);
+        return new ResponseEntity<>(answerForQuestion, HttpStatus.CREATED);
+    }
 
 }

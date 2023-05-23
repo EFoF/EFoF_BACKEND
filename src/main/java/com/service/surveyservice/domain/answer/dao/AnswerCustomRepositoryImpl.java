@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.answer.dao;
 
+import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,10 @@ public class AnswerCustomRepositoryImpl implements AnswerCustomRepository {
         return em.find(Survey.class, id);
     }
 
-    public List<Survey> findAll() {
+    public List<Survey> findAllSurvey() {
         return em.createQuery("select s from Survey s", Survey.class)
                 .getResultList();
     }
-
-    public List<Survey> findById(Long id) {
-        return em.createQuery("select s from Survey s where s.id = :id", Survey.class)
-                .setParameter("id", id)
-                .getResultList();
-    }
-
     // implements 때문에..
 //    @Override
 //    public List<SurveyDTO.SurveyInfoDTO> findSurveyInfoDTOBySurveyIdQuery(Long surveyId) {

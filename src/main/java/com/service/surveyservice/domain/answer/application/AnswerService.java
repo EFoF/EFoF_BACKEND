@@ -4,8 +4,7 @@ import com.service.surveyservice.domain.answer.dao.AnswerCustomRepository;
 import com.service.surveyservice.domain.answer.dto.AnswerDTO;
 import com.service.surveyservice.domain.answer.exceptoin.exceptions.AuthorOrMemberNotFoundException;
 import com.service.surveyservice.domain.constraintoptions.dao.ConstraintCustomRepositoryImpl;
-import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
-import com.service.surveyservice.domain.constraintoptions.model.ConstraintType;
+import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
 import com.service.surveyservice.domain.survey.dao.MemberSurveyRepository;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
@@ -28,6 +27,7 @@ public class AnswerService {
     private final SectionRepository sectionRepository;
     private final MemberSurveyRepository memberSurveyRepository;
     private final SurveyRepository surveyRepository;
+    private final QuestionRepository questionRepository;
 
 //    private final ConstraintRepository constraintRepository;
 
@@ -79,4 +79,14 @@ public class AnswerService {
     }
 
 
+    public AnswerDTO.QuestionBySectionForStatisticResponseDto getQuestionBySectionForStatistic(Long surveyId, Long sectionId) {
+
+        // sectionRepository에서 가져올 것
+        String questionOrder = sectionRepository.findQuestionOrderById(sectionId);
+        log.info(questionOrder);
+
+        // questionRepository에서 가져올 것
+
+        return null;
+    }
 }

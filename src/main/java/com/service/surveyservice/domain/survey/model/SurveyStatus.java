@@ -16,6 +16,10 @@ public enum SurveyStatus {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public static SurveyStatus findById(Long id) {
         for(SurveyStatus status : SurveyStatus.values()) {
             if(status.getId().equals(id))

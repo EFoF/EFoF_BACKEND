@@ -170,6 +170,23 @@ public class SurveyService {
         return surveyBySurveyId;
     }
 
+    @Transactional
+    public SurveySectionQueryDTO getSurveyData(Long member_id,  Long survey_id){
+
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+
+        // TODO Date 관련 처리 해줘야 함
+
+        SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyId(survey_id);
+        return surveyBySurveyId;
+    }
+
 
 
     @Transactional

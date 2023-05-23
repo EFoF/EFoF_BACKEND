@@ -82,8 +82,8 @@ public class AnswerService {
     public AnswerDTO.QuestionBySectionForStatisticResponseDto getQuestionBySectionForStatistic(Long surveyId, Long sectionId) {
 
         // sectionRepository에서 가져올 것
-        List<String> questionOrderList = sectionRepository.findQuestionOrderById(surveyId);
-//        log.info(questionOrderList.toString());
+        String questionOrder = sectionRepository.findQuestionOrderById(sectionId);
+        log.info(questionOrder);
 
         // questionRepository에서 가져올 것
 

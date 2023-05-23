@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.section.application;
 
+import com.service.surveyservice.domain.answer.dto.AnswerDTO;
 import com.service.surveyservice.domain.question.dao.QuestionOptionRepository;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.model.Question;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
 
@@ -142,7 +144,5 @@ public class SectionService {
         }
         return survey;
     }
-
-//    private Question getSurveySection()
 
 }

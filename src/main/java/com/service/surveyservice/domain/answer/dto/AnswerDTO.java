@@ -5,6 +5,7 @@ import com.service.surveyservice.domain.constraintoptions.dto.ConstraintDTO;
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.question.model.Question;
+import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.AllArgsConstructor;
@@ -42,21 +43,27 @@ public class AnswerDTO {
         }
     }
 
-//    @Getter
-//    @Builder
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    public static class SectionForStatisticResponseDto {
-//        private String question_text;
-//        private String question_type;
-//
-//        public SurveyForStatisticResponseDto toResponseDto(
-//                Question question
-//        ) {
-//            return SectionForStatisticResponseDto.builder()
-//                    .question_text(question.getQuestionText())
-//                    .question_type(question.getQuestionType())
-//                    .build();
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestionBySectionForStatisticResponseDto {
+        public QuestionBySectionForStatisticResponseDto toResponseDto;
+        private Long section_id;
+        private String question_text;
+        private String question_type;
+        private String questionOrder;
+
+//        private List<GraphInfo> graphInfo;
+
+        public QuestionBySectionForStatisticResponseDto toResponseDto(Section section) {
+            return QuestionBySectionForStatisticResponseDto.builder()
+                    .section_id(section.getId())
+                    .build();
+        }
+
+//        public void setGraphInfo(GraphInfo graphInfo) {
+//            this.graphInfo = graphInfo;
 //        }
-//    }
+    }
 }

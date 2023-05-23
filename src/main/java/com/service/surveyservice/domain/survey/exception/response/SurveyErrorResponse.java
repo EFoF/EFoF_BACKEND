@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.survey.exception.response;
 import com.service.surveyservice.domain.member.exception.exceptions.member.UserNotFoundException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveyPreMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveySectionMisMatchException;
 import com.service.surveyservice.global.error.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -24,4 +25,10 @@ public class SurveyErrorResponse {
             .exceptionName(SurveySectionMisMatchException.class.getSimpleName())
             .message("섹션의 설문이 잘못되었습니다.")
             .build(),HttpStatus.BAD_REQUEST);
+
+    public static final ResponseEntity<ErrorResponse> SURVEY_PRE_MISMATCH = new ResponseEntity<>(ErrorResponse.builder()
+            .exceptionName(SurveyPreMisMatchException.class.getSimpleName())
+            .message("현재 설문은 임시저장 상태가 아닙니다.")
+            .build(),HttpStatus.BAD_REQUEST);
+
 }

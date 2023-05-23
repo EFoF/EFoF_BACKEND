@@ -1,5 +1,7 @@
 package com.service.surveyservice.domain.section.application;
 
+import com.service.surveyservice.domain.answer.dto.AnswerDTO;
+import com.service.surveyservice.domain.question.dao.QuestionOptionRepository;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionType;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
 
@@ -41,6 +44,7 @@ public class SectionService {
     private final SectionCustomRepository sectionCustomRepository;
 
     private final QuestionRepository questionRepository;
+    private final QuestionOptionRepository questionOptionRepository;
 
     private final SurveyRepository surveyRepository;
 
@@ -54,30 +58,33 @@ public class SectionService {
     }
 
     @Transactional
-    public SectionDTO.createSectionResponseDto addSection(Long survey_id,Long member_id){
+    public SectionDTO.createSectionResponseDto addSection(Long survey_id, Long member_id) {
 
         Survey survey = checkSurveyOwner(member_id, survey_id);
 
         Section section = sectionRepository.save(Section.builder().survey(survey).build());
         Question question = questionRepository.save(Question.builder().section(section).questionType(QuestionType.ONE_CHOICE).isNecessary(false).build());
+        section.setQuestionOrder(String.valueOf(question.getId()));
         SectionDTO.createSectionResponseDto createSectionResponseDto = section.toResponseDto(question);
 
         return createSectionResponseDto;
     }
 
     @Transactional
-    public void deleteSection(Long survey_id, Long member_id, Long section_id){
-        checkSurveyOwner(member_id,survey_id);
+    public void deleteSection(Long survey_id, Long member_id, Long section_id) {
+        checkSurveyOwner(member_id, survey_id);
 
-        if(!sectionRepository.existsById(section_id)){
+        if (!sectionRepository.existsById(section_id)) {
             throw new SectionNotFoundException();
         }
 
+        sectionRepository.updateNextSectionBySectionId(section_id);
+        questionOptionRepository.updateNextSectionBySectionId(section_id);
         //section 에 포함되는 img url 리스트
         List<String> optionImgList = sectionRepository.findOptionImgBySectionId(section_id);
 
         for (String img : optionImgList) {
-            s3Uploader.delete(img,DIRECTORY);
+            s3Uploader.delete(img, DIRECTORY);
         }
         sectionRepository.deleteById(section_id);
 
@@ -89,30 +96,34 @@ public class SectionService {
          */
     }
 
-
     @Transactional
-    public List<Section> findSectionListBySurveyId(Long surveyId){
+    public List<Section> findSectionListBySurveyId(Long surveyId) {
         return sectionRepository.findBySurveyId(surveyId);
     }
 
-
     @Transactional
     public void updateNextSection(SectionDTO.updateSectionDto updateSectionDto
-            ,Long surveyId,Long member_id,Long section_id){
+            , Long surveyId, Long member_id, Long section_id) {
 
-        checkSurveyOwner(member_id,surveyId);
+        checkSurveyOwner(member_id, surveyId);
         Section section = sectionRepository.findById(section_id).orElse(null);
-        if(section==null){
+        if (section == null) {
             throw new SectionNotFoundException();
         }
-
-        Section nextSection =
-                sectionRepository.findById(updateSectionDto.getNextSectionId()).orElse(null);
-        if(nextSection==null){
-            throw new SectionNotFoundException();
+        Long nextSectionId = updateSectionDto.getNextSectionId();
+        if (nextSectionId != null) {
+            Section nextSection =
+                    sectionRepository.findById(nextSectionId).orElse(null);
+            if (nextSection == null) {
+                throw new SectionNotFoundException();
+            }
+            section.setParentSection(nextSection);
+        }
+        else{
+            section.setParentSection(null);
         }
 
-        section.setParentSection(nextSection);
+
     }
 
 
@@ -133,6 +144,5 @@ public class SectionService {
         }
         return survey;
     }
-
 
 }

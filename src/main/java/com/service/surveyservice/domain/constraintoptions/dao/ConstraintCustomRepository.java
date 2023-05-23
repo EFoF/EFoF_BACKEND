@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ConstraintCustomRepository {
 
-    List<ConstraintOptions> findConstraintBySurveyId(Long surveyId);
+    Integer findConstraintBySurveyId(Long surveyId);
 }

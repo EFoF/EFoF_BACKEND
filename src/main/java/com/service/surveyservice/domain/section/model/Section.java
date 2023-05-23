@@ -70,6 +70,7 @@ public class Section {
         return SectionDTO.createSectionResponseDto.builder()
                 .questionList(questionList)
                 .id(this.getId())
+                .questionOrder(this.getQuestionOrder())
                 .build();
     }
 }

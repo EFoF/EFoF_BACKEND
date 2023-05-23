@@ -1,6 +1,7 @@
 package com.service.surveyservice.domain.question.application;
 
 import com.service.surveyservice.domain.question.dao.QuestionCustomRepository;
+import com.service.surveyservice.domain.question.dao.QuestionOptionCustomRepository;
 import com.service.surveyservice.domain.question.dao.QuestionOptionRepository;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.dto.QuestionDTO;
@@ -8,6 +9,7 @@ import com.service.surveyservice.domain.question.dto.QuestionOptionDTO;
 import com.service.surveyservice.domain.question.exception.exceptions.*;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
+import com.service.surveyservice.domain.question.model.QuestionType;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.section.exception.exceptions.SectionNotFoundException;
@@ -45,6 +47,7 @@ public class QuestionService {
     private final SectionRepository sectionRepository;
     private final QuestionCustomRepository questionCustomRepository;
 
+    private final QuestionOptionCustomRepository questionOptionCustomRepository;
     private final QuestionRepository questionRepository;
 
     private final QuestionOptionRepository questionOptionRepository;
@@ -137,7 +140,47 @@ public class QuestionService {
         if (!question.getSection().getId().equals(section_id)) {
             throw new SectionQuestionMissMatchException();
         }
-        question.updateQuestion(saveQuestionRequestDto);
+        question.updateQuestionText(saveQuestionRequestDto);
+    }
+
+    @Transactional
+    public void updateQuestionType(QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
+                                      Long member_id,
+                                      Long question_id,
+                                      Long survey_id,
+                                      Long section_id) {
+
+        checkSurveyOwner(member_id, survey_id);
+
+        //질문이 존재하지 않는 경우
+        Question question = questionRepository.findById(question_id)
+                .orElseThrow(QuestionNotFoundException::new);
+
+        if (!question.getSection().getId().equals(section_id)) {
+            throw new SectionQuestionMissMatchException();
+        }
+        if(saveQuestionRequestDto.getType()== QuestionType.TRUE_FALSE.getId()){
+
+        }
+        question.updateQuestionType(saveQuestionRequestDto);
+    }
+
+    @Transactional
+    public void updateQuestionIsNecessary(Long member_id,
+                                      Long question_id,
+                                      Long survey_id,
+                                      Long section_id) {
+
+        checkSurveyOwner(member_id, survey_id);
+
+        //질문이 존재하지 않는 경우
+        Question question = questionRepository.findById(question_id)
+                .orElseThrow(QuestionNotFoundException::new);
+
+        if (!question.getSection().getId().equals(section_id)) {
+            throw new SectionQuestionMissMatchException();
+        }
+        question.updateQuestionIsNecessary();
     }
 
 
@@ -206,10 +249,24 @@ public class QuestionService {
         Question question = questionRepository.findById(question_id)
                 .orElseThrow(QuestionNotFoundException::new);
 
-        QuestionOption questionOption = saveQuestionOptionTextRequestDTO.toEntity(question);
+        QuestionOption questionOption =saveQuestionOptionTextRequestDTO.toEntity(question);
 
         QuestionOption savedQuestionOption = questionOptionRepository.save(questionOption);
         return savedQuestionOption.getId();
+    }
+
+    @Transactional
+    public void addAllQuestionOptionByBot(QuestionOptionDTO.SaveQuestionOptionTextByBotRequestDTO saveQuestionOptionTextByBotRequestDTO,
+                                     Long member_id, Long question_id, Long survey_id) {
+
+        //설문이 존재하지 않는경우
+        checkSurveyOwner(member_id, survey_id);
+
+        //질문이 존재하지 않는 경우
+        Question question = questionRepository.findById(question_id)
+                .orElseThrow(QuestionNotFoundException::new);
+
+        questionOptionCustomRepository.saveAll(saveQuestionOptionTextByBotRequestDTO.getOptionText(),question_id);
     }
 
     /**
@@ -417,7 +474,7 @@ public class QuestionService {
         }
 
 
-        if (endQuestionOrder.isEmpty() || endQuestionOrder == null) {//글자가 없는 경우 question이 0개인 경우
+        if ( endQuestionOrder == null||endQuestionOrder.isEmpty()) {//글자가 없는 경우 question이 0개인 경우
             endSection.setQuestionOrder(String.valueOf(question.getId()));
         } else if (!endQuestionOrder.contains(",")) { //1글자인 경우 즉 question이 1개인 경우 -> 1 이므로 split 이 안댐
             if (updateSectionOrderRequestDto.getEndSectionIdx() == 0) {

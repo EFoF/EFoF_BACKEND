@@ -53,7 +53,6 @@ public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
 
                 List<QuestionOptionDTO.SaveQuestionOptionRequestDTOInit> options = questionList.get(k).getOptions();
                 List<QuestionOption> questionOptionList = new ArrayList<>();
-
                 for (int i=0; i< options.size(); i++){
 
                     Section optionNextSection = sectionMap.get(requestSections.get(j).getQuestionList().get(k).getOptions().get(i).getNextSectionId());
@@ -63,9 +62,8 @@ public class QuestionCustomRepositoryImpl implements QuestionCustomRepository {
                 }
 
                 questionOptionRepository.saveAll(questionOptionList);
-
-
             }
+
             sb.deleteCharAt(sb.length() - 1);
 
             section.setParentSection(nextSection);

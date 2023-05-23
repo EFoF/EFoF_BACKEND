@@ -13,4 +13,9 @@ public interface QuestionRepository extends JpaRepository<Question, Long>{
             "  qo.question_option_img IS NOT NULL AND qo.question_option_img <> '');"
     , nativeQuery = true)
     List<String> findImgUrlByQuestionId(@Param("question_id")Long question_id);
+
+    @Query(value = "SELECT q.question_id FROM question q \n" +
+            "    WHERE q.section_id " +
+            "in (SELECT s.section_id FROM section s WHERE s.survey_id = 3);", nativeQuery = true)
+    List<String> findQuestionBySectionId(@Param("section_id")Long section_id);
 }

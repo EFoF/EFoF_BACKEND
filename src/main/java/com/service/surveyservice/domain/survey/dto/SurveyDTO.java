@@ -130,6 +130,32 @@ public class SurveyDTO {
             this.sectionList = sectionList;
         }
     }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateSurveyTextDto {
+        private String title;
+        private String description;
+    }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateSurveyColorDto {
+        private String fontColor;
+        private String bgColor;
+        private String btColor;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateSurveyDateDto {
+        private LocalDateTime openDate;
+        private LocalDateTime expireDate;
+    }
 
 }

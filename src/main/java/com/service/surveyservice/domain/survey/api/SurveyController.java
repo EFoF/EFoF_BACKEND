@@ -9,6 +9,8 @@ import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -175,7 +177,16 @@ public class SurveyController {
         return new ResponseEntity<>(surveyService.getSurveyData(currentMemberId, survey_id), HttpStatus.OK);
     }
 
-
+    /***
+     * 내가 생성한 설문 조회
+     * @param memberId
+     * @param pageable
+     * @return
+     */
+    @GetMapping(value = "/generate/{memberId}")
+    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
+        return ResponseEntity.ok(surveyService.findSurveyByAuthorId(memberId, pageable));
+    }
 
 
 }

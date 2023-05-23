@@ -12,7 +12,6 @@ import java.util.List;
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 
 public interface SurveyCustomRepository {
-
     Page<SurveyInfoDTO> findSurveyInfoDTOByAuthorId(Long authorId, Pageable pageable);
 
 

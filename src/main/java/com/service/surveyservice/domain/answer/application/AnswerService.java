@@ -192,13 +192,9 @@ public class AnswerService {
 //        return CREATED;
 //    }
 
-    // 설문 참여 응답 저장 - 로그인 한 유저
+    // 설문 참여 응답 저장
     @Transactional
     public String participateForm(ParticipateAnswerListDTO participateAnswerListDTO, Long currentMemberId){
-        // 응답하려는 사용자를 찾을 수 없다면 예외 발생
-        Member member = memberRepository.findById(currentMemberId).orElseThrow(UserNotFoundException::new);
-        log.info("member : {}",member);
-
         Long surveyId = participateAnswerListDTO.getSurveyId();
         log.info("surveyID : {}",surveyId);
 
@@ -207,17 +203,60 @@ public class AnswerService {
 
         //survey로 제약조건 조사
         List<ConstraintOptions> constraintOptions = constraintRepository.findBySurvey(survey.get());
+        log.info(constraintOptions.toString());
 
         List<ParticipateAnswerDTO> participateAnswerDTOList = participateAnswerListDTO.getParticipateAnswerDTOList();
 
         //bulk insert 할 List 생성
         List<AnswerForBatch> subAnswers = new ArrayList<>();
 
-        for (ConstraintOptions constraintOption : constraintOptions) {
-            ConstraintType constraintType = constraintOption.getConstraintType();
-            // 로그인 여부 & Email 걸려있는 survey 일 때
-            if (constraintType == ConstraintType.LOGGED_IN || constraintType == ConstraintType.EMAIL_CONSTRAINT){
-                //MemberSurvey 생성
+        // 응답하려는 사용자를 찾을 수 없다면 예외 발생
+        Member member = memberRepository.findById(currentMemberId).orElseThrow(UserNotFoundException::new);
+        log.info("member : {}",member);
+
+        boolean contains = constraintOptions.contains(ConstraintType.LOGGED_IN);
+        boolean contains1 = constraintOptions.contains(ConstraintType.EMAIL_CONSTRAINT);
+
+        if (contains || contains1){ // 로그인 여부 & Email 걸려있는 survey 일 때 => 로그인 필수
+            //MemberSurvey 생성
+            MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
+                    .member(member)
+                    .survey(survey.get())
+                    .build();
+
+            memberSurveyRepository.save(memberSurveyBuilder);
+            log.info("memberSurveyBuilder : {}",memberSurveyBuilder);
+
+            //어떤 유저가 참여한 어떤 설문인지 특정한다.
+            Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey.get());
+            log.info("memberSurveyId : {}",memberSurvey.get().getId());
+
+            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+                Long questionType = participateAnswerDTO.getQuestionType();
+                if (questionType == QuestionType.LONG_ANSWER.getId()){ // 주관식 일 경우
+                    subAnswers.add(AnswerForBatch.builder()
+                            .questionId(participateAnswerDTO.getQuestionId())
+                            .answerSentence(participateAnswerDTO.getAnswerSentence())
+                            .memberSurveyId(memberSurvey.get().getId())
+                            .questionType(questionType)
+                            .build());
+                }
+                else { // 주관식이 아닐 경우
+                    for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
+                        subAnswers.add(AnswerForBatch.builder()
+                                .questionId(participateAnswerDTO.getQuestionId())
+                                .questionOptionId(questionOptionId)
+                                .memberSurveyId(memberSurvey.get().getId())
+                                .questionType(questionType)
+                                .build());
+                    }
+                }
+            }
+
+            answerCustomRepository.saveAll(subAnswers);
+        }
+        else { // 로그인 여부 & Email 안 걸려있을 때 => 로그인 optional
+            if (member != null){ // 로그인 되어잇는 경우
                 MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
                         .member(member)
                         .survey(survey.get())
@@ -254,10 +293,8 @@ public class AnswerService {
 
                 answerCustomRepository.saveAll(subAnswers);
             }
-            // 설문 참여에 로그인이 필요없을 경우
-            else {
-                member = null;
-
+            else { // 로그인 안 되어잇는 경우
+//                member = null;
                 for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
                     Long questionType = participateAnswerDTO.getQuestionType();
                     if (questionType == QuestionType.LONG_ANSWER.getId()){ // 주관식 일 경우
@@ -285,6 +322,79 @@ public class AnswerService {
                 answerCustomRepository.saveAll(subAnswers);
             }
         }
+
+//        for (ConstraintOptions constraintOption : constraintOptions) {
+//            ConstraintType constraintType = constraintOption.getConstraintType();
+//            // 로그인 여부 & Email 걸려있는 survey 일 때
+//            if (constraintType == ConstraintType.LOGGED_IN || constraintType == ConstraintType.EMAIL_CONSTRAINT){
+//                //MemberSurvey 생성
+//                MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
+//                        .member(member)
+//                        .survey(survey.get())
+//                        .build();
+//
+//                memberSurveyRepository.save(memberSurveyBuilder);
+//                log.info("memberSurveyBuilder : {}",memberSurveyBuilder);
+//
+//                //어떤 유저가 참여한 어떤 설문인지 특정한다.
+//                Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey.get());
+//                log.info("memberSurveyId : {}",memberSurvey.get().getId());
+//
+//                for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+//                    Long questionType = participateAnswerDTO.getQuestionType();
+//                    if (questionType == QuestionType.LONG_ANSWER.getId()){ // 주관식 일 경우
+//                        subAnswers.add(AnswerForBatch.builder()
+//                                .questionId(participateAnswerDTO.getQuestionId())
+//                                .answerSentence(participateAnswerDTO.getAnswerSentence())
+//                                .memberSurveyId(memberSurvey.get().getId())
+//                                .questionType(questionType)
+//                                .build());
+//                    }
+//                    else { // 주관식이 아닐 경우
+//                        for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
+//                            subAnswers.add(AnswerForBatch.builder()
+//                                    .questionId(participateAnswerDTO.getQuestionId())
+//                                    .questionOptionId(questionOptionId)
+//                                    .memberSurveyId(memberSurvey.get().getId())
+//                                    .questionType(questionType)
+//                                    .build());
+//                        }
+//                    }
+//                }
+//
+//                answerCustomRepository.saveAll(subAnswers);
+//            }
+//            // 설문 참여에 로그인이 필요없을 경우
+//            else {
+//                member = null;
+//
+//                for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+//                    Long questionType = participateAnswerDTO.getQuestionType();
+//                    if (questionType == QuestionType.LONG_ANSWER.getId()){ // 주관식 일 경우
+//                        subAnswers.add(AnswerForBatch.builder()
+//                                .questionId(participateAnswerDTO.getQuestionId())
+//                                .answerSentence(participateAnswerDTO.getAnswerSentence())
+////                                .memberSurveyId(memberSurvey.get().getId())
+//                                .memberSurveyId(null)
+//                                .questionType(questionType)
+//                                .build());
+//                    }
+//                    else { // 주관식이 아닐 경우
+//                        for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
+//                            subAnswers.add(AnswerForBatch.builder()
+//                                    .questionId(participateAnswerDTO.getQuestionId())
+//                                    .questionOptionId(questionOptionId)
+////                                    .memberSurveyId(memberSurvey.get().getId())
+//                                    .memberSurveyId(null)
+//                                    .questionType(questionType)
+//                                    .build());
+//                        }
+//                    }
+//                }
+//
+//                answerCustomRepository.saveAll(subAnswers);
+//            }
+//        }
 //        Iterator<ParticipateAnswerDTO> iterator = participateAnswerDTOList.iterator();
 ////        Iterator<ParticipateAnswerDTO> iterator = participateAnswerListDTO.iterator();
 //

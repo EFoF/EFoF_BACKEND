@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.member.application;
 
+import com.service.surveyservice.domain.answer.exceptoin.exceptions.AuthorOrMemberNotFoundException;
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.dto.MemberDTO.RedunCheckDTO;

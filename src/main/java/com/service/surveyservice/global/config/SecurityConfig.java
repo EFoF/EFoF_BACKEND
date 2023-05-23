@@ -75,6 +75,7 @@ public class SecurityConfig {
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/logout-redirect").permitAll()
+                .antMatchers("/answer/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/survey/**").access("hasRole('ADMIN') or hasRole('USER')")
                 .antMatchers("/user/**").access("hasRole('ADMIN') or hasRole('USER')")

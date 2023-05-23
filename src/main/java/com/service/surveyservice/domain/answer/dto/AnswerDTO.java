@@ -46,6 +46,7 @@ public class AnswerDTO {
     @NoArgsConstructor
     public static class ParticipateAnswerDTO {
         private Long questionId;
+        private Boolean isNecessary;
         private String answerSentence;
         private Long questionType;
         private List<Long> questionChoiceId;
@@ -68,6 +69,7 @@ public class AnswerDTO {
         private String answerSentence;
         private Long memberSurveyId;
         private Long questionType;
+        private Boolean isNecessary;
     }
 
     @Builder

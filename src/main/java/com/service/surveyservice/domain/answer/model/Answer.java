@@ -5,16 +5,17 @@ import com.service.surveyservice.domain.model.BaseTimeEntity;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
-@AllArgsConstructor
-public class Answer extends BaseTimeEntity {
+public class Answer {
 
     @Id
     @Column(name = "answer_id")
@@ -36,5 +37,17 @@ public class Answer extends BaseTimeEntity {
 
     // 주관식 답변
     private String answerSentence;
+
+    @CreatedDate // Entity가 생성되어 저장될 때 시간이 자동 저장
+    @Column(updatable = false)
+    private LocalDateTime createDate;
+
+    @Builder
+    public Answer(Question question, MemberSurvey memberSurvey, QuestionOption questionOption, String answerSentence) {
+        this.question = question;
+        this.memberSurvey = memberSurvey;
+        this.questionOption = questionOption;
+        this.answerSentence = answerSentence;
+    }
 }
 

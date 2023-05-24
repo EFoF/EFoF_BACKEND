@@ -36,7 +36,7 @@ public class MemberSurveyService {
         페이지네이션을 위해서 JSON에 추가되는 정보들이 꽤 많아서, 필요에 따라 페이지네이션 데이터 없이
         필요한 데이터만 사용할 수 있는 옵션을 제공한다.
      */
-
+    // 철웅오빠 - 참여?
     // 페이지네이션을 지원하는 참여 설문 조회
     public Page<MemberSurveyInfoDTO> getInfoPagination(Long requesterId, Long currentMemberId,Pageable pageable) {
         if(!requesterId.equals(currentMemberId)) {

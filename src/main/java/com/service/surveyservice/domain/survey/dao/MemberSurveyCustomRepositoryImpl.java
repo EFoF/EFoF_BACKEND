@@ -24,6 +24,7 @@ public class MemberSurveyCustomRepositoryImpl implements MemberSurveyCustomRepos
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    // 철웅오빠 - 참여
     @Override
     public Page<MemberSurveyInfoDTO> findByMemberIdWithPage(Long memberId, Pageable pageable) {
         JPAQuery<Long> countQuery = jpaQueryFactory

@@ -9,17 +9,22 @@ import com.service.surveyservice.domain.survey.dao.SurveyRepository;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyPreMisMatchException;
+import com.service.surveyservice.domain.survey.model.ReleaseStatus;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import com.service.surveyservice.global.config.S3Config;
 import com.service.surveyservice.global.error.exception.NotFoundByIdException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 import static com.service.surveyservice.global.common.constants.S3Constants.DIRECTORY;
@@ -43,7 +48,7 @@ public class SurveyService {
      */
     @Transactional
     public Survey createSurvey(SaveSurveyRequestDto saveSurveyRequestDto, long currentMemberId) {
-        SurveyStatus surveyStatus = SurveyStatus.PRE_RELEASE;
+        ReleaseStatus surveyStatus = ReleaseStatus.PRE_RELEASE;
 
         // 요청으로 넘어온 사용자가 존재하는지 확인
         Member member = memberRepository.findById(currentMemberId).orElseThrow(() -> new NotFoundByIdException("사용자"));
@@ -162,9 +167,26 @@ public class SurveyService {
         }
 
         //임시 저장 상태가 아닌 경우
-        if(!survey.getSurveyStatus().equals(SurveyStatus.PRE_RELEASE)){
+        if(!survey.getReleaseStatus().equals(ReleaseStatus.PRE_RELEASE)){
             throw new SurveyPreMisMatchException();
         }
+
+        SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyId(survey_id);
+        return surveyBySurveyId;
+    }
+
+    @Transactional
+    public SurveySectionQueryDTO getSurveyData(Long member_id,  Long survey_id){
+
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+
+        // TODO Date 관련 처리 해줘야 함
 
         SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyId(survey_id);
         return surveyBySurveyId;
@@ -213,6 +235,13 @@ public class SurveyService {
             throw new SurveyMemberMisMatchException();
         }
         return survey;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<GetGenerateSurveyDTO> findSurveyByAuthorId(Long authorId, Pageable pageable) {
+        Page<SurveyRepository.GetSurveyInterface> generateSurveyById = surveyRepository.findGenerateSurveyByAuthorId(authorId, pageable);
+        List<GetGenerateSurveyDTO> collect = generateSurveyById.stream().map(GetGenerateSurveyDTO::new).collect(Collectors.toList());
+        return new PageImpl<>(collect, pageable, generateSurveyById.getTotalElements());
     }
 
 }

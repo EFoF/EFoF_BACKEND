@@ -117,15 +117,12 @@ public class AnswerService {
     public AnswerDTO.QuestionBySectionForStatisticResponseDto getQuestionBySectionForStatistic(Long surveyId, Long sectionId) {
         // 1-1. sectionId에 따른 questionOrder를 가져옴
         String questionOrder = sectionRepository.findQuestionOrderById(sectionId);
-//        log.info(questionOrder);
 
-        String[] split = questionOrder.split(",");
         // 1-2. questionOrder 타입 변환 (String -> Long)
         List<Long> questionOrderList = Arrays.stream(questionOrder.split(","))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
 //        log.info(questionOrderList.toString()); // [8, 7, 9]
-
 
         /**
          * 1. 먼저 질문에 대한 정보 리스트 - 정보를 어딘가에 넣어줘야함
@@ -134,8 +131,6 @@ public class AnswerService {
          */
         List<QuestionRepository.questionInfoByIdDtoI> questionInfoByIdInter = questionRepository.findQuestionInfoById(sectionId);
         List<QuestionDTO.QuestionInfoByIdDto> questionInfoById = questionInfoByIdInter.stream().map(QuestionDTO.QuestionInfoByIdDto::new).collect(Collectors.toList());
-        log.info("질문 확인용");
-        log.info(questionInfoById.toString());
 
         // 객관식
         List<AnswerRepository.choiceAnswerResponseDtoI> choiceAnswerByQuestionIdInter = answerRepository.findChoiceAnswerByQuestionId(sectionId);
@@ -148,13 +143,8 @@ public class AnswerService {
         List<AnswerDTO.LongAnswerResponseDto> longAnswerByQuestionId = longAnswerByQuestionIdInter.stream().map(AnswerDTO.LongAnswerResponseDto::new).collect(Collectors.toList());
         Map<Long, List<LongAnswerResponseDto>> longQuestionOptionList = longAnswerByQuestionId.stream()
                 .collect(Collectors.groupingBy(longAnswerByQuestionIdDto -> longAnswerByQuestionIdDto.getQuestion_id()));
-        log.info(choiceQuestionOptionList.toString());
-        log.info(longQuestionOptionList.toString());
 
-
-
-        return null;
-//        return new AnswerDTO.SurveyForStatisticResponseDto().toResponseDto(survey,participantNum,sectionList);
+        return new QuestionDTO.QuestionInfoByIdDto().toResponseDto((QuestionDTO.QuestionInfoByIdDto) questionInfoById, choiceQuestionOptionList, longQuestionOptionList);
     }
 
     // 설문 참여 응답 저장

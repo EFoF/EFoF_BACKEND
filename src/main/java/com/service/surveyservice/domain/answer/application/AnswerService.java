@@ -49,9 +49,8 @@ import static com.service.surveyservice.domain.answer.dto.AnswerDTO.*;
 @Service
 @RequiredArgsConstructor
 public class AnswerService {
-
-
     private final SectionRepository sectionRepository;
+
     private final SurveyRepository surveyRepository;
     private final MemberRepository memberRepository;
     private final MemberSurveyRepository memberSurveyRepository;
@@ -59,13 +58,10 @@ public class AnswerService {
     private final AnswerCustomRepository answerCustomRepository;
     private final QuestionRepository questionRepository;
 
-
     private final QuestionOptionRepository questionOptionRepository;
     private final ConstraintRepository constraintRepository;
     private final ConstraintCustomRepositoryImpl constraintCustomRepository;
     private final JwtTokenProvider jwtTokenProvider;
-
-
 
 //
 //    public List<SurveyInfoDTO> getInfoTitleNDescription(Long surveyId) {

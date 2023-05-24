@@ -1,18 +1,21 @@
 package com.service.surveyservice.domain.answer.dto;
 
 
+import com.service.surveyservice.domain.answer.dao.AnswerRepository;
 import com.service.surveyservice.domain.constraintoptions.dto.ConstraintDTO;
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintType;
 import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.model.Question;
+import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.model.Survey;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
+import javax.persistence.SqlResultSetMapping;
 import java.util.List;
 
 public class AnswerDTO {
@@ -110,21 +113,35 @@ public class AnswerDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ChoiceAnswerDto{    // 객관식
+    @ToString
+    public static class ChoiceAnswerResponseDto{    // 객관식
         private Long question_id;
         private Long question_choice_id;
         private int participant_num_question_option;
-        private String question_text;
-        private String question_type;
+        private String option_text;
         private String question_option_img;
+
+        public ChoiceAnswerResponseDto(AnswerRepository.choiceAnswerResponseDtoI choiceAnswerResponseDtoI) {
+            this.question_id = choiceAnswerResponseDtoI.getQuestion_id();
+            this.question_choice_id = choiceAnswerResponseDtoI.getQuestion_choice_id();
+            this.participant_num_question_option = choiceAnswerResponseDtoI.getParticipant_num_question_option();
+            this.option_text = choiceAnswerResponseDtoI.getOption_text();
+            this.question_option_img = choiceAnswerResponseDtoI.getQuestion_option_img();
+        }
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LongAnswerDto{  // 주관식
+    @ToString
+    public static class LongAnswerResponseDto{  // 주관식
         private Long question_id;
         private String answer_sentence;
+
+        public LongAnswerResponseDto(AnswerRepository.longAnswerResponseDtoI longAnswerResponseDtoI) {
+            this.question_id = longAnswerResponseDtoI.getQuestion_id();
+            this.answer_sentence = longAnswerResponseDtoI.getAnswer_sentence();
+        }
     }
 }

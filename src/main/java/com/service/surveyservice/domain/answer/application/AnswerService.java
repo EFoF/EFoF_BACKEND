@@ -38,12 +38,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
+import java.util.*;
 import javax.servlet.http.Cookie;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.service.surveyservice.global.common.constants.ResponseConstants.CREATED;
@@ -56,16 +52,13 @@ public class AnswerService {
 
 
     private final SectionRepository sectionRepository;
-
     private final SurveyRepository surveyRepository;
     private final MemberRepository memberRepository;
     private final MemberSurveyRepository memberSurveyRepository;
-    private final SectionRepository sectionRepository;
     private final AnswerRepository answerRepository;
     private final AnswerCustomRepository answerCustomRepository;
     private final QuestionRepository questionRepository;
 
-    private final AnswerRepository answerRepository;
 
     private final QuestionOptionRepository questionOptionRepository;
     private final ConstraintRepository constraintRepository;
@@ -122,7 +115,6 @@ public class AnswerService {
 
 
     public AnswerDTO.QuestionBySectionForStatisticResponseDto getQuestionBySectionForStatistic(Long surveyId, Long sectionId) {
-        // ====================Part 1. Question Info====================
         // 1-1. sectionId에 따른 questionOrder를 가져옴
         String questionOrder = sectionRepository.findQuestionOrderById(sectionId);
 //        log.info(questionOrder);
@@ -135,48 +127,29 @@ public class AnswerService {
 //        log.info(questionOrderList.toString()); // [8, 7, 9]
 
 
-        //List<questionListDto> list = repos
-        // 위의 dto에는 객관식 dto, 주관식 dto가 각각 존재
-        //list.get(0) => id =7 -> list.get(0) => id=8
-        //결국 소팅 해야함
-
-        //List<optionListDto> optionlist = qpRespo
-        //optionlist의 question_id가 7인 것들을 리스트로 만들어
-        //위에 있는 questionListDto인 list에 값을 넣어
-
-
         /**
          * 1. 먼저 질문에 대한 정보 리스트 - 정보를 어딘가에 넣어줘야함
          * 2. 객관식 답변 리스트 - 위 리스트에 각각 넣어줘야함
          * 3. 주관식 답변 리스트
          */
-//        List<List<QuestionDTO.QuestionOptionByQuestionDto>> questionInfoById = new ArrayList<>();
-//        for(Long question_id : questionOrderList) {
-//            List<QuestionDTO.QuestionOptionByQuestionDto> temp = questionRepository.findQuestionInfoById(question_id);
-//
-//        }
-
-        //
         List<QuestionRepository.questionInfoByIdDtoI> questionInfoByIdInter = questionRepository.findQuestionInfoById(sectionId);
         List<QuestionDTO.QuestionInfoByIdDto> questionInfoById = questionInfoByIdInter.stream().map(QuestionDTO.QuestionInfoByIdDto::new).collect(Collectors.toList());
+        log.info("질문 확인용");
         log.info(questionInfoById.toString());
 
-        log.info(answerRepository.findLongAnswerByQuestionId(questionOrderList).toString());
-        log.info(answerRepository.findChoiceAnswerByQuestionId(questionOrderList).toString());
+        // 객관식
+        List<AnswerRepository.choiceAnswerResponseDtoI> choiceAnswerByQuestionIdInter = answerRepository.findChoiceAnswerByQuestionId(sectionId);
+        List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerByQuestionId = choiceAnswerByQuestionIdInter.stream().map(AnswerDTO.ChoiceAnswerResponseDto::new).collect(Collectors.toList());
+        Map<Long, List<ChoiceAnswerResponseDto>> choiceQuestionOptionList = choiceAnswerByQuestionId.stream()
+                .collect(Collectors.groupingBy(choiceAnswerByQuestionIdDto -> choiceAnswerByQuestionIdDto.getQuestion_id()));
 
-        // 1-3. questionOrderList 순서대로 question_text, question_type 가져옴
-//        List<List<String>> questionInfoList = new ArrayList<>();
-//        for (Long question_id : questionOrderList) {
-//            String questionText = questionRepository.findQuestionTextById(question_id);
-//            String questionType = questionRepository.findQuestionTypeById(question_id);
-////            log.info(questionText, questionType);
-//
-//            List<String> questionInfo = Arrays.asList(questionText, questionType);
-//            questionInfoList.add(questionInfo);
-//        }
-//        log.info(questionInfoList.toString());
-
-        // ====================Part 2. Graph Info====================
+        // 주관식
+        List<AnswerRepository.longAnswerResponseDtoI> longAnswerByQuestionIdInter = answerRepository.findLongAnswerByQuestionId(sectionId);
+        List<AnswerDTO.LongAnswerResponseDto> longAnswerByQuestionId = longAnswerByQuestionIdInter.stream().map(AnswerDTO.LongAnswerResponseDto::new).collect(Collectors.toList());
+        Map<Long, List<LongAnswerResponseDto>> longQuestionOptionList = longAnswerByQuestionId.stream()
+                .collect(Collectors.groupingBy(longAnswerByQuestionIdDto -> longAnswerByQuestionIdDto.getQuestion_id()));
+        log.info(choiceQuestionOptionList.toString());
+        log.info(longQuestionOptionList.toString());
 
 
 

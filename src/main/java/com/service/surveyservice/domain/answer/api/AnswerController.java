@@ -77,4 +77,12 @@ public class AnswerController {
 
     }
 
+    // TODO 현종 참고용
+    @GetMapping(value = "/survey/currentMember/test")
+    public ResponseEntity<Long> tester() {
+        Long currentNullableMemberId = SecurityUtil.getCurrentNullableMemberId();
+        System.out.println(currentNullableMemberId);
+        return new ResponseEntity<>(currentNullableMemberId, HttpStatus.OK);
+    }
+
 }

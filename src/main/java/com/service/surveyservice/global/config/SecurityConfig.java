@@ -77,7 +77,9 @@ public class SecurityConfig {
                 .antMatchers("/logout-redirect").permitAll()
                 .antMatchers("/answer/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/survey/**").access("hasRole('ADMIN') or hasRole('USER')")
+//                .antMatchers("/survey/**").access("hasRole('ADMIN') or hasRole('USER')")
+//                .antMatchers("/survey/**").access("hasRole('ADMIN') or hasRole('USER')")
+                .antMatchers("/survey/**").permitAll()
                 .antMatchers("/user/**").access("hasRole('ADMIN') or hasRole('USER')")
                 .anyRequest().permitAll()
 

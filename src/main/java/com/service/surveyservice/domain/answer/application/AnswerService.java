@@ -270,7 +270,7 @@ public class AnswerService {
 
                         //어떤 유저가 참여한 어떤 설문인지 특정한다.
                         Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-                        log.info("memberSurveyId : {}", memberSurvey.get().getId());
+//                        log.info("memberSurveyId : {}", memberSurvey.get().getId());
 
                         if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
 

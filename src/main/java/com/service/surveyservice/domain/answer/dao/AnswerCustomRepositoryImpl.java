@@ -53,7 +53,7 @@ public class AnswerCustomRepositoryImpl implements AnswerCustomRepository {
 //    }
 
     @Override
-    public void saveAll(List<AnswerDTO.AnswerForBatch> answerForBatchList){
+    public void saveAll(List<AnswerDTO.AnswerForBatch> answerForBatchList) {
         String sql = "INSERT INTO answer (answer_sentence, member_survey_id, question_id, question_choice_id, create_date) " +
                 "VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
@@ -62,7 +62,7 @@ public class AnswerCustomRepositoryImpl implements AnswerCustomRepository {
                 AnswerDTO.AnswerForBatch answerForBatch = answerForBatchList.get(i);
 
                 Long questionType = answerForBatch.getQuestionType();
-                log.info("questionType:{}",questionType);
+                log.info("questionType:{}", questionType);
 
                 Boolean isNecessary = answerForBatch.getIsNecessary();
 
@@ -92,7 +92,9 @@ public class AnswerCustomRepositoryImpl implements AnswerCustomRepository {
 
     private void setParameters(PreparedStatement ps, String answerSentence, Long memberSurveyId, Long questionId, Long questionType, Long questionOptionId, LocalDateTime localDateTime) throws SQLException {
         ps.setString(1, answerSentence);
-        ps.setLong(2, memberSurveyId);
+        if (memberSurveyId == null) {
+            ps.setNull(2, NULL);
+        } else ps.setLong(2, memberSurveyId);
         ps.setLong(3, questionId);
         if (questionType != 1) { // 주관식이 아닐 때
             ps.setLong(4, questionOptionId);

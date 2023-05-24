@@ -17,6 +17,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -70,17 +72,15 @@ public class AnswerCustomRepositoryImpl implements AnswerCustomRepository {
                 Long questionId = answerForBatch.getQuestionId();
                 Long questionOptionId = answerForBatch.getQuestionOptionId();
 
-                if (isNecessary == true && answerSentence != null && questionOptionId != null){
-                    ps.setString(1, answerSentence);
-                    ps.setLong(2, answerForBatch.getMemberSurveyId());
-                    ps.setLong(3, questionId);
-                    if (questionType != 1)
-                        ps.setLong(4, questionOptionId);
-                    else
-                        ps.setNull(4, NULL);
-                    ps.setTimestamp(5, java.sql.Timestamp.valueOf(localDateTime));
+                if (isNecessary) {
+                    if (answerSentence != null || questionOptionId != null) {
+                        setParameters(ps, answerSentence, answerForBatch.getMemberSurveyId(), questionId, questionType, questionOptionId, localDateTime);
+                    } else {
+                        throw new NoNecessaryAnswerException();
+                    }
+                } else {
+                    setParameters(ps, answerSentence, answerForBatch.getMemberSurveyId(), questionId, questionType, questionOptionId, localDateTime);
                 }
-                else throw new NoNecessaryAnswerException();
             }
 
             @Override
@@ -88,6 +88,18 @@ public class AnswerCustomRepositoryImpl implements AnswerCustomRepository {
                 return answerForBatchList.size();
             }
         });
+    }
+
+    private void setParameters(PreparedStatement ps, String answerSentence, Long memberSurveyId, Long questionId, Long questionType, Long questionOptionId, LocalDateTime localDateTime) throws SQLException {
+        ps.setString(1, answerSentence);
+        ps.setLong(2, memberSurveyId);
+        ps.setLong(3, questionId);
+        if (questionType != 1) { // 주관식이 아닐 때
+            ps.setLong(4, questionOptionId);
+        } else {
+            ps.setNull(4, Types.NULL); // 주관식일 때
+        }
+        ps.setTimestamp(5, Timestamp.valueOf(localDateTime));
     }
 }
 

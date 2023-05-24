@@ -158,7 +158,7 @@ public class AnswerService {
 
                     //어떤 유저가 참여한 어떤 설문인지 특정한다.
                     Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-                    log.info("memberSurveyId : {}", memberSurvey.get().getId());
+//                    log.info("memberSurveyId : {}", memberSurvey.get().getId());
 
                     if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
                         //MemberSurvey 생성
@@ -170,6 +170,8 @@ public class AnswerService {
                         memberSurveyRepository.save(memberSurveyBuilder);
                         log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
 
+                        Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+
 
                         for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
                             Long questionType = participateAnswerDTO.getQuestionType();
@@ -180,7 +182,7 @@ public class AnswerService {
                                 subAnswers.add(AnswerForBatch.builder()
                                         .questionId(questionId)
                                         .answerSentence(participateAnswerDTO.getAnswerSentence())
-                                        .memberSurveyId(memberSurvey.get().getId())
+                                        .memberSurveyId(memberSurvey1.get().getId())
                                         .questionType(questionType)
                                         .isNecessary(isNecessary)
                                         .build());
@@ -189,7 +191,7 @@ public class AnswerService {
                                     subAnswers.add(AnswerForBatch.builder()
                                             .questionId(questionId)
                                             .questionOptionId(questionOptionId)
-                                            .memberSurveyId(memberSurvey.get().getId())
+                                            .memberSurveyId(memberSurvey1.get().getId())
                                             .questionType(questionType)
                                             .isNecessary(isNecessary)
                                             .build());
@@ -218,7 +220,7 @@ public class AnswerService {
 
                     //어떤 유저가 참여한 어떤 설문인지 특정한다.
                     Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-                    log.info("memberSurveyId : {}", memberSurvey.get().getId());
+//                    log.info("memberSurveyId : {}", memberSurvey.get().getId());
 
                     if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
                         for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
@@ -270,7 +272,7 @@ public class AnswerService {
 
                         //어떤 유저가 참여한 어떤 설문인지 특정한다.
                         Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-                        log.info("memberSurveyId : {}", memberSurvey.get().getId());
+//                        log.info("memberSurveyId : {}", memberSurvey.get().getId());
 
                         if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
 
@@ -283,6 +285,8 @@ public class AnswerService {
                             memberSurveyRepository.save(memberSurveyBuilder);
                             log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
 
+                            Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+
                             for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
                                 Long questionType = participateAnswerDTO.getQuestionType();
                                 Long questionId = participateAnswerDTO.getQuestionId();
@@ -292,7 +296,7 @@ public class AnswerService {
                                     subAnswers.add(AnswerForBatch.builder()
                                             .questionId(questionId)
                                             .answerSentence(participateAnswerDTO.getAnswerSentence())
-                                            .memberSurveyId(memberSurvey.get().getId())
+                                            .memberSurveyId(memberSurvey1.get().getId())
                                             .questionType(questionType)
                                             .isNecessary(isNecessary)
                                             .build());
@@ -301,7 +305,7 @@ public class AnswerService {
                                         subAnswers.add(AnswerForBatch.builder()
                                                 .questionId(questionId)
                                                 .questionOptionId(questionOptionId)
-                                                .memberSurveyId(memberSurvey.get().getId())
+                                                .memberSurveyId(memberSurvey1.get().getId())
                                                 .questionType(questionType)
                                                 .isNecessary(isNecessary)
                                                 .build());
@@ -393,7 +397,7 @@ public class AnswerService {
 
                         //어떤 유저가 참여한 어떤 설문인지 특정한다.
                         Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-                        log.info("memberSurveyId : {}", memberSurvey.get().getId());
+//                        log.info("memberSurveyId : {}", memberSurvey.get().getId());
 
                         if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
                             for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {

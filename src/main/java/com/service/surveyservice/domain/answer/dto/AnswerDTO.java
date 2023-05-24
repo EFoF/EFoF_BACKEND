@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.answer.dto;
 
 import com.service.surveyservice.domain.constraintoptions.dto.ConstraintDTO;
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
+import com.service.surveyservice.domain.constraintoptions.model.ConstraintType;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.section.model.Section;
@@ -70,6 +71,7 @@ public class AnswerDTO {
         private Long memberSurveyId;
         private Long questionType;
         private Boolean isNecessary;
+        private List<ConstraintType> constraintTypeList;
     }
 
     @Builder

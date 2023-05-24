@@ -23,11 +23,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long>{
 
     interface questionInfoByIdDtoI {
         Long getQuestion_id();
-
         String getQuestion_text();
-
          QuestionType getQuestion_type();
-
         int getParticipant_num_question();
     }
 

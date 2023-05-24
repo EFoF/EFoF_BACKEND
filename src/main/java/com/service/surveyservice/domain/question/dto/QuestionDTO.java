@@ -1,6 +1,8 @@
 package com.service.surveyservice.domain.question.dto;
 
 
+import com.service.surveyservice.domain.answer.dto.AnswerDTO;
+import com.service.surveyservice.domain.question.dao.QuestionRepository;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionType;
 import com.service.surveyservice.domain.section.model.Section;
@@ -112,4 +114,34 @@ public class QuestionDTO {
         }
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ToString
+    public static class QuestionInfoByIdDto{
+        private Long question_id;
+        private String question_text;
+        private QuestionType question_type;
+        private int participant_num_question;
+
+        List<AnswerDTO.LongAnswerDto> longAnswerDtos;
+        List<AnswerDTO.ChoiceAnswerDto> choiceAnswerDtos;
+
+        public QuestionInfoByIdDto(QuestionRepository.questionInfoByIdDtoI questionOptionByQuestionDtoI) {
+            this.question_id = questionOptionByQuestionDtoI.getQuestion_id();
+            this.question_text = questionOptionByQuestionDtoI.getQuestion_text();
+            this.question_type = questionOptionByQuestionDtoI.getQuestion_type();
+            this.participant_num_question = questionOptionByQuestionDtoI.getParticipant_num_question();
+        }
+
+        public void setLongAnswerDtos(List<AnswerDTO.LongAnswerDto> longAnswerDtos) {
+            this.longAnswerDtos = longAnswerDtos;
+        }
+
+        public void setChoiceAnswerDtos(List<AnswerDTO.ChoiceAnswerDto> choiceAnswerDtos) {
+            this.choiceAnswerDtos = choiceAnswerDtos;
+        }
+
+    }
 }

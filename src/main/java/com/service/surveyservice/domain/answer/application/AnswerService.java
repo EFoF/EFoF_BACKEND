@@ -140,6 +140,9 @@ public class AnswerService {
         log.info("객관식 리스트");
         log.info(choiceQuestionOptionList.toString());
 
+        log.info("mapping test");
+        log.info(choiceQuestionOptionList.get(7L).toString());
+
         // 주관식
         List<AnswerRepository.longAnswerResponseDtoI> longAnswerByQuestionIdInter = answerRepository.findLongAnswerByQuestionId(sectionId);
         List<AnswerDTO.LongAnswerResponseDto> longAnswerByQuestionId = longAnswerByQuestionIdInter.stream().map(AnswerDTO.LongAnswerResponseDto::new).collect(Collectors.toList());
@@ -147,6 +150,27 @@ public class AnswerService {
                 .collect(Collectors.groupingBy(longAnswerByQuestionIdDto -> longAnswerByQuestionIdDto.getQuestion_id()));
         log.info("주관식 리스트");
         log.info(longQuestionOptionList.toString());
+
+        // =========================================
+        for (QuestionDTO.QuestionInfoByIdDto questionInfo : questionInfoById) {
+            Long questionId = questionInfo.getQuestion_id();
+
+            // 객관식 매핑
+            if (choiceQuestionOptionList.containsKey(questionId)) {
+                List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos = choiceQuestionOptionList.get(questionId);
+                questionInfo.setChoiceAnswerDtos(choiceAnswerDtos);
+            }
+
+            // 주관식 매핑
+            if (longQuestionOptionList.containsKey(questionId)) {
+                List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos = longQuestionOptionList.get(questionId);
+                questionInfo.setLongAnswerDtos(longAnswerDtos);
+            }
+        }
+
+        log.info("mapping 후 질문 정보 리스트");
+        log.info(questionInfoById.toString());
+
 
 
         return new QuestionDTO.QuestionInfoByIdDto().toResponseDto((QuestionDTO.QuestionInfoByIdDto) questionInfoById, choiceQuestionOptionList, longQuestionOptionList);

@@ -39,6 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.Cookie;
 import java.util.stream.Collectors;
 
@@ -50,7 +52,8 @@ import static com.service.surveyservice.domain.answer.dto.AnswerDTO.*;
 @RequiredArgsConstructor
 public class AnswerService {
     private final SectionRepository sectionRepository;
-
+    @PersistenceContext
+    private EntityManager entityManager;
     private final SurveyRepository surveyRepository;
     private final MemberRepository memberRepository;
     private final MemberSurveyRepository memberSurveyRepository;
@@ -280,9 +283,6 @@ public class AnswerService {
                 } else // 이미 참여한 설문인 경우
                     throw new DuplicatedParticipateException();
             }
-//                else { //토큰 값이 이상한 경우
-//                    throw new ExpiredAccessTokenAnswerException();
-//                }
         } else { // 로그인 여부 & Email 안 걸려있을 때 => 로그인 optional
             if (currentNullableMemberId != null) { // 로그인 한 상황
                 if (!constraintAnonymous) { // 로그인 했고 익명인 상황
@@ -387,6 +387,20 @@ public class AnswerService {
                 }
             }
             else { // 로그인 안 한 상황
+                MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
+                        .member(null)
+                        .survey(survey)
+                        .build();
+
+                MemberSurvey save = memberSurveyRepository.save(memberSurveyBuilder);
+                log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
+                Long id = save.getId();
+                log.info("id :{}", id);
+
+//                Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(memberSurveyBuilder.getMember(), survey);
+//                Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(memberRepository.findById(id).get(), survey);
+//                Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findById(id);
+
                 for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
                     Long questionType = participateAnswerDTO.getQuestionType();
                     Long questionId = participateAnswerDTO.getQuestionId();
@@ -396,7 +410,7 @@ public class AnswerService {
                         subAnswers.add(AnswerForBatch.builder()
                                 .questionId(questionId)
                                 .answerSentence(participateAnswerDTO.getAnswerSentence())
-                                .memberSurveyId(null)
+                                .memberSurveyId(id)
                                 .questionType(questionType)
                                 .isNecessary(isNecessary)
                                 .constraintTypeList(constraintTypeList)
@@ -406,7 +420,7 @@ public class AnswerService {
                             subAnswers.add(AnswerForBatch.builder()
                                     .questionId(questionId)
                                     .questionOptionId(questionOptionId)
-                                    .memberSurveyId(null)
+                                    .memberSurveyId(id)
                                     .questionType(questionType)
                                     .isNecessary(isNecessary)
                                     .constraintTypeList(constraintTypeList)
@@ -414,8 +428,12 @@ public class AnswerService {
                         }
                     }
                 }
+                log.info("insert-----------------------");
+                entityManager.flush();
+                log.info("insert-----------------------");
 
                 answerCustomRepository.saveAll(subAnswers);
+
             }
         }
         return CREATED;

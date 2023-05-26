@@ -100,9 +100,7 @@ public class AnswerCustomRepositoryImpl implements AnswerCustomRepository {
 //        if (memberSurveyId == null) { // memberSurveyId = null 일경우 => type 이 그냥 anonymous 걸려있으면 검증하면됨.
 //            ps.setNull(2, NULL);
 //        } else ps.setLong(2, memberSurveyId);
-        if (constraintAnonymous || memberSurveyId == null) { // 익명 설정 걸려있거나 비로그인일 경우
-            ps.setNull(2, NULL);
-        } else ps.setLong(2, memberSurveyId);
+        ps.setLong(2, memberSurveyId);
         ps.setLong(3, questionId);
         if (questionType != 1) { // 주관식이 아닐 때
             ps.setLong(4, questionOptionId);

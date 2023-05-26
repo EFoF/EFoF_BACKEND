@@ -54,13 +54,14 @@ public class AnswerController {
      * 설문 참여 응답 저장
      */
     @PostMapping(value = "/answer/participate")
-    public void formParticipate(@RequestBody ParticipateAnswerListDTO participateAnswerListDTO,
-                                HttpServletRequest request){
+    public void formParticipate(@RequestBody ParticipateAnswerListDTO participateAnswerListDTO){
         log.info("데이터 들어옴");
 
-        Cookie cookie = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
+        Long currentNullableMemberId = SecurityUtil.getCurrentNullableMemberId();
 
-        answerService.participateForm(participateAnswerListDTO, cookie);
+        log.info("currentNullableMemberId : {}", currentNullableMemberId);
+
+        answerService.participateForm(participateAnswerListDTO,currentNullableMemberId);
     }
 
     @GetMapping(value = "/survey/{survey_id}/statistics/{section_id}")
@@ -82,6 +83,7 @@ public class AnswerController {
     public ResponseEntity<Long> tester() {
         Long currentNullableMemberId = SecurityUtil.getCurrentNullableMemberId();
         System.out.println(currentNullableMemberId);
+        log.info("currentNullableMemberId : {}", currentNullableMemberId);
         return new ResponseEntity<>(currentNullableMemberId, HttpStatus.OK);
     }
 

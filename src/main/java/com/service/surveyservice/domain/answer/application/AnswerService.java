@@ -143,9 +143,9 @@ public class AnswerService {
         return new QuestionDTO.QuestionInfoByIdDto().toResponseDto((QuestionDTO.QuestionInfoByIdDto) questionInfoById, choiceQuestionOptionList, longQuestionOptionList);
     }
 
-    // 설문 참여 응답 저장
+//    설문 참여 응답 저장
     @Transactional
-    public String participateForm(ParticipateAnswerListDTO participateAnswerListDTO, Cookie cookie) {
+    public String participateForm(ParticipateAnswerListDTO participateAnswerListDTO, Long currentNullableMemberId) {
         Long surveyId = participateAnswerListDTO.getSurveyId();
         log.info("surveyID : {}", surveyId);
 
@@ -175,82 +175,122 @@ public class AnswerService {
 
         if (constraintLoggedIn || constraintEmail) { // 로그인 여부 or Email 걸려있는 survey 일 때 => 로그인 필수
             if (!constraintAnonymous) { // 로그인 여부 or Email 걸려있고 익명이 아닌 상태
-                if (cookie == null) { // 토큰이 있는 지 검증
+                if (currentNullableMemberId == null) { //currentNullableMemberId 가 없으면 예외 터뜨리기
                     throw new NoSuchCookieAnswerException(); //로그인 필요하다는 예외
                 }
-                String jwt = cookie.getValue(); //쿠키 값 꺼내오기
 
-                //토큰이 괜찮은 놈인지 검증
-                if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-                    //로그인이 정상적으로 돼 있을 때 로직
-                    Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
-                    Long memberId = Long.valueOf(authentication.getName());
-                    Member member = memberRepository.findById(memberId).orElseThrow(UserNotFoundException::new);
+                //로그인이 정상적으로 돼 있을 때 로직
+                Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
 
-                    //어떤 유저가 참여한 어떤 설문인지 특정한다.
-                    Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//                    log.info("memberSurveyId : {}", memberSurvey.get().getId());
+                //어떤 유저가 참여한 어떤 설문인지 특정한다.
+                Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
 
-                    if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
-                        //MemberSurvey 생성
-                        MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
-                                .member(member)
-                                .survey(survey)
-                                .build();
+                if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
+                    //MemberSurvey 생성
+                    MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
+                            .member(member)
+                            .survey(survey)
+                            .build();
 
-                        memberSurveyRepository.save(memberSurveyBuilder);
-                        log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
+                    memberSurveyRepository.save(memberSurveyBuilder);
+                    log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
 
-                        Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+                    Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
 
-                        for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-                            Long questionType = participateAnswerDTO.getQuestionType();
-                            Long questionId = participateAnswerDTO.getQuestionId();
-                            Boolean isNecessary = participateAnswerDTO.getIsNecessary();
+                    for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+                        Long questionType = participateAnswerDTO.getQuestionType();
+                        Long questionId = participateAnswerDTO.getQuestionId();
+                        Boolean isNecessary = participateAnswerDTO.getIsNecessary();
 
-                            if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
+                        if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
+                            subAnswers.add(AnswerForBatch.builder()
+                                    .questionId(questionId)
+                                    .answerSentence(participateAnswerDTO.getAnswerSentence())
+                                    .memberSurveyId(memberSurvey1.get().getId())
+                                    .questionType(questionType)
+                                    .isNecessary(isNecessary)
+                                    .constraintTypeList(constraintTypeList)
+                                    .build());
+                        } else { // 주관식이 아닐 경우
+                            for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
                                 subAnswers.add(AnswerForBatch.builder()
                                         .questionId(questionId)
-                                        .answerSentence(participateAnswerDTO.getAnswerSentence())
+                                        .questionOptionId(questionOptionId)
                                         .memberSurveyId(memberSurvey1.get().getId())
                                         .questionType(questionType)
                                         .isNecessary(isNecessary)
+                                        .constraintTypeList(constraintTypeList)
                                         .build());
-                            } else { // 주관식이 아닐 경우
-                                for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
-                                    subAnswers.add(AnswerForBatch.builder()
-                                            .questionId(questionId)
-                                            .questionOptionId(questionOptionId)
-                                            .memberSurveyId(memberSurvey1.get().getId())
-                                            .questionType(questionType)
-                                            .isNecessary(isNecessary)
-                                            .build());
-                                }
                             }
                         }
-                        answerCustomRepository.saveAll(subAnswers);
-                    } else // 이미 참여한 설문인 경우
-                        throw new DuplicatedParticipateException();
-                } else { //토큰 값이 이상한 경우
-                    throw new ExpiredAccessTokenAnswerException();
-                }
+                    }
+                    answerCustomRepository.saveAll(subAnswers);
+                } else // 이미 참여한 설문인 경우
+                    throw new DuplicatedParticipateException();
             } else { // 로그인 여부 or Email 걸려있고 익명인 상태
-                if (cookie == null) { // 토큰이 있는 지 검증
+                if (currentNullableMemberId == null) { //currentNullableMemberId 가 없으면 예외 터뜨리기
                     throw new NoSuchCookieAnswerException(); //로그인 필요하다는 예외
                 }
+                //로그인이 정상적으로 돼 있을 때 로직
+                Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
 
-                String jwt = cookie.getValue(); //쿠키 값 꺼내오기
+                //어떤 유저가 참여한 어떤 설문인지 특정한다.
+                Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
 
-                //토큰이 괜찮은 놈인지 검증
-                if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+                if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
+                    //MemberSurvey 생성
+                    MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
+                            .member(member)
+                            .survey(survey)
+                            .build();
+
+                    memberSurveyRepository.save(memberSurveyBuilder);
+                    log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
+
+                    Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+
+                    for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+                        Long questionType = participateAnswerDTO.getQuestionType();
+                        Long questionId = participateAnswerDTO.getQuestionId();
+                        Boolean isNecessary = participateAnswerDTO.getIsNecessary();
+
+                        if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
+                            subAnswers.add(AnswerForBatch.builder()
+                                    .questionId(questionId)
+                                    .answerSentence(participateAnswerDTO.getAnswerSentence())
+                                    .memberSurveyId(memberSurvey1.get().getId())
+                                    .questionType(questionType)
+                                    .isNecessary(isNecessary)
+                                    .constraintTypeList(constraintTypeList)
+                                    .build());
+                        } else { // 주관식이 아닐 경우
+                            for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
+                                subAnswers.add(AnswerForBatch.builder()
+                                        .questionId(questionId)
+                                        .questionOptionId(questionOptionId)
+                                        .memberSurveyId(memberSurvey1.get().getId())
+                                        .questionType(questionType)
+                                        .isNecessary(isNecessary)
+                                        .constraintTypeList(constraintTypeList)
+                                        .build());
+                            }
+                        }
+                    }
+                    answerCustomRepository.saveAll(subAnswers);
+                } else // 이미 참여한 설문인 경우
+                    throw new DuplicatedParticipateException();
+            }
+//                else { //토큰 값이 이상한 경우
+//                    throw new ExpiredAccessTokenAnswerException();
+//                }
+        } else { // 로그인 여부 & Email 안 걸려있을 때 => 로그인 optional
+            if (currentNullableMemberId != null) { // 로그인 한 상황
+                if (!constraintAnonymous) { // 로그인 했고 익명인 상황
                     //로그인이 정상적으로 돼 있을 때 로직
-                    Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
-                    Long memberId = Long.valueOf(authentication.getName());
-                    Member member = memberRepository.findById(memberId).orElseThrow(UserNotFoundException::new);
+                    Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
 
                     //어떤 유저가 참여한 어떤 설문인지 특정한다.
                     Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//                    log.info("memberSurveyId : {}", memberSurvey.get().getId());
 
                     if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
                         //MemberSurvey 생성
@@ -294,262 +334,264 @@ public class AnswerService {
                         answerCustomRepository.saveAll(subAnswers);
                     } else // 이미 참여한 설문인 경우
                         throw new DuplicatedParticipateException();
-                } else { //토큰 값이 이상한 경우
-                    throw new ExpiredAccessTokenAnswerException();
+                }
+                else { // 로그인 했고 익명 아닌 상황
+                    //로그인이 정상적으로 돼 있을 때 로직
+                    Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
+
+                    //어떤 유저가 참여한 어떤 설문인지 특정한다.
+                    Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+
+                    if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
+                        //MemberSurvey 생성
+                        MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
+                                .member(member)
+                                .survey(survey)
+                                .build();
+
+                        memberSurveyRepository.save(memberSurveyBuilder);
+                        log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
+
+                        Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+
+                        for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+                            Long questionType = participateAnswerDTO.getQuestionType();
+                            Long questionId = participateAnswerDTO.getQuestionId();
+                            Boolean isNecessary = participateAnswerDTO.getIsNecessary();
+
+                            if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
+                                subAnswers.add(AnswerForBatch.builder()
+                                        .questionId(questionId)
+                                        .answerSentence(participateAnswerDTO.getAnswerSentence())
+                                        .memberSurveyId(memberSurvey1.get().getId())
+                                        .questionType(questionType)
+                                        .isNecessary(isNecessary)
+                                        .constraintTypeList(constraintTypeList)
+                                        .build());
+                            } else { // 주관식이 아닐 경우
+                                for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
+                                    subAnswers.add(AnswerForBatch.builder()
+                                            .questionId(questionId)
+                                            .questionOptionId(questionOptionId)
+                                            .memberSurveyId(memberSurvey1.get().getId())
+                                            .questionType(questionType)
+                                            .isNecessary(isNecessary)
+                                            .constraintTypeList(constraintTypeList)
+                                            .build());
+                                }
+                            }
+                        }
+                        answerCustomRepository.saveAll(subAnswers);
+                    } else // 이미 참여한 설문인 경우
+                        throw new DuplicatedParticipateException();
                 }
             }
-        } else { // 로그인 여부 & Email 안 걸려있을 때 => 로그인 optional
-            if (!constraintAnonymous) { // 로그인 optional 이고 익명이 아닌 상태
-                // 로그인 한 상태로 설문에 참여한 경우
-                if (cookie != null) { // 토큰이 있는 지 검증
-                    String jwt = cookie.getValue(); //쿠키 값 꺼내오기
+            else { // 로그인 안 한 상황
+                for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+                    Long questionType = participateAnswerDTO.getQuestionType();
+                    Long questionId = participateAnswerDTO.getQuestionId();
+                    Boolean isNecessary = participateAnswerDTO.getIsNecessary();
 
-                    //토큰이 괜찮은 놈인지 검증
-                    if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-                        //로그인이 정상적으로 돼 있을 때 로직
-                        Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
-                        Long memberId = Long.valueOf(authentication.getName());
-                        Member member = memberRepository.findById(memberId).orElseThrow(UserNotFoundException::new);
-
-                        //어떤 유저가 참여한 어떤 설문인지 특정한다.
-                        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//                        log.info("memberSurveyId : {}", memberSurvey.get().getId());
-
-                        if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
-
-                            //MemberSurvey 생성
-                            MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
-                                    .member(member)
-                                    .survey(survey)
-                                    .build();
-
-                            memberSurveyRepository.save(memberSurveyBuilder);
-                            log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
-
-                            Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-
-                            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-                                Long questionType = participateAnswerDTO.getQuestionType();
-                                Long questionId = participateAnswerDTO.getQuestionId();
-                                Boolean isNecessary = participateAnswerDTO.getIsNecessary();
-
-                                if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
-                                    subAnswers.add(AnswerForBatch.builder()
-                                            .questionId(questionId)
-                                            .answerSentence(participateAnswerDTO.getAnswerSentence())
-                                            .memberSurveyId(memberSurvey1.get().getId())
-                                            .questionType(questionType)
-                                            .isNecessary(isNecessary)
-                                            .constraintTypeList(constraintTypeList)
-                                            .build());
-                                } else { // 주관식이 아닐 경우
-                                    for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
-                                        subAnswers.add(AnswerForBatch.builder()
-                                                .questionId(questionId)
-                                                .questionOptionId(questionOptionId)
-                                                .memberSurveyId(memberSurvey1.get().getId())
-                                                .questionType(questionType)
-                                                .isNecessary(isNecessary)
-                                                .constraintTypeList(constraintTypeList)
-                                                .build());
-                                    }
-                                }
-                            }
-
-                            answerCustomRepository.saveAll(subAnswers);
-                        } else // 이미 참여한 설문인 경우
-                            throw new DuplicatedParticipateException();
-
-                    } else { // 토큰이 존재하지만, 토큰 값이 이상한 경우 => 로그인을 하지 않은 상태로 설문에 참여한 경우
-                        // 로그인 안 했을 때 로직
-                        for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-                            Long questionType = participateAnswerDTO.getQuestionType();
-                            Long questionId = participateAnswerDTO.getQuestionId();
-                            Boolean isNecessary = participateAnswerDTO.getIsNecessary();
-
-                            if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
-                                subAnswers.add(AnswerForBatch.builder()
-                                        .questionId(questionId)
-                                        .answerSentence(participateAnswerDTO.getAnswerSentence())
-//                                .memberSurveyId(memberSurvey.get().getId())
-                                        .memberSurveyId(null)
-                                        .questionType(questionType)
-                                        .isNecessary(isNecessary)
-                                        .build());
-                            } else { // 주관식이 아닐 경우
-                                for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
-                                    subAnswers.add(AnswerForBatch.builder()
-                                            .questionId(questionId)
-                                            .questionOptionId(questionOptionId)
-//                                    .memberSurveyId(memberSurvey.get().getId())
-                                            .memberSurveyId(null)
-                                            .questionType(questionType)
-                                            .isNecessary(isNecessary)
-                                            .build());
-                                }
-                            }
-                        }
-
-                        answerCustomRepository.saveAll(subAnswers);
-
-                    }
-                } else { // 토큰이 존재하지 않는 경우 => 로그인을 하지 않은 상태로 설문에 참여한 경우
-                    // 로그인 안 했을 때 로직
-                    for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-                        Long questionType = participateAnswerDTO.getQuestionType();
-                        Long questionId = participateAnswerDTO.getQuestionId();
-                        Boolean isNecessary = participateAnswerDTO.getIsNecessary();
-
-                        if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
+                    if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
+                        subAnswers.add(AnswerForBatch.builder()
+                                .questionId(questionId)
+                                .answerSentence(participateAnswerDTO.getAnswerSentence())
+                                .memberSurveyId(null)
+                                .questionType(questionType)
+                                .isNecessary(isNecessary)
+                                .constraintTypeList(constraintTypeList)
+                                .build());
+                    } else { // 주관식이 아닐 경우
+                        for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
                             subAnswers.add(AnswerForBatch.builder()
                                     .questionId(questionId)
-                                    .answerSentence(participateAnswerDTO.getAnswerSentence())
-//                                .memberSurveyId(memberSurvey.get().getId())
+                                    .questionOptionId(questionOptionId)
                                     .memberSurveyId(null)
                                     .questionType(questionType)
                                     .isNecessary(isNecessary)
+                                    .constraintTypeList(constraintTypeList)
                                     .build());
-                        } else { // 주관식이 아닐 경우
-                            for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
-                                subAnswers.add(AnswerForBatch.builder()
-                                        .questionId(questionId)
-                                        .questionOptionId(questionOptionId)
-//                                    .memberSurveyId(memberSurvey.get().getId())
-                                        .memberSurveyId(null)
-                                        .questionType(questionType)
-                                        .isNecessary(isNecessary)
-                                        .build());
-                            }
                         }
                     }
-
-                    answerCustomRepository.saveAll(subAnswers);
-
                 }
-            } else { // 로그인 optional 이고 익명인 상태
-                // 로그인 한 상태로 설문에 참여한 경우
-                if (cookie != null) { // 토큰이 있는 지 검증
-                    String jwt = cookie.getValue(); //쿠키 값 꺼내오기
 
-                    //토큰이 괜찮은 놈인지 검증
-                    if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-                        //로그인이 정상적으로 돼 있을 때 로직
-                        Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
-                        Long memberId = Long.valueOf(authentication.getName());
-                        Member member = memberRepository.findById(memberId).orElseThrow(UserNotFoundException::new);
-
-                        //어떤 유저가 참여한 어떤 설문인지 특정한다.
-                        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//                        log.info("memberSurveyId : {}", memberSurvey.get().getId());
-
-                        if (memberSurvey.isEmpty()) { // 설문에 참여한 적이 없는 유저만 참여 가능함.
-                            //MemberSurvey 생성
-                            MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
-                                    .member(member)
-                                    .survey(survey)
-                                    .build();
-
-                            memberSurveyRepository.save(memberSurveyBuilder);
-                            log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
-
-                            Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-
-                            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-                                Long questionType = participateAnswerDTO.getQuestionType();
-                                Long questionId = participateAnswerDTO.getQuestionId();
-                                Boolean isNecessary = participateAnswerDTO.getIsNecessary();
-
-                                if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
-                                    subAnswers.add(AnswerForBatch.builder()
-                                            .questionId(questionId)
-                                            .answerSentence(participateAnswerDTO.getAnswerSentence())
-                                            .memberSurveyId(memberSurvey1.get().getId())
-                                            .questionType(questionType)
-                                            .isNecessary(isNecessary)
-                                            .constraintTypeList(constraintTypeList)
-                                            .build());
-                                } else { // 주관식이 아닐 경우
-                                    for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
-                                        subAnswers.add(AnswerForBatch.builder()
-                                                .questionId(questionId)
-                                                .questionOptionId(questionOptionId)
-                                                .memberSurveyId(memberSurvey1.get().getId())
-                                                .questionType(questionType)
-                                                .isNecessary(isNecessary)
-                                                .constraintTypeList(constraintTypeList)
-                                                .build());
-                                    }
-                                }
-                            }
-                            answerCustomRepository.saveAll(subAnswers);
-                        } else // 이미 참여한 설문인 경우
-                            throw new DuplicatedParticipateException();
-                    } else { // 토큰이 존재하지만, 토큰 값이 이상한 경우 => 로그인을 하지 않은 상태로 설문에 참여한 경우
-                        // 로그인 안 했을 때 로직
-                        for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-                            Long questionType = participateAnswerDTO.getQuestionType();
-                            Long questionId = participateAnswerDTO.getQuestionId();
-                            Boolean isNecessary = participateAnswerDTO.getIsNecessary();
-
-                            if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
-                                subAnswers.add(AnswerForBatch.builder()
-                                        .questionId(questionId)
-                                        .answerSentence(participateAnswerDTO.getAnswerSentence())
-//                                .memberSurveyId(memberSurvey.get().getId())
-                                        .memberSurveyId(null)
-                                        .questionType(questionType)
-                                        .isNecessary(isNecessary)
-                                        .build());
-                            } else { // 주관식이 아닐 경우
-                                for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
-                                    subAnswers.add(AnswerForBatch.builder()
-                                            .questionId(questionId)
-                                            .questionOptionId(questionOptionId)
-//                                    .memberSurveyId(memberSurvey.get().getId())
-                                            .memberSurveyId(null)
-                                            .questionType(questionType)
-                                            .isNecessary(isNecessary)
-                                            .build());
-                                }
-                            }
-                        }
-
-                        answerCustomRepository.saveAll(subAnswers);
-
-                    }
-                } else { // 토큰이 존재하지 않는 경우 => 로그인을 하지 않은 상태로 설문에 참여한 경우
-                    // 로그인 안 했을 때 로직
-                    for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-                        Long questionType = participateAnswerDTO.getQuestionType();
-                        Long questionId = participateAnswerDTO.getQuestionId();
-                        Boolean isNecessary = participateAnswerDTO.getIsNecessary();
-
-                        if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
-                            subAnswers.add(AnswerForBatch.builder()
-                                    .questionId(questionId)
-                                    .answerSentence(participateAnswerDTO.getAnswerSentence())
-//                                .memberSurveyId(memberSurvey.get().getId())
-                                    .memberSurveyId(null)
-                                    .questionType(questionType)
-                                    .isNecessary(isNecessary)
-                                    .build());
-                        } else { // 주관식이 아닐 경우
-                            for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
-                                subAnswers.add(AnswerForBatch.builder()
-                                        .questionId(questionId)
-                                        .questionOptionId(questionOptionId)
-//                                    .memberSurveyId(memberSurvey.get().getId())
-                                        .memberSurveyId(null)
-                                        .questionType(questionType)
-                                        .isNecessary(isNecessary)
-                                        .build());
-                            }
-                        }
-                    }
-                    answerCustomRepository.saveAll(subAnswers);
-                }
+                answerCustomRepository.saveAll(subAnswers);
             }
         }
         return CREATED;
     }
+
+    //아래는 리팩토링 중인 코드
+
+//    @Transactional
+//    public String participateForm2(ParticipateAnswerListDTO participateAnswerListDTO, Long currentNullableMemberId) {
+//        Long surveyId = participateAnswerListDTO.getSurveyId();
+//        log.info("surveyID : {}", surveyId);
+//
+//        List<ParticipateAnswerDTO> participateAnswerDTOList = participateAnswerListDTO.getParticipateAnswerDTOList();
+//
+//        Survey survey = surveyRepository.findById(surveyId).orElseThrow(SurveyNotFoundAnswerException::new);
+//        log.info("survey : {}", survey);
+//
+//        //survey로 제약조건 조사
+//        List<ConstraintOptions> constraintOptions = constraintRepository.findBySurvey(survey);
+//
+//        //bulk insert 할 List 생성
+//        List<AnswerForBatch> subAnswers = new ArrayList<>();
+//
+//        //제약 조건들 담을 List 생성
+//        List<ConstraintType> constraintTypeList = new ArrayList<>();
+//
+//        for (ConstraintOptions constraintOption : constraintOptions) {
+//            constraintTypeList.add(constraintOption.getConstraintType());
+//        }
+//
+//        log.info("constraintTypeList : {}", constraintTypeList);
+//
+//        boolean constraintLoggedIn = constraintTypeList.contains(ConstraintType.LOGGED_IN);
+//        boolean constraintEmail = constraintTypeList.contains(ConstraintType.EMAIL_CONSTRAINT);
+//        boolean constraintAnonymous = constraintTypeList.contains(ConstraintType.ANONYMOUS);
+//
+//        if (constraintLoggedIn || constraintEmail) { // 로그인 여부 or Email 걸려있는 survey 일 때 => 로그인 필수
+//            if (!constraintAnonymous) {
+//                handleLoggedInState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
+//            } else { // 로그인 여부 or Email 걸려있고 익명인 상태
+//                handleAnonymousState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
+//            }
+//        } else { // 로그인 여부 & Email 안 걸려있을 때 => 로그인 optional
+//            if (currentNullableMemberId != null) { // 로그인 한 상황
+//                if (!constraintAnonymous) { // 로그인 했고 익명 아닌 상황
+//                    handleOptionalLoggedInState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
+//                } else { // 로그인 했고 익명인 상황
+//                    handleOptionalAnonymousState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
+//                }
+//            } else { // 로그인 안 한 상황
+//                handleLoggedOutState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
+//            }
+//        }
+//        return CREATED;
+//    }
+//
+//    private void handleLoggedInState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
+//                                     List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
+//        if (currentNullableMemberId == null) {
+//            throw new NoSuchCookieAnswerException();
+//        }
+//
+//        Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
+//        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+//
+//        if (memberSurvey.isEmpty()) {
+//            Long memberSurvey1 = createMemberSurvey(member, survey);
+//
+//            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+//                createAnswerForBatch(participateAnswerDTO, memberSurvey1, constraintTypeList, subAnswers);
+//            }
+//            answerCustomRepository.saveAll(subAnswers);
+//        } else {
+//            throw new DuplicatedParticipateException();
+//        }
+//    }
+//
+//    private void handleAnonymousState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
+//                                      List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
+//        if (currentNullableMemberId == null) {
+//            throw new NoSuchCookieAnswerException();
+//        }
+//
+//        Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
+//        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+//
+//        if (memberSurvey.isEmpty()) {
+//            Long memberSurvey1 = createMemberSurvey(member, survey);
+//
+//            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+//                createAnswerForBatch(participateAnswerDTO, memberSurvey1, constraintTypeList, subAnswers);
+//            }
+//            answerCustomRepository.saveAll(subAnswers);
+//        }
+//    }
+//
+//    private void handleOptionalLoggedInState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
+//                                             List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
+//
+//        Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
+//        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+//
+//        if (memberSurvey.isEmpty()) {
+//            Long memberSurvey1 = createMemberSurvey(member, survey);
+//
+//            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+//                createAnswerForBatch(participateAnswerDTO, memberSurvey1, constraintTypeList, subAnswers);
+//            }
+//            answerCustomRepository.saveAll(subAnswers);
+//        } else {
+//            throw new DuplicatedParticipateException();
+//        }
+//    }
+//
+//    private void handleOptionalAnonymousState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
+//                                              List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
+//
+//        Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
+//        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+//
+//        if (memberSurvey.isEmpty()) {
+//            Long memberSurvey1 = createMemberSurvey(member, survey);
+//
+//            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+//                createAnswerForBatch(participateAnswerDTO, memberSurvey1, constraintTypeList, subAnswers);
+//            }
+//            answerCustomRepository.saveAll(subAnswers);
+//        } else {
+//            throw new DuplicatedParticipateException();
+//        }
+//    }
+//
+//    private void handleLoggedOutState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
+//                                      List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
+//
+//        for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
+//            createAnswerForBatch(participateAnswerDTO, null, constraintTypeList, subAnswers);
+//        }
+//        answerCustomRepository.saveAll(subAnswers);
+//
+//    }
+//
+//    private Long createMemberSurvey(Member member, Survey survey) {
+//        //MemberSurvey 생성
+//        MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
+//                .member(member)
+//                .survey(survey)
+//                .build();
+//
+//        memberSurveyRepository.save(memberSurveyBuilder);
+//        log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
+//
+//        Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
+//        Long id = memberSurvey1.get().getId();
+//
+//        return id;
+//    }
+//
+//    private void createAnswerForBatch(ParticipateAnswerDTO participateAnswerDTO, Long memberSurveyId,
+//                                      List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
+//        Long questionType = participateAnswerDTO.getQuestionType();
+//        Long questionId = participateAnswerDTO.getQuestionId();
+//        Boolean isNecessary = participateAnswerDTO.getIsNecessary();
+//
+//        if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
+//            AnswerForBatch answerForBatch = new AnswerForBatch(questionId, null, participateAnswerDTO.getAnswerSentence(),
+//                    memberSurveyId, questionType, isNecessary, constraintTypeList);
+//
+//            subAnswers.add(answerForBatch);
+//        } else { // 주관식이 아닐 경우
+//            for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
+//                AnswerForBatch answerForBatch = new AnswerForBatch(questionId, questionOptionId, null,
+//                        memberSurveyId, questionType, isNecessary, constraintTypeList);
+//
+//                subAnswers.add(answerForBatch);
+//            }
+//        }
+//    }
 }

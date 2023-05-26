@@ -10,7 +10,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class QuestionDTO {
@@ -125,6 +124,9 @@ public class QuestionDTO {
         private String question_text;
         private QuestionType question_type;
         private int participant_num_question;
+        List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos;
+        List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos;
+
         public QuestionInfoByIdDto(QuestionRepository.questionInfoByIdDtoI questionOptionByQuestionDtoI) {
             this.question_id = questionOptionByQuestionDtoI.getQuestion_id();
             this.question_text = questionOptionByQuestionDtoI.getQuestion_text();
@@ -132,24 +134,18 @@ public class QuestionDTO {
             this.participant_num_question = questionOptionByQuestionDtoI.getParticipant_num_question();
         }
 
-        // =======================================================
-        List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos;
-        List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos;
-
         public void setLongAnswerDtos(List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos) {
             this.longAnswerDtos = longAnswerDtos;
         }
         public void setChoiceAnswerDtos(List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos) {
             this.choiceAnswerDtos = choiceAnswerDtos;
         }
+
         // =======================================================
-        public AnswerDTO.QuestionBySectionForStatisticResponseDto toResponseDto(
-                QuestionInfoByIdDto questionInfoByIdDto,
-                Map<Long, List<AnswerDTO.ChoiceAnswerResponseDto>> choiceQuestionOptionList,
-                Map<Long, List<AnswerDTO.LongAnswerResponseDto>> longQuestionOptionList) {
+
+        public AnswerDTO.QuestionBySectionForStatisticResponseDto toResponseDto(List<QuestionInfoByIdDto> questionInfoById) {
 
             return AnswerDTO.QuestionBySectionForStatisticResponseDto.builder()
-
                     .build();
         }
     }

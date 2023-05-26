@@ -117,9 +117,9 @@ public class AnswerService {
         String questionOrder = sectionRepository.findQuestionOrderById(sectionId);
 
         // 1-2. questionOrder 타입 변환 (String -> Long)
-        List<Long> questionOrderList = Arrays.stream(questionOrder.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
+//        List<Long> questionOrderList = Arrays.stream(questionOrder.split(","))
+//                .map(Long::parseLong)
+//                .collect(Collectors.toList());
 //        log.info(questionOrderList.toString()); // [8, 7, 9]
 
         /**

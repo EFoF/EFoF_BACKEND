@@ -177,10 +177,6 @@ public class SurveyService {
         return surveyBySurveyId;
     }
 
-    public SurveySectionQueryDTO getSurveyDataSetting(Long member_id,  Long survey_id){
-
-        Survey survey = surveyRepository.findById(survey_id)
-                .orElseThrow(SurveyNotFoundException::new);
 
     public SurveySectionQueryDTO getSurveyData(Long member_id,  Long survey_id){
 
@@ -199,13 +195,19 @@ public class SurveyService {
     }
 
 
+    @Transactional
+    public SurveySectionQueryDTO getSurveyDataSetting(Long member_id,  Long survey_id){
+
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
         //설문 생성자의 요청이 아닌 경우
         if(!survey.getAuthor().getId().equals(member_id)){
             throw new SurveyMemberMisMatchException();
         }
 
         //임시 저장 상태가 아닌 경우
-        if(!survey.getSurveyStatus().equals(SurveyStatus.PRE_RELEASE)){
+        if(!survey.getReleaseStatus().equals(SurveyStatus.PRE_RELEASE)){
             throw new SurveyPreMisMatchException();
         }
 
@@ -258,16 +260,26 @@ public class SurveyService {
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
         ConstraintType type;
+
         if(updateSurveySettingDto.getEmail()){
             type = ConstraintType.EMAIL_CONSTRAINT;
+            ConstraintOptions options = ConstraintOptions.builder().survey(survey).constraintType(type).build();
+            survey.getConstraintOptions().add(options);
+            return;
         }
         if(updateSurveySettingDto.getGps()){
             type = ConstraintType.GPS_CONSTRAINT;
+            ConstraintOptions options = ConstraintOptions.builder().survey(survey).constraintType(type).build();
+            survey.getConstraintOptions().add(options);
+            return;
         }
         if(updateSurveySettingDto.getLogin()){
+            type = ConstraintType.LOGGED_IN;
+            ConstraintOptions options = ConstraintOptions.builder().survey(survey).constraintType(type).build();
+            survey.getConstraintOptions().add(options);
+            return;
         }
-        ConstraintOptions options = ConstraintOptions.builder().survey(survey).constraintType(ConstraintType.STATISTICS_ACCESS).build();
-        survey.getConstraintOptions().add(options);
+
     }
     private Survey checkSurveyOwner(Long member_id, Long survey_id) {
         Survey survey = surveyRepository.findById(survey_id)

@@ -24,6 +24,7 @@ public class QuestionDTO {
         private int type;
         private String questionContent;
         private Boolean isNecessary;
+        private Boolean hasImage;
 
         private List<QuestionOptionDTO.SaveQuestionOptionRequestDTOInit> options;
 
@@ -32,6 +33,7 @@ public class QuestionDTO {
                     .questionType(QuestionType.fromId(this.type))
                     .questionText(this.questionContent)
                     .isNecessary(this.isNecessary)
+                    .hasImage(this.hasImage)
                     .section(section).build();
         }
 
@@ -100,13 +102,15 @@ public class QuestionDTO {
         private Boolean isNecessary;
         private Long sectionId;
         private List<QuestionOptionDTO.QuestionOptionQueryDto> options;
+        private Boolean hasImage;
 
-        public QuestionQueryDto(Long id, QuestionType type, String questionContent, Boolean isNecessary, Long sectionId) {
+        public QuestionQueryDto(Long id, QuestionType type, String questionContent, Boolean isNecessary, Boolean hasImage, Long sectionId) {
             this.id = id;
             this.type = type.getId();
             this.questionContent = questionContent;
             this.isNecessary = isNecessary;
             this.sectionId = sectionId;
+            this.hasImage = hasImage;
             this.answers = new ArrayList<>();
         }
 

@@ -106,6 +106,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
                         question.questionType,
                         question.questionText,
                         question.isNecessary,
+                        question.hasImage,
                         question.section.id)).
                 from(question).
                 where(question.section.id.in(sectionIdList)).fetch();

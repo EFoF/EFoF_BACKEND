@@ -6,6 +6,7 @@ import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFou
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyPreMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveySectionMisMatchException;
 import com.service.surveyservice.global.error.ErrorResponse;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -30,5 +31,10 @@ public class SurveyErrorResponse {
             .exceptionName(SurveyPreMisMatchException.class.getSimpleName())
             .message("현재 설문은 임시저장 상태가 아닙니다.")
             .build(),HttpStatus.BAD_REQUEST);
+
+    public static final ResponseEntity<ErrorResponse> FILE_SIZE_EXCEED = new ResponseEntity<>(ErrorResponse.builder()
+            .exceptionName(FileSizeLimitExceededException.class.getSimpleName())
+            .message("업로드한 사진의 크기가 최대 용량을 초과합니다.")
+            .build(),HttpStatus.CONFLICT);
 
 }

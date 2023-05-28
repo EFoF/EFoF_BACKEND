@@ -60,13 +60,9 @@ public class AnswerService {
     private final SurveyRepository surveyRepository;
     private final MemberRepository memberRepository;
     private final MemberSurveyRepository memberSurveyRepository;
-    private final SectionRepository sectionRepository;
     private final AnswerRepository answerRepository;
     private final AnswerCustomRepository answerCustomRepository;
     private final QuestionRepository questionRepository;
-
-    private final AnswerRepository answerRepository;
-
     private final QuestionOptionRepository questionOptionRepository;
     private final ConstraintRepository constraintRepository;
     private final ConstraintCustomRepositoryImpl constraintCustomRepository;

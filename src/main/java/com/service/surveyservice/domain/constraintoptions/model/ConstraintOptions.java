@@ -32,7 +32,7 @@ public class ConstraintOptions {
 
     @Column
     @Enumerated(value = EnumType.STRING)
-    private ConstraintType constraintType; //통계보기 허용, 수정 허용, GPS , PASSWORD , EMAIL, 익명
+    private ConstraintType constraintType; //통계보기 허용, 수정 허용, GPS , PASSWORD , EMAIL, 익명, 로그인 여부
 
     @Column
     private String ConstraintValue; //GPS 나 PASSWORD, EMAIL 의 경우 값이 필요함

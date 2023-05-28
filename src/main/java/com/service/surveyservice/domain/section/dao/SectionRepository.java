@@ -27,5 +27,9 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     @Query(value = "UPDATE section AS s SET s.parent_section_section_id = null WHERE s.parent_section_section_id = :section_id", nativeQuery = true)
     void updateNextSectionBySectionId(@Param("section_id") Long sectionId);
 
+    @Query(value = "SELECT s.questionOrder FROM Section s WHERE s.id = :section_id")
+    String findQuestionOrderById(@Param("section_id") Long surveyId);
+
+
 
 }

@@ -56,7 +56,7 @@ public class Survey extends BaseTimeEntity {
     private String btColor;
 
     @Enumerated(EnumType.STRING)
-    private SurveyStatus surveyStatus;
+    private ReleaseStatus releaseStatus;
 
     private LocalDateTime openDate;
 
@@ -64,6 +64,7 @@ public class Survey extends BaseTimeEntity {
 
     @Builder
     public Survey(Long id, Member author, List<Section> section, Set<ConstraintOptions> constraintOptions, List<MemberSurvey> memberSurveys, String title, String description, String sImageURL, String fontColor, String bgColor, String btColor, SurveyStatus surveyStatus, LocalDateTime openDate, LocalDateTime expireDate) {
+
         this.id = id;
         this.author = author;
         this.section = section;
@@ -75,7 +76,7 @@ public class Survey extends BaseTimeEntity {
         this.fontColor = fontColor;
         this.bgColor = bgColor;
         this.btColor = btColor;
-        this.surveyStatus = surveyStatus;
+        this.releaseStatus = releaseStatus;
         this.openDate = openDate;
         this.expireDate = expireDate;
     }

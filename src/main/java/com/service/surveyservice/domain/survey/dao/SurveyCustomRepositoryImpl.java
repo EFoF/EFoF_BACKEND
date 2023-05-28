@@ -106,6 +106,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
                         question.questionType,
                         question.questionText,
                         question.isNecessary,
+                        question.hasImage,
                         question.section.id)).
                 from(question).
                 where(question.section.id.in(sectionIdList)).fetch();
@@ -141,7 +142,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
     }
     private List<SurveyInfoDTO> findSurveyInfoDTOByAuthorIdQuery(Long authorId) {
         List<SurveyInfoDTO> results = queryFactory
-                .select(new QSurveyDTO_SurveyInfoDTO(survey.title, survey.description, survey.author.id, survey.sImageURL, survey.surveyStatus))
+                .select(new QSurveyDTO_SurveyInfoDTO(survey.title, survey.description, survey.author.id, survey.sImageURL, survey.releaseStatus))
                 .from(survey)
                 .where(survey.author.id.eq(authorId))
                 .fetch();

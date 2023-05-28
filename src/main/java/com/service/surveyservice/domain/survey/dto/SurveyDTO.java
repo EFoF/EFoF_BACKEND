@@ -3,6 +3,8 @@ package com.service.surveyservice.domain.survey.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.service.surveyservice.domain.member.model.Member;
+import com.service.surveyservice.domain.survey.dao.SurveyRepository;
+import com.service.surveyservice.domain.survey.model.ReleaseStatus;
 import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.*;
@@ -30,7 +32,7 @@ public class SurveyDTO {
         // surveyStatus는 openDate를 보고 내부적으로 지정해주겠다.
         // 제약, 섹션, memberSurvey는 설문이 만들어진 뒤에 생성되어 insert 된다.
 
-        public Survey toEntity(Member author, SurveyStatus surveyStatus) {
+        public Survey toEntity(Member author, ReleaseStatus releaseStatus) {
             return Survey.builder()
                     .author(author)
                     .title(this.title)
@@ -39,7 +41,7 @@ public class SurveyDTO {
                     .expireDate(this.expireDate)
                     .description(this.description)
                     .sImageURL(this.surveyImageUrl)
-                    .surveyStatus(surveyStatus)
+                    .releaseStatus(releaseStatus)
                     .build();
         }
     }
@@ -53,17 +55,17 @@ public class SurveyDTO {
         private Long author;
         private String surveyImageUrl;
         //        private String pointColor;
-        private SurveyStatus surveyStatus;
+        private ReleaseStatus releaseStatus;
         // 개봉, 마감일 포함할까 고민 중
 
         @QueryProjection
-        public SurveyInfoDTO(String title, String description, Long author, String surveyImageUrl, SurveyStatus surveyStatus) {
+        public SurveyInfoDTO(String title, String description, Long author, String surveyImageUrl, ReleaseStatus releaseStatus) {
             this.title = title;
             this.description = description;
             this.author = author;
             this.surveyImageUrl = surveyImageUrl;
 //            this.pointColor = pointColor;
-            this.surveyStatus = surveyStatus;
+            this.releaseStatus = releaseStatus;
         }
     }
 
@@ -80,12 +82,12 @@ public class SurveyDTO {
         private String btColor;
         private List<SaveSectionRequestDto> sections;
 
-        public Survey toEntity(Member author, SurveyStatus surveyStatus) {
+        public Survey toEntity(Member author, ReleaseStatus releaseStatus) {
             return Survey.builder()
                     .author(author)
                     .description(this.detail)
                     .sImageURL(image)
-                    .surveyStatus(surveyStatus)
+                    .releaseStatus(releaseStatus)
                     .bgColor(this.bgColor)
                     .fontColor(this.fontColor)
                     .btColor(this.btColor)
@@ -168,4 +170,40 @@ public class SurveyDTO {
         private Boolean email;
         private Boolean login;
     }
+
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class GetGenerateSurveyDTO {
+        private Long survey_id;
+        private String title;
+        private String description;
+        private Long member_id;
+        private String s_imageurl;
+        private LocalDateTime open_date;
+        private LocalDateTime expire_date;
+        private String surveyStatus;
+
+        @QueryProjection
+        public GetGenerateSurveyDTO(SurveyRepository.GetSurveyInterface getGenerateSurveyInterface) {
+            this.survey_id = getGenerateSurveyInterface.getSurvey_id();
+            this.title = getGenerateSurveyInterface.getTitle();
+            this.description = getGenerateSurveyInterface.getDescription();
+            this.member_id = getGenerateSurveyInterface.getMember_id();
+            this.s_imageurl = getGenerateSurveyInterface.getS_imageurl();
+            this.open_date = getGenerateSurveyInterface.getOpen_date();
+            this.expire_date = getGenerateSurveyInterface.getExpire_date();
+            if (LocalDateTime.now().isBefore(open_date)) {
+                this.surveyStatus = SurveyStatus.PRE_RELEASE.getName();
+            }
+            else if(LocalDateTime.now().isAfter(expire_date)) {
+                this.surveyStatus = SurveyStatus.OVER.getName();
+            }
+            else {
+                this.surveyStatus = SurveyStatus.PROGRESS.getName();
+            }
+        }
+    }
+
 }

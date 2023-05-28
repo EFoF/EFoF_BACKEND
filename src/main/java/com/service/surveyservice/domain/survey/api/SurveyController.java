@@ -9,6 +9,8 @@ import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -169,7 +171,31 @@ public class SurveyController {
         return new ResponseEntity<>(surveyService.getSurveyDataPreRelease(currentMemberId,survey_id),HttpStatus.OK);
     }
 
+    @GetMapping(value = "/{survey_id}/in_progress")
+    public ResponseEntity<SurveySectionQueryDTO> getSurveyDataInProgress(@PathVariable Long survey_id) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        return new ResponseEntity<>(surveyService.getSurveyData(currentMemberId, survey_id), HttpStatus.OK);
+    }
 
+    /***
+     * 내가 생성한 설문 조회
+     * @param memberId
+     * @param pageable
+     * @return
+     */
+    @GetMapping(value = "/generate/{memberId}")
+    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(@PathVariable(name = "memberId") Long memberId,
+                                                                        @RequestParam(value = "surveyStatus", required = false, defaultValue="") String surveyStatus,
+                                                                        Pageable pageable) {
+        Page<GetGenerateSurveyDTO> pages;
+        if(surveyStatus.isEmpty()) {
+            pages = surveyService.findSurveyByAuthorId(memberId, pageable);
+        }
+        else {
+            pages = surveyService.findSurveyByAuthorIdWithStatus(memberId, surveyStatus, pageable);
+        }
+        return ResponseEntity.ok(pages);
+    }
 
     @PostMapping(value = "/{survey_id}/setting/open_date")
     public ResponseEntity updateSurveyOpenDate(@PathVariable Long survey_id,@RequestBody UpdateSurveyDateDto updateSurveyDateDto){

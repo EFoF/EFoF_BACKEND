@@ -1,14 +1,11 @@
 package com.service.surveyservice.domain.section.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
-import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;

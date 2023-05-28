@@ -184,7 +184,7 @@ public class SurveyDTO {
             this.open_date = getGenerateSurveyInterface.getOpen_date();
             this.expire_date = getGenerateSurveyInterface.getExpire_date();
             if (LocalDateTime.now().isBefore(open_date)) {
-                this.surveyStatus = SurveyStatus.PRE_LELEASE.getName();
+                this.surveyStatus = SurveyStatus.PRE_RELEASE.getName();
             }
             else if(LocalDateTime.now().isAfter(expire_date)) {
                 this.surveyStatus = SurveyStatus.OVER.getName();

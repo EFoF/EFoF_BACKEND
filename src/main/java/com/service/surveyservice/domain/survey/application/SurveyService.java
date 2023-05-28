@@ -244,4 +244,16 @@ public class SurveyService {
         return new PageImpl<>(collect, pageable, generateSurveyById.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
+    public Page<GetGenerateSurveyDTO> findSurveyByAuthorIdWithStatus(Long authorId, String SurveyStatus, Pageable pageable) {
+        Page<SurveyRepository.GetSurveyInterface> generateSurveyById = surveyRepository.findGenerateSurveyByAuthorId(authorId, pageable);
+        List<GetGenerateSurveyDTO> collect = generateSurveyById.stream()
+                .map(GetGenerateSurveyDTO::new)
+                .filter(dto -> {
+                    String surveyStatus = dto.getSurveyStatus();
+                    return surveyStatus.equals(SurveyStatus);
+                })
+                .collect(Collectors.toList());
+        return new PageImpl<>(collect, pageable, generateSurveyById.getTotalElements());
+    }
 }

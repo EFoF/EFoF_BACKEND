@@ -184,8 +184,17 @@ public class SurveyController {
      * @return
      */
     @GetMapping(value = "/generate/{memberId}")
-    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
-        return ResponseEntity.ok(surveyService.findSurveyByAuthorId(memberId, pageable));
+    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(@PathVariable(name = "memberId") Long memberId,
+                                                                        @RequestParam(value = "surveyStatus", required = false, defaultValue="") String surveyStatus,
+                                                                        Pageable pageable) {
+        Page<GetGenerateSurveyDTO> pages;
+        if(surveyStatus.isEmpty()) {
+            pages = surveyService.findSurveyByAuthorId(memberId, pageable);
+        }
+        else {
+            pages = surveyService.findSurveyByAuthorIdWithStatus(memberId, surveyStatus, pageable);
+        }
+        return ResponseEntity.ok(pages);
     }
 
 

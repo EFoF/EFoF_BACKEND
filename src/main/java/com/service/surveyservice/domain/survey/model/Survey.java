@@ -12,7 +12,9 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -36,7 +38,7 @@ public class Survey extends BaseTimeEntity {
 
     // FetchType.EAGER 고민중
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<ConstraintOptions> constraintOptions = new ArrayList<>();
+    private Set<ConstraintOptions> constraintOptions = new HashSet<>();
 
     @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<MemberSurvey> memberSurveys = new ArrayList<>();
@@ -61,7 +63,7 @@ public class Survey extends BaseTimeEntity {
     private LocalDateTime expireDate;
 
     @Builder
-    public Survey(Long id, Member author, List<Section> section, List<ConstraintOptions> constraintOptions, List<MemberSurvey> memberSurveys, String title, String description, String sImageURL, String fontColor, String bgColor, String btColor, SurveyStatus surveyStatus, LocalDateTime openDate, LocalDateTime expireDate) {
+    public Survey(Long id, Member author, List<Section> section, Set<ConstraintOptions> constraintOptions, List<MemberSurvey> memberSurveys, String title, String description, String sImageURL, String fontColor, String bgColor, String btColor, SurveyStatus surveyStatus, LocalDateTime openDate, LocalDateTime expireDate) {
         this.id = id;
         this.author = author;
         this.section = section;
@@ -96,8 +98,11 @@ public class Survey extends BaseTimeEntity {
         this.btColor = updateSurveyColorDto.getBtColor();
     }
 
-    public void updateDate(SurveyDTO.UpdateSurveyDateDto updateSurveyDateDto) {
+    public void updateOpenDate(SurveyDTO.UpdateSurveyDateDto updateSurveyDateDto) {
         this.openDate = updateSurveyDateDto.getOpenDate();
+    }
+
+    public void updateExpireDate(SurveyDTO.UpdateSurveyDateDto updateSurveyDateDto) {
         this.expireDate = updateSurveyDateDto.getExpireDate();
     }
 }

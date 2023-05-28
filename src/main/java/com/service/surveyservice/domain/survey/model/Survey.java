@@ -62,8 +62,9 @@ public class Survey extends BaseTimeEntity {
 
     private LocalDateTime expireDate;
 
+
     @Builder
-    public Survey(Long id, Member author, List<Section> section, Set<ConstraintOptions> constraintOptions, List<MemberSurvey> memberSurveys, String title, String description, String sImageURL, String fontColor, String bgColor, String btColor, SurveyStatus surveyStatus, LocalDateTime openDate, LocalDateTime expireDate) {
+    public Survey(Long id, Member author, List<Section> section, Set<ConstraintOptions> constraintOptions, List<MemberSurvey> memberSurveys, String title, String description, String sImageURL, String fontColor, String bgColor, String btColor, ReleaseStatus releaseStatus, LocalDateTime openDate, LocalDateTime expireDate) {
 
         this.id = id;
         this.author = author;

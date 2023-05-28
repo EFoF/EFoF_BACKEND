@@ -91,6 +91,8 @@ public class SurveyDTO {
                     .bgColor(this.bgColor)
                     .fontColor(this.fontColor)
                     .btColor(this.btColor)
+                    .expireDate(LocalDateTime.now())
+                    .openDate(LocalDateTime.now())
                     .title(this.title).build();
         }
     }
@@ -158,6 +160,15 @@ public class SurveyDTO {
     public static class UpdateSurveyDateDto {
         private LocalDateTime openDate;
         private LocalDateTime expireDate;
+    }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateSurveySettingDto {
+        private Boolean gps;
+        private Boolean email;
+        private Boolean login;
     }
 
     @Builder

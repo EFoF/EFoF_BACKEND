@@ -1,5 +1,7 @@
 package com.service.surveyservice.domain.survey.application;
 
+import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
+import com.service.surveyservice.domain.constraintoptions.model.ConstraintType;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.question.exception.exceptions.QuestionOptionNotFoundException;
@@ -175,7 +177,11 @@ public class SurveyService {
         return surveyBySurveyId;
     }
 
-    @Transactional
+    public SurveySectionQueryDTO getSurveyDataSetting(Long member_id,  Long survey_id){
+
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+
     public SurveySectionQueryDTO getSurveyData(Long member_id,  Long survey_id){
 
         Survey survey = surveyRepository.findById(survey_id)
@@ -193,6 +199,19 @@ public class SurveyService {
     }
 
 
+        //설문 생성자의 요청이 아닌 경우
+        if(!survey.getAuthor().getId().equals(member_id)){
+            throw new SurveyMemberMisMatchException();
+        }
+
+        //임시 저장 상태가 아닌 경우
+        if(!survey.getSurveyStatus().equals(SurveyStatus.PRE_RELEASE)){
+            throw new SurveyPreMisMatchException();
+        }
+
+        SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyId(survey_id);
+        return surveyBySurveyId;
+    }
 
     @Transactional
     public void updateSurveyTitle(UpdateSurveyTextDto updateSurveyTextDto,Long member_id,  Long survey_id){
@@ -219,13 +238,37 @@ public class SurveyService {
     }
 
     @Transactional
-    public void updateSurveyDate(UpdateSurveyDateDto updateSurveyDateDto,Long member_id,  Long survey_id){
+    public void updateSurveyOpenDate(UpdateSurveyDateDto updateSurveyDateDto,Long member_id,  Long survey_id){
 
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
-        survey.updateDate(updateSurveyDateDto);
+        survey.updateOpenDate(updateSurveyDateDto);
     }
 
+    @Transactional
+    public void updateSurveyExpireDate(UpdateSurveyDateDto updateSurveyDateDto,Long member_id,  Long survey_id){
+
+        //설문이 존재하지 않는경우
+        Survey survey = checkSurveyOwner(member_id, survey_id);
+        survey.updateExpireDate(updateSurveyDateDto);
+    }
+    @Transactional
+    public void updateSurveyStat(UpdateSurveySettingDto updateSurveySettingDto,Long member_id,  Long survey_id){
+
+        //설문이 존재하지 않는경우
+        Survey survey = checkSurveyOwner(member_id, survey_id);
+        ConstraintType type;
+        if(updateSurveySettingDto.getEmail()){
+            type = ConstraintType.EMAIL_CONSTRAINT;
+        }
+        if(updateSurveySettingDto.getGps()){
+            type = ConstraintType.GPS_CONSTRAINT;
+        }
+        if(updateSurveySettingDto.getLogin()){
+        }
+        ConstraintOptions options = ConstraintOptions.builder().survey(survey).constraintType(ConstraintType.STATISTICS_ACCESS).build();
+        survey.getConstraintOptions().add(options);
+    }
     private Survey checkSurveyOwner(Long member_id, Long survey_id) {
         Survey survey = surveyRepository.findById(survey_id)
                 .orElseThrow(SurveyNotFoundException::new);

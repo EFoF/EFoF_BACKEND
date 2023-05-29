@@ -211,22 +211,56 @@ public class SurveyController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping(value = "/{survey_id}/setting/email")
+    public ResponseEntity updateSurveyEmail(@PathVariable Long survey_id,@RequestBody UpdateSurveySettingDto updateSurveySettingDto){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyEmail(updateSurveySettingDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     @PostMapping(value = "/{survey_id}/setting/stat")
     public ResponseEntity updateSurveyStat(@PathVariable Long survey_id,@RequestBody UpdateSurveySettingDto updateSurveySettingDto){
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         surveyService.updateSurveyStat(updateSurveySettingDto,currentMemberId,survey_id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    /**
-     * 임시 저장 중인 데이터 조회
-     * @param survey_id
-     * @return
-     */
-    @GetMapping(value = "/{survey_id}/setting")
-    public ResponseEntity<SurveySectionQueryDTO> getSurveyDataSetting(@PathVariable Long survey_id){
+    @PostMapping(value = "/{survey_id}/setting/login")
+    public ResponseEntity updateSurveyLogin(@PathVariable Long survey_id,@RequestBody UpdateSurveySettingDto updateSurveySettingDto){
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        return new ResponseEntity<>(surveyService.getSurveyDataSetting(currentMemberId,survey_id),HttpStatus.OK);
+        surveyService.updateSurveyLogin(updateSurveySettingDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PostMapping(value = "/{survey_id}/setting/participate")
+    public ResponseEntity updateSurveyParticipate(@PathVariable Long survey_id,@RequestBody UpdateSurveySettingDto updateSurveySettingDto){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyParticipate(updateSurveySettingDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PostMapping(value = "/{survey_id}/setting/participate_num")
+    public ResponseEntity updateSurveyParticipateNum(@PathVariable Long survey_id,@RequestBody UpdateSurveySettingDto updateSurveySettingDto){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyParticipateNum(updateSurveySettingDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{survey_id}/setting/gps")
+    public ResponseEntity updateSurveyGps(@PathVariable Long survey_id,@RequestBody UpdateSurveySettingGpsDto updateSurveySettingGpsDto){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyGps(updateSurveySettingGpsDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/{survey_id}/setting/distance")
+    public ResponseEntity updateSurveyGpsValue(@PathVariable Long survey_id,@RequestBody UpdateSurveySettingGpsDto updateSurveySettingGpsDto){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyGpsValue(updateSurveySettingGpsDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{survey_id}/setting")
+    public ResponseEntity<SurveySettingResponseDto> getSurveySetting(@PathVariable Long survey_id){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        SurveySettingResponseDto surveySetting = surveyService.getSurveySetting(currentMemberId, survey_id);
+        return new ResponseEntity<>(surveySetting,HttpStatus.OK);
     }
 
 

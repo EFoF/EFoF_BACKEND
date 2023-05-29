@@ -9,6 +9,7 @@ import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.*;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -166,9 +167,40 @@ public class SurveyDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateSurveySettingDto {
-        private Boolean gps;
+        private Boolean stat;
         private Boolean email;
         private Boolean login;
+        private Boolean participate;
+        private String participate_num;
+    }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateSurveySettingGpsDto {
+        private Boolean gps;
+        private Float latitude;
+        private Float longitude;
+        private String distance;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Setter
+    public static class SurveySettingResponseDto {
+        private LocalDateTime open_date;
+        private LocalDateTime expire_date;
+        private Boolean stat;
+        private Boolean gps;
+        private Float latitude;
+        private Float longitude;
+        private String distance;
+        private Boolean login;
+        private Boolean email;
+        private Boolean participate;
+        private String participate_num;
     }
 
     @Builder

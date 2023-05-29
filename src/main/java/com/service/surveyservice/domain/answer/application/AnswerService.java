@@ -111,7 +111,7 @@ public class AnswerService {
     }
 
 
-    public AnswerDTO.QuestionBySectionForStatisticResponseDto getQuestionBySectionForStatistic(Long surveyId, Long sectionId) {
+    public List<QuestionDTO.QuestionInfoByIdDto> getQuestionBySectionForStatistic(Long surveyId, Long sectionId) {
         // 1-1. sectionId에 따른 questionOrder를 가져옴
         String questionOrder = sectionRepository.findQuestionOrderById(sectionId);
 
@@ -141,6 +141,7 @@ public class AnswerService {
         Map<Long, List<LongAnswerResponseDto>> longQuestionOptionList = longAnswerByQuestionId.stream()
                 .collect(Collectors.groupingBy(longAnswerByQuestionIdDto -> longAnswerByQuestionIdDto.getQuestion_id()));
 
+
         // =========================================
         // questionInfoById의 longAnswerDtos와 choiceAnswerDtos에 값을 mapping
         for (QuestionDTO.QuestionInfoByIdDto questionInfo : questionInfoById) {
@@ -163,7 +164,7 @@ public class AnswerService {
         log.info(questionInfoById.toString());
 
         // 여기만 수정하면 백엔드 완료
-        return new AnswerDTO.QuestionBySectionForStatisticResponseDto().toResponseDto(questionInfoById);
+        return questionInfoById;
     }
 
 //    설문 참여 응답 저장

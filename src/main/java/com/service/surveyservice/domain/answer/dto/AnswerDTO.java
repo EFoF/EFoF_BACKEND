@@ -78,31 +78,7 @@ public class AnswerDTO {
         private List<ConstraintType> constraintTypeList;
     }
 
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class QuestionBySectionForStatisticResponseDto {
-        private Long question_id;
-        private String question_text;
-        private String question_type;
-        private int participant_num_question;
-        private List<ChoiceAnswerResponseDto> choiceAnswerDtos;
-        private List<LongAnswerResponseDto> longAnswerDtos;
 
-        public QuestionBySectionForStatisticResponseDto toResponseDto(
-                List<QuestionDTO.QuestionInfoByIdDto> questionInfoById) {
-
-            return  QuestionBySectionForStatisticResponseDto.builder()
-                    .question_id(this.question_id)
-                    .question_text(this.question_text)
-                    .question_type(this.question_type)
-                    .participant_num_question(this.participant_num_question)
-                    .choiceAnswerDtos(this.choiceAnswerDtos)
-                    .longAnswerDtos(this.longAnswerDtos)
-                    .build();
-        }
-    }
 
     @Getter
     @Builder

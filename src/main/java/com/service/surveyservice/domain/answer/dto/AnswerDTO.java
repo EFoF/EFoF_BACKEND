@@ -78,6 +78,7 @@ public class AnswerDTO {
         private List<ConstraintType> constraintTypeList;
     }
 
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -107,7 +108,6 @@ public class AnswerDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @ToString
     public static class ChoiceAnswerResponseDto{    // 객관식
         private Long question_id;
         private Long question_choice_id;
@@ -128,7 +128,6 @@ public class AnswerDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @ToString
     public static class LongAnswerResponseDto{  // 주관식
         private Long question_id;
         private String answer_sentence;

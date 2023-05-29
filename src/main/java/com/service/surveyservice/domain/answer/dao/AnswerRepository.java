@@ -11,10 +11,12 @@ public interface AnswerRepository extends JpaRepository<Answer, Long>{
     // questionOrderList <- [8, 7, 9]
 
     // 객관식
-    @Query(value = "SELECT qo.question_id, aws.question_choice_id, aws.participant_num_question_option, qo.option_text,qo.question_option_img " +
-            "FROM (SELECT question_choice_id, count(*)as participant_num_question_option FROM answer\n" +
-            "WHERE question_id IN (select q.question_id from question q where q.section_id = :section_id)\n" +
-            "group by question_choice_id) as aws left join question_option qo on aws.question_choice_id = qo.question_choice_id\n" +
+    @Query(value = "SELECT qo.question_id, aws.question_choice_id, aws.participant_num_question_option, qo.option_text,qo.question_option_img\n" +
+            "FROM (SELECT qc.question_choice_id, IFNULL(COUNT(a.question_choice_id), 0) AS participant_num_question_option\n" +
+            "FROM question_option qc\n" +
+            "LEFT JOIN answer a ON qc.question_choice_id = a.question_choice_id\n" +
+            "WHERE qc.question_id IN (SELECT q.question_id FROM question q WHERE q.section_id = :section_id)\n" +
+            "GROUP BY qc.question_choice_id) as aws left join question_option qo on aws.question_choice_id = qo.question_choice_id\n" +
             "where aws.question_choice_id IS NOT NULL;", nativeQuery = true)
     List<choiceAnswerResponseDtoI> findChoiceAnswerByQuestionId(Long section_id);
     interface choiceAnswerResponseDtoI {

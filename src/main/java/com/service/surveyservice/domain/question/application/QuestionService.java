@@ -112,7 +112,7 @@ public class QuestionService {
             section.setQuestionOrder(questionOrder.concat("," + savedQuestion.getId()));
         }
 
-        return savedQuestion.Dto();
+        return savedQuestion.toResponseDto();
     }
 
 

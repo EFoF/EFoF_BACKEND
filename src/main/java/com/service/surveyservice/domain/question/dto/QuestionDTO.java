@@ -123,7 +123,7 @@ public class QuestionDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     @ToString
-    public static class QuestionInfoByIdDto{
+    public static class QuestionInfoByIdDto {
         private Long question_id;
         private String question_text;
         private QuestionType question_type;

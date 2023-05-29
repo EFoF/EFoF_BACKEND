@@ -32,6 +32,8 @@ public class Question {
     @JoinColumn(name = "section_id")
     private Section section;
 
+    private Boolean hasImage;
+
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
     @BatchSize(size = 10)
     private List<QuestionOption> questionOptions = new ArrayList<>();

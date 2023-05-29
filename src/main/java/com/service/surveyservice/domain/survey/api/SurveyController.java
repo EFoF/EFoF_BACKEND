@@ -184,8 +184,49 @@ public class SurveyController {
      * @return
      */
     @GetMapping(value = "/generate/{memberId}")
-    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
-        return ResponseEntity.ok(surveyService.findSurveyByAuthorId(memberId, pageable));
+    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(@PathVariable(name = "memberId") Long memberId,
+                                                                        @RequestParam(value = "surveyStatus", required = false, defaultValue="") String surveyStatus,
+                                                                        Pageable pageable) {
+        Page<GetGenerateSurveyDTO> pages;
+        if(surveyStatus.isEmpty()) {
+            pages = surveyService.findSurveyByAuthorId(memberId, pageable);
+        }
+        else {
+            pages = surveyService.findSurveyByAuthorIdWithStatus(memberId, surveyStatus, pageable);
+        }
+        return ResponseEntity.ok(pages);
+    }
+
+    @PostMapping(value = "/{survey_id}/setting/open_date")
+    public ResponseEntity updateSurveyOpenDate(@PathVariable Long survey_id,@RequestBody UpdateSurveyDateDto updateSurveyDateDto){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyOpenDate(updateSurveyDateDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{survey_id}/setting/expire_date")
+    public ResponseEntity updateSurveyExpireDate(@PathVariable Long survey_id,@RequestBody UpdateSurveyDateDto updateSurveyDateDto){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyExpireDate(updateSurveyDateDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{survey_id}/setting/stat")
+    public ResponseEntity updateSurveyStat(@PathVariable Long survey_id,@RequestBody UpdateSurveySettingDto updateSurveySettingDto){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateSurveyStat(updateSurveySettingDto,currentMemberId,survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * 임시 저장 중인 데이터 조회
+     * @param survey_id
+     * @return
+     */
+    @GetMapping(value = "/{survey_id}/setting")
+    public ResponseEntity<SurveySectionQueryDTO> getSurveyDataSetting(@PathVariable Long survey_id){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        return new ResponseEntity<>(surveyService.getSurveyDataSetting(currentMemberId,survey_id),HttpStatus.OK);
     }
 
 

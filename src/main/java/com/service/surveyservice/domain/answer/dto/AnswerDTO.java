@@ -7,6 +7,7 @@ import com.service.surveyservice.domain.constraintoptions.model.ConstraintOption
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintType;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.section.model.Section;
@@ -81,32 +82,25 @@ public class AnswerDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class QuestionBySectionForStatisticResponseDto {
-
-        private String title; //설문 제목
-        private String description; //설문 설명
-        private String sImageURL; //설문 이미지
-        private int participantNum; //참여자 수
-        private List<Long> SectionList; //설문의 리스트
-
+        private Long question_id;
         private String question_text;
         private String question_type;
+        private int participant_num_question;
+        private List<ChoiceAnswerResponseDto> choiceAnswerDtos;
+        private List<LongAnswerResponseDto> longAnswerDtos;
 
         public QuestionBySectionForStatisticResponseDto toResponseDto(
-                Question question,
-                int participantNum,
-                List<Long> sectionList) {
+                List<QuestionDTO.QuestionInfoByIdDto> questionInfoById) {
 
-            return QuestionBySectionForStatisticResponseDto.builder()
-//                    .title(survey.getTitle())
-//                    .description(survey.getDescription())
-//                    .sImageURL(survey.getSImageURL())
-                    .question_text(question.getQuestionText())
-                    .question_type(String.valueOf(question.getQuestionType()))  // 일단은..? 나중에 물어보자
-                    .participantNum(participantNum)
-                    .SectionList(sectionList)
+            return  QuestionBySectionForStatisticResponseDto.builder()
+                    .question_id(this.question_id)
+                    .question_text(this.question_text)
+                    .question_type(this.question_type)
+                    .participant_num_question(this.participant_num_question)
+                    .choiceAnswerDtos(this.choiceAnswerDtos)
+                    .longAnswerDtos(this.longAnswerDtos)
                     .build();
         }
-
     }
 
     @Getter

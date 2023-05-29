@@ -138,19 +138,14 @@ public class QuestionDTO {
             this.participant_num_question = questionOptionByQuestionDtoI.getParticipant_num_question();
         }
 
+        // 주관식
         public void setLongAnswerDtos(List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos) {
             this.longAnswerDtos = longAnswerDtos;
         }
+
+        // 객관식
         public void setChoiceAnswerDtos(List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos) {
             this.choiceAnswerDtos = choiceAnswerDtos;
-        }
-
-        // =======================================================
-
-        public AnswerDTO.QuestionBySectionForStatisticResponseDto toResponseDto(List<QuestionInfoByIdDto> questionInfoById) {
-
-            return AnswerDTO.QuestionBySectionForStatisticResponseDto.builder()
-                    .build();
         }
     }
 }

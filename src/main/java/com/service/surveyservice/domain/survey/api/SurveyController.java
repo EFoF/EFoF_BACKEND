@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
+import static com.service.surveyservice.domain.survey.dto.MemberSurveyDTO.*;
 
 @Slf4j
 @RestController
@@ -183,8 +184,7 @@ public class SurveyController {
      * @return
      */
     @GetMapping(value = "/generate")
-    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(
-                                                                        @RequestParam(value = "surveyStatus", required = false, defaultValue="") String surveyStatus,
+    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(@RequestParam(value = "surveyStatus", required = false, defaultValue="") String surveyStatus,
                                                                         Pageable pageable) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Page<GetGenerateSurveyDTO> pages;
@@ -193,6 +193,20 @@ public class SurveyController {
         }
         else {
             pages = surveyService.findSurveyByAuthorIdWithStatus(memberId, surveyStatus, pageable);
+        }
+        return ResponseEntity.ok(pages);
+    }
+
+    @GetMapping(value="/participate")
+    public ResponseEntity<Page<GetParticipateSurveyDTO>> getParticipateSurvey(@RequestParam(value = "surveyStatus", required = false, defaultValue="") String surveyStatus,
+                                                                              Pageable pageable) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Page<GetParticipateSurveyDTO> pages;
+        if(surveyStatus.isEmpty()) {
+            pages = memberSurveyService.findMemberSurveyByMemberId(memberId, pageable);
+        }
+        else {
+            pages = memberSurveyService.findMemberSurveyByMemberIdWithStatus(memberId, surveyStatus, pageable);
         }
         return ResponseEntity.ok(pages);
     }

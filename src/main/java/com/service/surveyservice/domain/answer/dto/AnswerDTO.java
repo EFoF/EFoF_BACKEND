@@ -7,6 +7,7 @@ import com.service.surveyservice.domain.constraintoptions.model.ConstraintOption
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintType;
 import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.question.dao.QuestionRepository;
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.model.Question;
 import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.section.model.Section;
@@ -77,43 +78,12 @@ public class AnswerDTO {
         private List<ConstraintType> constraintTypeList;
     }
 
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class QuestionBySectionForStatisticResponseDto {
 
-        private String title; //설문 제목
-        private String description; //설문 설명
-        private String sImageURL; //설문 이미지
-        private int participantNum; //참여자 수
-        private List<Long> SectionList; //설문의 리스트
-
-        private String question_text;
-        private String question_type;
-
-        public QuestionBySectionForStatisticResponseDto toResponseDto(
-                Question question,
-                int participantNum,
-                List<Long> sectionList) {
-
-            return QuestionBySectionForStatisticResponseDto.builder()
-//                    .title(survey.getTitle())
-//                    .description(survey.getDescription())
-//                    .sImageURL(survey.getSImageURL())
-                    .question_text(question.getQuestionText())
-                    .question_type(String.valueOf(question.getQuestionType()))  // 일단은..? 나중에 물어보자
-                    .participantNum(participantNum)
-                    .SectionList(sectionList)
-                    .build();
-        }
-
-    }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @ToString
     public static class ChoiceAnswerResponseDto{    // 객관식
         private Long question_id;
         private Long question_choice_id;
@@ -134,7 +104,6 @@ public class AnswerDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @ToString
     public static class LongAnswerResponseDto{  // 주관식
         private Long question_id;
         private String answer_sentence;

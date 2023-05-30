@@ -10,7 +10,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class QuestionDTO {
@@ -24,6 +23,7 @@ public class QuestionDTO {
         private int type;
         private String questionContent;
         private Boolean isNecessary;
+        private Boolean hasImage;
 
         private List<QuestionOptionDTO.SaveQuestionOptionRequestDTOInit> options;
 
@@ -32,6 +32,7 @@ public class QuestionDTO {
                     .questionType(QuestionType.fromId(this.type))
                     .questionText(this.questionContent)
                     .isNecessary(this.isNecessary)
+                    .hasImage(this.hasImage)
                     .section(section).build();
         }
 
@@ -100,13 +101,15 @@ public class QuestionDTO {
         private Boolean isNecessary;
         private Long sectionId;
         private List<QuestionOptionDTO.QuestionOptionQueryDto> options;
+        private Boolean hasImage;
 
-        public QuestionQueryDto(Long id, QuestionType type, String questionContent, Boolean isNecessary, Long sectionId) {
+        public QuestionQueryDto(Long id, QuestionType type, String questionContent, Boolean isNecessary, Boolean hasImage, Long sectionId) {
             this.id = id;
             this.type = type.getId();
             this.questionContent = questionContent;
             this.isNecessary = isNecessary;
             this.sectionId = sectionId;
+            this.hasImage = hasImage;
             this.answers = new ArrayList<>();
         }
 
@@ -120,11 +123,14 @@ public class QuestionDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     @ToString
-    public static class QuestionInfoByIdDto{
+    public static class QuestionInfoByIdDto {
         private Long question_id;
         private String question_text;
         private QuestionType question_type;
         private int participant_num_question;
+        List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos;
+        List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos;
+
         public QuestionInfoByIdDto(QuestionRepository.questionInfoByIdDtoI questionOptionByQuestionDtoI) {
             this.question_id = questionOptionByQuestionDtoI.getQuestion_id();
             this.question_text = questionOptionByQuestionDtoI.getQuestion_text();
@@ -132,25 +138,14 @@ public class QuestionDTO {
             this.participant_num_question = questionOptionByQuestionDtoI.getParticipant_num_question();
         }
 
-        // =======================================================
-        List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos;
-        List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos;
-
+        // 주관식
         public void setLongAnswerDtos(List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos) {
             this.longAnswerDtos = longAnswerDtos;
         }
+
+        // 객관식
         public void setChoiceAnswerDtos(List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos) {
             this.choiceAnswerDtos = choiceAnswerDtos;
-        }
-        // =======================================================
-        public AnswerDTO.QuestionBySectionForStatisticResponseDto toResponseDto(
-                QuestionInfoByIdDto questionInfoByIdDto,
-                Map<Long, List<AnswerDTO.ChoiceAnswerResponseDto>> choiceQuestionOptionList,
-                Map<Long, List<AnswerDTO.LongAnswerResponseDto>> longQuestionOptionList) {
-
-            return AnswerDTO.QuestionBySectionForStatisticResponseDto.builder()
-
-                    .build();
         }
     }
 }

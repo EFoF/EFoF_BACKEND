@@ -9,6 +9,7 @@ import com.service.surveyservice.domain.survey.model.Survey;
 import com.service.surveyservice.domain.survey.model.SurveyStatus;
 import lombok.*;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -91,6 +92,8 @@ public class SurveyDTO {
                     .bgColor(this.bgColor)
                     .fontColor(this.fontColor)
                     .btColor(this.btColor)
+                    .expireDate(LocalDateTime.now())
+                    .openDate(LocalDateTime.now())
                     .title(this.title).build();
         }
     }
@@ -159,6 +162,46 @@ public class SurveyDTO {
         private LocalDateTime openDate;
         private LocalDateTime expireDate;
     }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateSurveySettingDto {
+        private Boolean stat;
+        private Boolean email;
+        private Boolean login;
+        private Boolean participate;
+        private String participate_num;
+    }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateSurveySettingGpsDto {
+        private Boolean gps;
+        private Float latitude;
+        private Float longitude;
+        private String distance;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Setter
+    public static class SurveySettingResponseDto {
+        private LocalDateTime open_date;
+        private LocalDateTime expire_date;
+        private Boolean stat;
+        private Boolean gps;
+        private Float latitude;
+        private Float longitude;
+        private String distance;
+        private Boolean login;
+        private Boolean email;
+        private Boolean participate;
+        private String participate_num;
+    }
 
     @Builder
     @AllArgsConstructor
@@ -184,7 +227,7 @@ public class SurveyDTO {
             this.open_date = getGenerateSurveyInterface.getOpen_date();
             this.expire_date = getGenerateSurveyInterface.getExpire_date();
             if (LocalDateTime.now().isBefore(open_date)) {
-                this.surveyStatus = SurveyStatus.PRE_LELEASE.getName();
+                this.surveyStatus = SurveyStatus.PRE_RELEASE.getName();
             }
             else if(LocalDateTime.now().isAfter(expire_date)) {
                 this.surveyStatus = SurveyStatus.OVER.getName();

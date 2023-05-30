@@ -4,6 +4,7 @@ import com.amazonaws.Response;
 import com.service.surveyservice.domain.answer.application.AnswerService;
 import com.service.surveyservice.domain.answer.dto.AnswerDTO;
 import com.service.surveyservice.domain.question.application.QuestionService;
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.section.application.SectionService;
 import com.service.surveyservice.domain.section.model.Section;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 import static com.service.surveyservice.domain.answer.dto.AnswerDTO.*;
 import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
 
@@ -35,7 +38,7 @@ public class AnswerController {
     @GetMapping(value = "/survey/{survey_id}/statistics")
     public ResponseEntity<AnswerDTO.SurveyForStatisticResponseDto> getSurveyForStatistic(
             @PathVariable Long survey_id) {
-        log.info("확인용");
+        log.info("getSurveyForStatistic 확인용");
 
         // 현재 로그인한 사람의 member id를 받는 변수
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
@@ -45,6 +48,20 @@ public class AnswerController {
                 answerService.getSurveyForStatistic(survey_id, currentMemberId);
 
         return new ResponseEntity<>(surveyForStatistic,HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/survey/{survey_id}/statistics/{section_id}")
+    public ResponseEntity<List<QuestionDTO.QuestionInfoByIdDto>> getQuestionBySectionForStatistic(
+            @PathVariable Long survey_id, @PathVariable Long section_id) {
+        log.info("getQuestionBySectionForStatistic 정보 확인용");
+
+//        AnswerDTO.QuestionBySectionForStatisticResponseDto answerForQuestion =
+//                answerService.getQuestionBySectionForStatistic(survey_id, section_id);
+//        AnswerDTO.QuestionBySectionForStatisticResponseDto answerForQuestion =
+//                (QuestionBySectionForStatisticResponseDto) answerService.getQuestionBySectionForStatistic(survey_id, section_id);
+        List<QuestionDTO.QuestionInfoByIdDto> answerForQuestion = answerService.getQuestionBySectionForStatistic(survey_id, section_id);
+//        return new ResponseEntity<>(List<answerForQuestion>, HttpStatus.CREATED);
+        return new ResponseEntity<>(answerForQuestion, HttpStatus.CREATED);
     }
 
     /**
@@ -62,20 +79,6 @@ public class AnswerController {
         log.info("currentNullableMemberId : {}", currentNullableMemberId);
 
         answerService.participateForm(participateAnswerListDTO,currentNullableMemberId);
-    }
-
-    @GetMapping(value = "/survey/{survey_id}/statistics/{section_id}")
-    public ResponseEntity<AnswerDTO.QuestionBySectionForStatisticResponseDto> getQuestionBySectionForStatistic(
-            @PathVariable Long survey_id, @PathVariable Long section_id) {
-        log.info("section 정보 확인용");
-
-        AnswerDTO.QuestionBySectionForStatisticResponseDto answerForQuestion =
-                answerService.getQuestionBySectionForStatistic(survey_id, section_id);
-
-
-//        return new ResponseEntity<>(List<answerForQuestion>, HttpStatus.CREATED);
-        return new ResponseEntity<>(answerForQuestion, HttpStatus.CREATED);
-
     }
 
     // TODO 현종 참고용

@@ -60,7 +60,6 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
     private final AnswerCustomRepository answerCustomRepository;
     private final QuestionRepository questionRepository;
-
     private final QuestionOptionRepository questionOptionRepository;
     private final ConstraintRepository constraintRepository;
     private final ConstraintCustomRepositoryImpl constraintCustomRepository;
@@ -72,7 +71,6 @@ public class AnswerService {
 //    }
 
     public AnswerDTO.SurveyForStatisticResponseDto getSurveyForStatistic(Long surveyId, Long memberId) {
-
 
 //        0. 사용자가 설문 ID 등을 포함해서 설문 통계 조회 요청을 보냄
         Optional<Survey> surveyByOptional = surveyRepository.findById(surveyId);
@@ -113,14 +111,14 @@ public class AnswerService {
     }
 
 
-    public AnswerDTO.QuestionBySectionForStatisticResponseDto getQuestionBySectionForStatistic(Long surveyId, Long sectionId) {
+    public List<QuestionDTO.QuestionInfoByIdDto> getQuestionBySectionForStatistic(Long surveyId, Long sectionId) {
         // 1-1. sectionId에 따른 questionOrder를 가져옴
         String questionOrder = sectionRepository.findQuestionOrderById(sectionId);
 
         // 1-2. questionOrder 타입 변환 (String -> Long)
-        List<Long> questionOrderList = Arrays.stream(questionOrder.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
+//        List<Long> questionOrderList = Arrays.stream(questionOrder.split(","))
+//                .map(Long::parseLong)
+//                .collect(Collectors.toList());
 //        log.info(questionOrderList.toString()); // [8, 7, 9]
 
         /**
@@ -143,7 +141,30 @@ public class AnswerService {
         Map<Long, List<LongAnswerResponseDto>> longQuestionOptionList = longAnswerByQuestionId.stream()
                 .collect(Collectors.groupingBy(longAnswerByQuestionIdDto -> longAnswerByQuestionIdDto.getQuestion_id()));
 
-        return new QuestionDTO.QuestionInfoByIdDto().toResponseDto((QuestionDTO.QuestionInfoByIdDto) questionInfoById, choiceQuestionOptionList, longQuestionOptionList);
+
+        // =========================================
+        // questionInfoById의 longAnswerDtos와 choiceAnswerDtos에 값을 mapping
+        for (QuestionDTO.QuestionInfoByIdDto questionInfo : questionInfoById) {
+            Long questionId = questionInfo.getQuestion_id();
+
+            // 객관식 매핑
+            if (choiceQuestionOptionList.containsKey(questionId)) {
+                List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos = choiceQuestionOptionList.get(questionId);
+                questionInfo.setChoiceAnswerDtos(choiceAnswerDtos);
+            }
+
+            // 주관식 매핑
+            if (longQuestionOptionList.containsKey(questionId)) {
+                List<AnswerDTO.LongAnswerResponseDto> longAnswerDtos = longQuestionOptionList.get(questionId);
+                questionInfo.setLongAnswerDtos(longAnswerDtos);
+            }
+        }
+
+        log.info("mapping 후 질문 정보 리스트");
+        log.info(questionInfoById.toString());
+
+        // 여기만 수정하면 백엔드 완료
+        return questionInfoById;
     }
 
 //    설문 참여 응답 저장

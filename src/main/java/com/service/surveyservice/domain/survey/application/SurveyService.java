@@ -68,7 +68,7 @@ public class SurveyService {
      */
     @Transactional
     public String saveSurveyImage(MultipartFile inputBoardImage) throws IOException {
-        String imageUrl = s3Uploader.upload(inputBoardImage,DIRECTORY);
+        String imageUrl = s3Uploader.upload(inputBoardImage, DIRECTORY);
         return imageUrl;
     }
 
@@ -78,7 +78,7 @@ public class SurveyService {
      */
     @Transactional
     public void deleteSurveyImage(String imageUrl) {
-        s3Uploader.delete(imageUrl,DIRECTORY);
+        s3Uploader.delete(imageUrl, DIRECTORY);
     }
 
     /**
@@ -92,8 +92,8 @@ public class SurveyService {
 
         //설문 대표 사진 삭제
         String surveyImageURL = survey.getSImageURL();
-        if(!surveyImageURL.isEmpty()){
-            s3Uploader.delete(surveyImageURL,DIRECTORY);
+        if (!surveyImageURL.isEmpty()) {
+            s3Uploader.delete(surveyImageURL, DIRECTORY);
         }
 
         //질문 항목에 사용되는 이미지 리스트 조회
@@ -101,13 +101,12 @@ public class SurveyService {
 
         //설문에서 사용되는 모든 이미지 삭제(survey 메인 사진 제외)
         for (String img : imgUrlBySurveyId) {
-            s3Uploader.delete(img,DIRECTORY);
+            s3Uploader.delete(img, DIRECTORY);
         }
 
         surveyRepository.delete(survey);
 
     }
-
 
 
     /**
@@ -117,14 +116,14 @@ public class SurveyService {
      * @throws IOException
      */
     @Transactional
-    public void deleteSurveyImg(Long member_id,  Long survey_id) throws IOException {
+    public void deleteSurveyImg(Long member_id, Long survey_id) throws IOException {
 
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
 
         String surveyImageURL = survey.getSImageURL();
-        if(!surveyImageURL.isEmpty()){
-            s3Uploader.delete(surveyImageURL,DIRECTORY);
+        if (!surveyImageURL.isEmpty()) {
+            s3Uploader.delete(surveyImageURL, DIRECTORY);
         }
 
         survey.setImageURL(null);
@@ -139,16 +138,16 @@ public class SurveyService {
      */
     @Transactional
     public String updateSurveyImg(MultipartFile image,
-            Long member_id,  Long survey_id) throws IOException {
+                                  Long member_id, Long survey_id) throws IOException {
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
 
         String surveyImageURL = survey.getSImageURL();
-        if(!(surveyImageURL==null||surveyImageURL.isEmpty())){
-            s3Uploader.delete(surveyImageURL,DIRECTORY); //기존 image 삭제
+        if (!(surveyImageURL == null || surveyImageURL.isEmpty())) {
+            s3Uploader.delete(surveyImageURL, DIRECTORY); //기존 image 삭제
         }
 
-        String imageUrl = s3Uploader.upload(image,DIRECTORY); //새로운 image 추가
+        String imageUrl = s3Uploader.upload(image, DIRECTORY); //새로운 image 추가
 
         survey.setImageURL(imageUrl);
         return imageUrl;
@@ -156,18 +155,18 @@ public class SurveyService {
 
 
     @Transactional
-    public SurveySectionQueryDTO getSurveyDataPreRelease(Long member_id,  Long survey_id){
+    public SurveySectionQueryDTO getSurveyDataPreRelease(Long member_id, Long survey_id) {
 
         Survey survey = surveyRepository.findById(survey_id)
                 .orElseThrow(SurveyNotFoundException::new);
 
         //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
+        if (!survey.getAuthor().getId().equals(member_id)) {
             throw new SurveyMemberMisMatchException();
         }
 
         //임시 저장 상태가 아닌 경우
-        if(!survey.getReleaseStatus().equals(ReleaseStatus.PRE_RELEASE)){
+        if (!survey.getReleaseStatus().equals(ReleaseStatus.PRE_RELEASE)) {
             throw new SurveyPreMisMatchException();
         }
 
@@ -176,13 +175,13 @@ public class SurveyService {
     }
 
     @Transactional
-    public SurveySectionQueryDTO getSurveyData(Long member_id,  Long survey_id){
+    public SurveySectionQueryDTO getSurveyData(Long member_id, Long survey_id) {
 
         Survey survey = surveyRepository.findById(survey_id)
                 .orElseThrow(SurveyNotFoundException::new);
 
         //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
+        if (!survey.getAuthor().getId().equals(member_id)) {
             throw new SurveyMemberMisMatchException();
         }
 
@@ -193,9 +192,8 @@ public class SurveyService {
     }
 
 
-
     @Transactional
-    public void updateSurveyTitle(UpdateSurveyTextDto updateSurveyTextDto,Long member_id,  Long survey_id){
+    public void updateSurveyTitle(UpdateSurveyTextDto updateSurveyTextDto, Long member_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
@@ -203,7 +201,7 @@ public class SurveyService {
         survey.setTitle(updateSurveyTextDto.getTitle());
     }
     @Transactional
-    public void updateSurveyDescription(UpdateSurveyTextDto updateSurveyTextDto,Long member_id,  Long survey_id){
+    public void updateSurveyDescription(UpdateSurveyTextDto updateSurveyTextDto, Long member_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
@@ -211,7 +209,7 @@ public class SurveyService {
         survey.setDescription(updateSurveyTextDto.getDescription());
     }
     @Transactional
-    public void updateSurveyColor(UpdateSurveyColorDto updateSurveyColorDto,Long member_id,  Long survey_id){
+    public void updateSurveyColor(UpdateSurveyColorDto updateSurveyColorDto, Long member_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
@@ -219,7 +217,7 @@ public class SurveyService {
     }
 
     @Transactional
-    public void updateSurveyDate(UpdateSurveyDateDto updateSurveyDateDto,Long member_id,  Long survey_id){
+    public void updateSurveyDate(UpdateSurveyDateDto updateSurveyDateDto, Long member_id, Long survey_id) {
 
         //설문이 존재하지 않는경우
         Survey survey = checkSurveyOwner(member_id, survey_id);
@@ -231,7 +229,7 @@ public class SurveyService {
                 .orElseThrow(SurveyNotFoundException::new);
 
         //설문 생성자의 요청이 아닌 경우
-        if(!survey.getAuthor().getId().equals(member_id)){
+        if (!survey.getAuthor().getId().equals(member_id)) {
             throw new SurveyMemberMisMatchException();
         }
         return survey;

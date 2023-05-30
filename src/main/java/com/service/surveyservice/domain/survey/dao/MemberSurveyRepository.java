@@ -5,10 +5,13 @@ import com.service.surveyservice.domain.member.model.Member;
 import com.service.surveyservice.domain.survey.dto.MemberSurveyDTO;
 import com.service.surveyservice.domain.survey.model.MemberSurvey;
 import com.service.surveyservice.domain.survey.model.Survey;
-import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,4 +38,40 @@ public interface MemberSurveyRepository extends JpaRepository<MemberSurvey, Long
     int findMemberIdBySurveyId(Long survey_id, Long member_id);
 
 //    boolean existsByMemberAndSurvey(Member member, Survey survey); // findByMemberAndSurvey().isPresent 로 해결할 수 있을듯?
+
+
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date " +
+            "FROM survey s WHERE s.survey_id in (SELECT ms.survey_id FROM member_survey as ms WHERE ms.member_id= :userId)",
+            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId)", nativeQuery = true)
+    Page<MemberSurveyRepository.GetSurveyInterface> findMemberSurveyByMemberId(@org.springframework.data.repository.query.Param(value = "userId") Long userId, Pageable pageable);
+
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date " +
+            "FROM survey s WHERE s.survey_id in (SELECT ms.survey_id FROM member_survey as ms WHERE ms.member_id= :userId)" +
+            "and open_date<NOW() and NOW()<expire_date",
+            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and open_date<NOW() and NOW()<expire_date", nativeQuery = true)
+    Page<MemberSurveyRepository.GetSurveyInterface> findMemberSurveyByMemberIdPro(@org.springframework.data.repository.query.Param(value = "userId") Long userId, Pageable pageable);
+
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date " +
+            "FROM survey s WHERE s.survey_id in (SELECT ms.survey_id FROM member_survey as ms WHERE ms.member_id= :userId)" +
+            "and expire_date<NOW()",
+            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and expire_date< NOW()", nativeQuery = true)
+    Page<MemberSurveyRepository.GetSurveyInterface> findMemberSurveyByMemberIdOver(@Param(value = "userId") Long userId, Pageable pageable);
+
+
+    interface GetSurveyInterface {
+        Long getSurvey_id();
+
+        String getTitle();
+
+        String getDescription();
+
+        Long getMember_id();
+
+        String getS_imageurl();
+
+        LocalDateTime getOpen_date();
+
+        LocalDateTime getExpire_date();
+
+    }
 }

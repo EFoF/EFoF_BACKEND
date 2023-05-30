@@ -179,14 +179,14 @@ public class SurveyController {
 
     /***
      * 내가 생성한 설문 조회
-     * @param memberId
      * @param pageable
      * @return
      */
-    @GetMapping(value = "/generate/{memberId}")
-    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(@PathVariable(name = "memberId") Long memberId,
+    @GetMapping(value = "/generate")
+    public ResponseEntity<Page<GetGenerateSurveyDTO>> getGenerateSurvey(
                                                                         @RequestParam(value = "surveyStatus", required = false, defaultValue="") String surveyStatus,
                                                                         Pageable pageable) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         Page<GetGenerateSurveyDTO> pages;
         if(surveyStatus.isEmpty()) {
             pages = surveyService.findSurveyByAuthorId(memberId, pageable);

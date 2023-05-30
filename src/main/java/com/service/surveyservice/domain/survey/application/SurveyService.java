@@ -246,14 +246,18 @@ public class SurveyService {
 
     @Transactional(readOnly = true)
     public Page<GetGenerateSurveyDTO> findSurveyByAuthorIdWithStatus(Long authorId, String SurveyStatus, Pageable pageable) {
-        Page<SurveyRepository.GetSurveyInterface> generateSurveyById = surveyRepository.findGenerateSurveyByAuthorId(authorId, pageable);
-        List<GetGenerateSurveyDTO> collect = generateSurveyById.stream()
-                .map(GetGenerateSurveyDTO::new)
-                .filter(dto -> {
-                    String surveyStatus = dto.getSurveyStatus();
-                    return surveyStatus.equals(SurveyStatus);
-                })
-                .collect(Collectors.toList());
+        Page<SurveyRepository.GetSurveyInterface> generateSurveyById;
+        if(SurveyStatus.equals("prerelease")){
+            generateSurveyById = surveyRepository.findGenerateSurveyByAuthorIdPre(authorId, pageable);
+        }else if(SurveyStatus.equals("over")){
+            generateSurveyById = surveyRepository.findGenerateSurveyByAuthorIdOver(authorId, pageable);
+        }
+        else if(SurveyStatus.equals("progress")){
+            generateSurveyById = surveyRepository.findGenerateSurveyByAuthorIdPro(authorId, pageable);
+        }else{
+            generateSurveyById = surveyRepository.findGenerateSurveyByAuthorId(authorId, pageable);
+        }
+        List<GetGenerateSurveyDTO> collect = generateSurveyById.stream().map(GetGenerateSurveyDTO::new).collect(Collectors.toList());
         return new PageImpl<>(collect, pageable, generateSurveyById.getTotalElements());
     }
 }

@@ -33,6 +33,21 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, SurveyCus
             countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId", nativeQuery = true)
     Page<GetSurveyInterface> findGenerateSurveyByAuthorId(@Param(value = "userId") Long userId, Pageable pageable);
 
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date\n" +
+            "FROM survey s WHERE s.member_id = :userId and open_date>NOW()",
+            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and open_date>NOW()", nativeQuery = true)
+    Page<GetSurveyInterface> findGenerateSurveyByAuthorIdPre(@Param(value = "userId") Long userId, Pageable pageable);
+
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date\n" +
+            "FROM survey s WHERE s.member_id = :userId and open_date<NOW() and NOW()<expire_date",
+            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and open_date<NOW() and NOW()<expire_date", nativeQuery = true)
+    Page<GetSurveyInterface> findGenerateSurveyByAuthorIdPro(@Param(value = "userId") Long userId, Pageable pageable);
+
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date\n" +
+            "FROM survey s WHERE s.member_id = :userId and expire_date<NOW()",
+            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and expire_date< NOW()", nativeQuery = true)
+    Page<GetSurveyInterface> findGenerateSurveyByAuthorIdOver(@Param(value = "userId") Long userId, Pageable pageable);
+
 
     interface GetSurveyInterface {
         Long getSurvey_id();

@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface ConstraintRepository extends JpaRepository<ConstraintOptions, Long> {
     List<ConstraintOptions> findBySurvey(Survey survey);
+    List<ConstraintOptions> findByConstraintType(ConstraintType constraintType);
 
     @Query(value = "select co from ConstraintOptions co where co.survey.id = :survey_id")
     List<ConstraintOptions> findBySurveyId(@Param("survey_id")Long survey_id);
@@ -19,7 +20,6 @@ public interface ConstraintRepository extends JpaRepository<ConstraintOptions, L
     @Modifying
     @Query(value = "delete FROM ConstraintOptions co WHERE co.survey.id = :survey_id and co.constraintType = :constraintType" )
     void deleteByType(@Param("survey_id")Long survey_id, @Param("constraintType")ConstraintType constraintType);
-
 
     @Query(value = "select co FROM ConstraintOptions co WHERE co.survey.id = :survey_id and co.constraintType = :constraintType" )
     ConstraintOptions findBySurveyId(@Param("survey_id")Long survey_id, @Param("constraintType")ConstraintType constraintType);

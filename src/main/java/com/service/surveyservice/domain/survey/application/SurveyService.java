@@ -191,7 +191,7 @@ public class SurveyService {
         return surveyBySurveyId;
     }
 
-
+    @Transactional
     public SurveySectionQueryDTO getSurveyData(Long member_id, Long survey_id) {
 
         Survey survey = surveyRepository.findById(survey_id)

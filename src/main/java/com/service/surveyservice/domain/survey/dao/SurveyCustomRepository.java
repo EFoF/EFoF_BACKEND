@@ -16,4 +16,5 @@ public interface SurveyCustomRepository {
 
 
     SurveySectionQueryDTO findSurveyBySurveyId(Long survey_id);
+    SurveySectionQueryDTO findSurveyBySurveyIdWithAnswer(Long survey_id);
 }

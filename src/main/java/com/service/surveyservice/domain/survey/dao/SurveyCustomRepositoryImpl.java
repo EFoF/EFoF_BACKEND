@@ -3,6 +3,7 @@ package com.service.surveyservice.domain.survey.dao;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.service.surveyservice.domain.answer.model.QAnswer;
 import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.survey.dto.QSurveyDTO_SurveyInfoDTO;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.querydsl.jpa.JPAExpressions.select;
+import static com.service.surveyservice.domain.answer.model.QAnswer.*;
 import static com.service.surveyservice.domain.question.dto.QuestionDTO.*;
 import static com.service.surveyservice.domain.question.dto.QuestionOptionDTO.*;
 import static com.service.surveyservice.domain.question.model.QQuestion.question;
@@ -140,6 +142,8 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
 
         return questionOptionMap;
     }
+
+
     private List<SurveyInfoDTO> findSurveyInfoDTOByAuthorIdQuery(Long authorId) {
         List<SurveyInfoDTO> results = queryFactory
                 .select(new QSurveyDTO_SurveyInfoDTO(survey.title, survey.description, survey.author.id, survey.sImageURL, survey.releaseStatus))
@@ -150,6 +154,84 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
         return results;
     }
 
+    @Override
+    public SurveySectionQueryDTO findSurveyBySurveyIdWithAnswer (Long survey_id) {
 
+        SurveySectionQueryDTO surveySectionQueryDTO = findSurveyInfo(survey_id);
+        List<SectionDTO.SectionQuestionQueryDto> surveySectionInfo = findSurveySectionInfo(survey_id);
+        List<Long> sectionIdList = surveySectionInfo.stream()
+                .map(SectionDTO.SectionQuestionQueryDto::getId)
+                .collect(Collectors.toList());
+        Map<Long, List<QuestionQueryDto>> questionInfo = findQuestionInfoWithAnswer(sectionIdList);
+
+        surveySectionInfo.forEach(sS ->
+        {
+            if (questionInfo.containsKey(sS.getId())) {
+                sS.setQuestionList(questionInfo.get(sS.getId()));
+            }else {
+                // 키가 존재하지 않는 경우에 대한 처리
+                // 예를 들어, 빈 리스트로 설정하거나 기본값을 할당할 수 있습니다.
+                sS.setQuestionList(new ArrayList<>()); // 빈 리스트로 설정
+            }
+        });
+        surveySectionQueryDTO.setSectionList(surveySectionInfo);
+
+
+        return surveySectionQueryDTO;
+    }
+
+    private Map<Long, List<QuestionQueryDto>> findQuestionInfoWithAnswer(List<Long> sectionIdList) {
+        List<QuestionQueryDto> questionList = queryFactory.select(Projections.constructor(QuestionQueryDto.class,
+                question.id,
+                question.questionType,
+                question.questionText,
+                question.isNecessary,
+                question.hasImage,
+                question.section.id)).
+                from(question).
+                where(question.section.id.in(sectionIdList)).fetch();
+
+        List<Long> questionIdList = questionList.stream()
+                .map(QuestionQueryDto::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, List<QuestionOptionQueryDto>> questionOptionInfo = findQuestionOptionInfo(questionIdList);
+        Map<Long, List<QuestionAnswersQueryDto>> questionAnswers = findQuestionAnswers(questionIdList);
+
+        questionList.forEach(ql -> ql.setOptions(questionOptionInfo.get(ql.getId())));
+
+        questionList.forEach(element -> {
+            // nullPointer 발생
+            for (QuestionAnswersQueryDto questionAnswersQueryDto : questionAnswers.get(element.getId())) {
+                if(questionAnswersQueryDto.getNarrativeAnswer() == null) {
+                    // 객관식 답변의 경우 리스트에 추가해줌
+                    element.addAnswerToList(questionAnswersQueryDto.getMarkedOptionId());
+                } else {
+                    // 조관식 답변의 경우 narrative Answer에 추가해줌
+                    element.setNarrativeAnswer(questionAnswersQueryDto.getNarrativeAnswer());
+                }
+            }
+        });
+
+        Map<Long, List<QuestionQueryDto>> questionMap = questionList.stream()
+                .collect(Collectors.groupingBy(questionListDto -> questionListDto.getSectionId()));
+
+        return questionMap;
+    }
+
+    // 사실상 AnswerCustomRepository로 가야하는데, 가독성을 위해 여기서 다루겠음
+    private Map<Long, List<QuestionAnswersQueryDto>> findQuestionAnswers(List<Long> questionIdList) {
+        // id로 조회, group by로 정렬
+        List<QuestionAnswersQueryDto> totalQueryResult = queryFactory.select(Projections.constructor(QuestionAnswersQueryDto.class,
+                answer.question.id,
+                answer.answerSentence,
+                answer.questionOption.id
+        )).from(answer).where(answer.question.id.in(questionIdList)).fetch();
+
+        Map<Long, List<QuestionAnswersQueryDto>> collect
+                = totalQueryResult.stream().collect(Collectors.groupingBy(field -> field.getId()));
+
+        return collect;
+    }
 
 }

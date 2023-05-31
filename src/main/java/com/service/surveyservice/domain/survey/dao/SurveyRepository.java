@@ -16,7 +16,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, SurveyCus
 
 
     @Query(value = "SELECT qoi.img_url FROM question_option qo\n" +
-            "INNER JOIN question_option_img qoi ON qo.question_option_img_id = qoi.question_option_img_id\n" +
+            "INNER JOIN question_option_img qoi ON qo.question_option_img = qoi.question_option_img_id\n" +
             "WHERE qo.question_id IN (\n" +
             "  SELECT q.question_id FROM question q\n" +
             "  INNER JOIN section s ON q.section_id = s.section_id\n" +
@@ -25,27 +25,27 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, SurveyCus
             , nativeQuery = true)
     List<String> findImgUrlBySurveyId(@Param("survey_id")Long survey_id);
 
-    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date " +
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status " +
             "FROM survey s WHERE s.member_id = :userId",
             countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId", nativeQuery = true)
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorId(@Param(value = "userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status\n" +
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status " +
             "FROM survey s WHERE s.member_id = :userId and s.release_status='PRE_RELEASE'",
             countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='PRE_RELEASE'", nativeQuery = true)
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorIdMake(@Param(value = "userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status\n" +
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status " +
             "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date>NOW()",
             countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date>NOW()", nativeQuery = true)
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorIdPre(@Param(value = "userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status\n" +
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status " +
             "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date<NOW() and NOW()<s.expire_date",
             countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date<NOW() and NOW()<s.expire_date", nativeQuery = true)
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorIdPro(@Param(value = "userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status\n" +
+    @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status " +
             "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.expire_date<NOW()",
             countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.expire_date< NOW()", nativeQuery = true)
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorIdOver(@Param(value = "userId") Long userId, Pageable pageable);
@@ -66,7 +66,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, SurveyCus
 
         LocalDateTime getExpire_date();
 
-        ReleaseStatus getReleaseStatus();
+        String getRelease_Status();
 
     }
 }

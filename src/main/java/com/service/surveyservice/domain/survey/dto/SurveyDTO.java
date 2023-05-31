@@ -216,6 +216,8 @@ public class SurveyDTO {
         private String s_imageurl;
         private LocalDateTime open_date;
         private LocalDateTime expire_date;
+        private String release_status;
+        private String surveyStatus;
 
         @QueryProjection
         public GetGenerateSurveyDTO(SurveyRepository.GetSurveyInterface getGenerateSurveyInterface) {
@@ -226,6 +228,18 @@ public class SurveyDTO {
             this.s_imageurl = getGenerateSurveyInterface.getS_imageurl();
             this.open_date = getGenerateSurveyInterface.getOpen_date();
             this.expire_date = getGenerateSurveyInterface.getExpire_date();
+            this.release_status = getGenerateSurveyInterface.getRelease_Status();
+            if (this.release_status.equals("PRE_RELEASE")) {
+                this.surveyStatus = SurveyStatus.MAKING.getName();
+            } else if(this.release_status.equals("OVER")) {
+                if (LocalDateTime.now().isBefore(open_date)) {
+                    this.surveyStatus = SurveyStatus.PRE_RELEASE.getName();
+                } else if (LocalDateTime.now().isAfter(open_date) && LocalDateTime.now().isBefore(expire_date)) {
+                    this.surveyStatus = SurveyStatus.PROGRESS.getName();
+                } else if (LocalDateTime.now().isAfter(expire_date)) {
+                    this.surveyStatus = SurveyStatus.OVER.getName();
+                }
+            }
         }
     }
 

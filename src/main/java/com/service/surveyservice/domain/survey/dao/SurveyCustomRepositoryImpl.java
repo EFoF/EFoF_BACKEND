@@ -14,6 +14,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -191,6 +192,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
                 from(question).
                 where(question.section.id.in(sectionIdList)).fetch();
 
+
         List<Long> questionIdList = questionList.stream()
                 .map(QuestionQueryDto::getId)
                 .collect(Collectors.toList());
@@ -198,22 +200,36 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
         Map<Long, List<QuestionOptionQueryDto>> questionOptionInfo = findQuestionOptionInfo(questionIdList);
         Map<Long, List<QuestionAnswersQueryDto>> questionAnswers = findQuestionAnswers(questionIdList);
 
-        questionList.forEach(ql -> ql.setOptions(questionOptionInfo.get(ql.getId())));
+        List<QuestionQueryDto> result = new ArrayList<>();
+
+//        questionList.forEach(ql -> ql.setOptions(questionOptionInfo.get(ql.getId())));
+
+        Map<Long, Boolean> flagMap = new HashMap<>();
 
         questionList.forEach(element -> {
-            // nullPointer 발생
-            for (QuestionAnswersQueryDto questionAnswersQueryDto : questionAnswers.get(element.getId())) {
-                if(questionAnswersQueryDto.getNarrativeAnswer() == null) {
-                    // 객관식 답변의 경우 리스트에 추가해줌
-                    element.addAnswerToList(questionAnswersQueryDto.getMarkedOptionId());
-                } else {
-                    // 조관식 답변의 경우 narrative Answer에 추가해줌
-                    element.setNarrativeAnswer(questionAnswersQueryDto.getNarrativeAnswer());
+            if(questionAnswers.get(element.getId()) != null) {
+                for (QuestionAnswersQueryDto questionAnswersQueryDto : questionAnswers.get(element.getId())) {
+                    if(questionAnswersQueryDto.getNarrativeAnswer() == null) {
+                        // 객관식 답변의 경우 리스트에 추가해줌
+                            element.addAnswerToList(questionAnswersQueryDto.getMarkedOptionId());
+                            if(!flagMap.containsKey(element.getId())) {
+                                result.add(element);
+                                // 중복 추가를 방지하기 위함.
+                                flagMap.put(element.getId(), true);
+                            }
+//                            flag[Math.toIntExact(element.getId())] = true;
+                    } else {
+                        // 주관식 답변의 경우 narrative Answer에 추가해줌
+                        element.setNarrativeAnswer(questionAnswersQueryDto.getNarrativeAnswer());
+                        result.add(element);
+                    }
                 }
             }
         });
 
-        Map<Long, List<QuestionQueryDto>> questionMap = questionList.stream()
+        result.forEach(ql -> ql.setOptions(questionOptionInfo.get(ql.getId())));
+
+        Map<Long, List<QuestionQueryDto>> questionMap = result.stream()
                 .collect(Collectors.groupingBy(questionListDto -> questionListDto.getSectionId()));
 
         return questionMap;
@@ -221,7 +237,6 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
 
     // 사실상 AnswerCustomRepository로 가야하는데, 가독성을 위해 여기서 다루겠음
     private Map<Long, List<QuestionAnswersQueryDto>> findQuestionAnswers(List<Long> questionIdList) {
-        // id로 조회, group by로 정렬
         List<QuestionAnswersQueryDto> totalQueryResult = queryFactory.select(Projections.constructor(QuestionAnswersQueryDto.class,
                 answer.question.id,
                 answer.answerSentence,

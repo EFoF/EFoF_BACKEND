@@ -24,6 +24,8 @@ import com.service.surveyservice.domain.question.model.QuestionType;
 import com.service.surveyservice.domain.section.dao.SectionRepository;
 import com.service.surveyservice.domain.survey.dao.MemberSurveyRepository;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
+import com.service.surveyservice.domain.survey.dto.SurveyDTO;
+import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
 import com.service.surveyservice.domain.survey.model.MemberSurvey;
 import com.service.surveyservice.domain.survey.model.Survey;
@@ -44,6 +46,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.http.Cookie;
 import java.util.stream.Collectors;
 
+import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 import static com.service.surveyservice.global.common.constants.ResponseConstants.CREATED;
 import static com.service.surveyservice.domain.answer.dto.AnswerDTO.*;
 
@@ -460,177 +463,15 @@ public class AnswerService {
         return CREATED;
     }
 
-    //아래는 리팩토링 중인 코드
-
-//    @Transactional
-//    public String participateForm2(ParticipateAnswerListDTO participateAnswerListDTO, Long currentNullableMemberId) {
-//        Long surveyId = participateAnswerListDTO.getSurveyId();
-//        log.info("surveyID : {}", surveyId);
-//
-//        List<ParticipateAnswerDTO> participateAnswerDTOList = participateAnswerListDTO.getParticipateAnswerDTOList();
-//
-//        Survey survey = surveyRepository.findById(surveyId).orElseThrow(SurveyNotFoundAnswerException::new);
-//        log.info("survey : {}", survey);
-//
-//        //survey로 제약조건 조사
-//        List<ConstraintOptions> constraintOptions = constraintRepository.findBySurvey(survey);
-//
-//        //bulk insert 할 List 생성
-//        List<AnswerForBatch> subAnswers = new ArrayList<>();
-//
-//        //제약 조건들 담을 List 생성
-//        List<ConstraintType> constraintTypeList = new ArrayList<>();
-//
-//        for (ConstraintOptions constraintOption : constraintOptions) {
-//            constraintTypeList.add(constraintOption.getConstraintType());
-//        }
-//
-//        log.info("constraintTypeList : {}", constraintTypeList);
-//
-//        boolean constraintLoggedIn = constraintTypeList.contains(ConstraintType.LOGGED_IN);
-//        boolean constraintEmail = constraintTypeList.contains(ConstraintType.EMAIL_CONSTRAINT);
-//        boolean constraintAnonymous = constraintTypeList.contains(ConstraintType.ANONYMOUS);
-//
-//        if (constraintLoggedIn || constraintEmail) { // 로그인 여부 or Email 걸려있는 survey 일 때 => 로그인 필수
-//            if (!constraintAnonymous) {
-//                handleLoggedInState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
-//            } else { // 로그인 여부 or Email 걸려있고 익명인 상태
-//                handleAnonymousState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
-//            }
-//        } else { // 로그인 여부 & Email 안 걸려있을 때 => 로그인 optional
-//            if (currentNullableMemberId != null) { // 로그인 한 상황
-//                if (!constraintAnonymous) { // 로그인 했고 익명 아닌 상황
-//                    handleOptionalLoggedInState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
-//                } else { // 로그인 했고 익명인 상황
-//                    handleOptionalAnonymousState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
-//                }
-//            } else { // 로그인 안 한 상황
-//                handleLoggedOutState(currentNullableMemberId, survey, participateAnswerDTOList, constraintTypeList, subAnswers);
-//            }
-//        }
-//        return CREATED;
-//    }
-//
-//    private void handleLoggedInState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
-//                                     List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
-//        if (currentNullableMemberId == null) {
-//            throw new NoSuchCookieAnswerException();
-//        }
-//
-//        Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
-//        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//
-//        if (memberSurvey.isEmpty()) {
-//            Long memberSurvey1 = createMemberSurvey(member, survey);
-//
-//            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-//                createAnswerForBatch(participateAnswerDTO, memberSurvey1, constraintTypeList, subAnswers);
-//            }
-//            answerCustomRepository.saveAll(subAnswers);
-//        } else {
-//            throw new DuplicatedParticipateException();
-//        }
-//    }
-//
-//    private void handleAnonymousState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
-//                                      List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
-//        if (currentNullableMemberId == null) {
-//            throw new NoSuchCookieAnswerException();
-//        }
-//
-//        Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
-//        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//
-//        if (memberSurvey.isEmpty()) {
-//            Long memberSurvey1 = createMemberSurvey(member, survey);
-//
-//            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-//                createAnswerForBatch(participateAnswerDTO, memberSurvey1, constraintTypeList, subAnswers);
-//            }
-//            answerCustomRepository.saveAll(subAnswers);
-//        }
-//    }
-//
-//    private void handleOptionalLoggedInState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
-//                                             List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
-//
-//        Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
-//        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//
-//        if (memberSurvey.isEmpty()) {
-//            Long memberSurvey1 = createMemberSurvey(member, survey);
-//
-//            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-//                createAnswerForBatch(participateAnswerDTO, memberSurvey1, constraintTypeList, subAnswers);
-//            }
-//            answerCustomRepository.saveAll(subAnswers);
-//        } else {
-//            throw new DuplicatedParticipateException();
-//        }
-//    }
-//
-//    private void handleOptionalAnonymousState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
-//                                              List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
-//
-//        Member member = memberRepository.findById(currentNullableMemberId).orElseThrow(UserNotFoundException::new);
-//        Optional<MemberSurvey> memberSurvey = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//
-//        if (memberSurvey.isEmpty()) {
-//            Long memberSurvey1 = createMemberSurvey(member, survey);
-//
-//            for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-//                createAnswerForBatch(participateAnswerDTO, memberSurvey1, constraintTypeList, subAnswers);
-//            }
-//            answerCustomRepository.saveAll(subAnswers);
-//        } else {
-//            throw new DuplicatedParticipateException();
-//        }
-//    }
-//
-//    private void handleLoggedOutState(Long currentNullableMemberId, Survey survey, List<ParticipateAnswerDTO> participateAnswerDTOList,
-//                                      List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
-//
-//        for (ParticipateAnswerDTO participateAnswerDTO : participateAnswerDTOList) {
-//            createAnswerForBatch(participateAnswerDTO, null, constraintTypeList, subAnswers);
-//        }
-//        answerCustomRepository.saveAll(subAnswers);
-//
-//    }
-//
-//    private Long createMemberSurvey(Member member, Survey survey) {
-//        //MemberSurvey 생성
-//        MemberSurvey memberSurveyBuilder = MemberSurvey.builder()
-//                .member(member)
-//                .survey(survey)
-//                .build();
-//
-//        memberSurveyRepository.save(memberSurveyBuilder);
-//        log.info("memberSurveyBuilder : {}", memberSurveyBuilder);
-//
-//        Optional<MemberSurvey> memberSurvey1 = memberSurveyRepository.findByMemberAndSurvey(member, survey);
-//        Long id = memberSurvey1.get().getId();
-//
-//        return id;
-//    }
-//
-//    private void createAnswerForBatch(ParticipateAnswerDTO participateAnswerDTO, Long memberSurveyId,
-//                                      List<ConstraintType> constraintTypeList, List<AnswerForBatch> subAnswers) {
-//        Long questionType = participateAnswerDTO.getQuestionType();
-//        Long questionId = participateAnswerDTO.getQuestionId();
-//        Boolean isNecessary = participateAnswerDTO.getIsNecessary();
-//
-//        if (questionType == QuestionType.LONG_ANSWER.getId()) { // 주관식 일 경우
-//            AnswerForBatch answerForBatch = new AnswerForBatch(questionId, null, participateAnswerDTO.getAnswerSentence(),
-//                    memberSurveyId, questionType, isNecessary, constraintTypeList);
-//
-//            subAnswers.add(answerForBatch);
-//        } else { // 주관식이 아닐 경우
-//            for (Long questionOptionId : participateAnswerDTO.getQuestionChoiceId()) {
-//                AnswerForBatch answerForBatch = new AnswerForBatch(questionId, questionOptionId, null,
-//                        memberSurveyId, questionType, isNecessary, constraintTypeList);
-//
-//                subAnswers.add(answerForBatch);
-//            }
-//        }
-//    }
+    @Transactional
+    public SurveySectionQueryDTO getSurveyDataWithAnswer(Long member_id, Long survey_id) {
+        Survey survey = surveyRepository.findById(survey_id)
+                .orElseThrow(SurveyNotFoundException::new);
+        //설문 생성자의 요청이 아닌 경우
+        if (!survey.getAuthor().getId().equals(member_id)) {
+            throw new SurveyMemberMisMatchException();
+        }
+        SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyIdWithAnswer(survey_id);
+        return surveyBySurveyId;
+    }
 }

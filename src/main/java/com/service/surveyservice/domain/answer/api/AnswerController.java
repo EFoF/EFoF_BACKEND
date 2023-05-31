@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static com.service.surveyservice.domain.answer.dto.AnswerDTO.*;
+import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
 import static com.service.surveyservice.global.common.constants.JwtConstants.ACCESS_TOKEN;
 
 //import static jdk.internal.org.jline.reader.impl.LineReaderImpl.CompletionType.List;
@@ -82,7 +83,11 @@ public class AnswerController {
     }
 
     @GetMapping(value = "/answer/participate/{surveyId}")
-    public ResponseEntity<>
+    public ResponseEntity<SurveySectionQueryDTO> getQuestionInfoWithAnswer(@PathVariable Long surveyId) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        SurveySectionQueryDTO surveyDataWithAnswer = answerService.getSurveyDataWithAnswer(currentMemberId, surveyId);
+        return new ResponseEntity<>(surveyDataWithAnswer, HttpStatus.OK);
+    }
 
     // TODO 현종 참고용
     @GetMapping(value = "/survey/currentMember/test")

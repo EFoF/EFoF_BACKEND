@@ -199,7 +199,9 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
         Map<Long, List<QuestionAnswersQueryDto>> questionAnswers = findQuestionAnswers(questionIdList);
 
         questionList.forEach(ql -> ql.setOptions(questionOptionInfo.get(ql.getId())));
+
         questionList.forEach(element -> {
+            // nullPointer 발생
             for (QuestionAnswersQueryDto questionAnswersQueryDto : questionAnswers.get(element.getId())) {
                 if(questionAnswersQueryDto.getNarrativeAnswer() == null) {
                     // 객관식 답변의 경우 리스트에 추가해줌
@@ -221,7 +223,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
     private Map<Long, List<QuestionAnswersQueryDto>> findQuestionAnswers(List<Long> questionIdList) {
         // id로 조회, group by로 정렬
         List<QuestionAnswersQueryDto> totalQueryResult = queryFactory.select(Projections.constructor(QuestionAnswersQueryDto.class,
-                answer.id,
+                answer.question.id,
                 answer.answerSentence,
                 answer.questionOption.id
         )).from(answer).where(answer.question.id.in(questionIdList)).fetch();

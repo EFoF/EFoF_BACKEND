@@ -45,14 +45,16 @@ public class ConstraintDTO {
         private Float lng;
         private Long id;
         private String title;
+        private String description;
         private String sImageURL;
 
         @Builder
-        public ConstraintTypeDTO(Float lat, Float lng, Long id, String title, String sImageURL) {
+        public ConstraintTypeDTO(Float lat, Float lng, Long id, String title, String description, String sImageURL) {
             this.lat = lat;
             this.lng = lng;
             this.id = id;
             this.title = title;
+            this.description = description;
             this.sImageURL = sImageURL;
         }
     }

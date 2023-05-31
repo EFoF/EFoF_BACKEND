@@ -47,14 +47,14 @@ public interface MemberSurveyRepository extends JpaRepository<MemberSurvey, Long
 
     @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date " +
             "FROM survey s WHERE s.survey_id in (SELECT ms.survey_id FROM member_survey as ms WHERE ms.member_id= :userId)" +
-            "and open_date<NOW() and NOW()<expire_date",
-            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and open_date<NOW() and NOW()<expire_date", nativeQuery = true)
+            "and s.release_status='OVER' and open_date<NOW() and NOW()<expire_date",
+            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and s.release_status='OVER'  and open_date<NOW() and NOW()<expire_date", nativeQuery = true)
     Page<MemberSurveyRepository.GetSurveyInterface> findMemberSurveyByMemberIdPro(@org.springframework.data.repository.query.Param(value = "userId") Long userId, Pageable pageable);
 
     @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date " +
             "FROM survey s WHERE s.survey_id in (SELECT ms.survey_id FROM member_survey as ms WHERE ms.member_id= :userId)" +
-            "and expire_date<NOW()",
-            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and expire_date< NOW()", nativeQuery = true)
+            "and s.release_status='OVER' and expire_date<NOW()",
+            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and s.release_status='OVER' and expire_date< NOW()", nativeQuery = true)
     Page<MemberSurveyRepository.GetSurveyInterface> findMemberSurveyByMemberIdOver(@Param(value = "userId") Long userId, Pageable pageable);
 
 

@@ -10,6 +10,7 @@ public enum SurveyStatus {
     SurveyStatus(long id, String name) {
         this.id = id;
         this.name = name;
+
     }
 
     public Long getId() {

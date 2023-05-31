@@ -107,4 +107,8 @@ public class Survey extends BaseTimeEntity {
     public void updateExpireDate(SurveyDTO.UpdateSurveyDateDto updateSurveyDateDto) {
         this.expireDate = updateSurveyDateDto.getExpireDate();
     }
+
+    public void updateReleaseStatus() {
+        this.releaseStatus = ReleaseStatus.OVER;
+    }
 }

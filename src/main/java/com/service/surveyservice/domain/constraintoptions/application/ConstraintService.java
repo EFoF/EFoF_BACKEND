@@ -44,6 +44,7 @@ public class ConstraintService {
             Optional<Survey> survey = surveyRepository.findById(surveyId);
 
             String title = survey.get().getTitle();
+            String description = survey.get().getDescription();
             String sImageURL = survey.get().getSImageURL();
 
 
@@ -59,6 +60,7 @@ public class ConstraintService {
                                 .lng(lng)
                                 .id(surveyId)
                                 .title(title)
+                                .description(description)
                                 .sImageURL(sImageURL)
                         .build());
             }

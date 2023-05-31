@@ -96,7 +96,8 @@ public class QuestionDTO {
     public static class QuestionQueryDto{
         private Long id;
         private long type;
-        private List<String> answers;
+        private List<Long> answers;
+        private String narrativeAnswer;
         private String questionContent;
         private Boolean isNecessary;
         private Long sectionId;
@@ -115,6 +116,14 @@ public class QuestionDTO {
 
         public void setOptions(List<QuestionOptionDTO.QuestionOptionQueryDto> options) {
             this.options = options;
+        }
+
+        public void setNarrativeAnswer(String narrativeAnswer) {
+            this.narrativeAnswer = narrativeAnswer;
+        }
+
+        public void addAnswerToList(Long markedOptionId) {
+            answers.add(markedOptionId);
         }
     }
 
@@ -146,6 +155,20 @@ public class QuestionDTO {
         // 객관식
         public void setChoiceAnswerDtos(List<AnswerDTO.ChoiceAnswerResponseDto> choiceAnswerDtos) {
             this.choiceAnswerDtos = choiceAnswerDtos;
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    public static class QuestionAnswersQueryDto{
+        private Long id;
+        private String narrativeAnswer;
+        private Long markedOptionId;
+        public QuestionAnswersQueryDto(Long id, String narrativeAnswer, Long markedOptionId) {
+            this.id = id;
+            this.narrativeAnswer = narrativeAnswer;
+            this.markedOptionId = markedOptionId;
         }
     }
 }

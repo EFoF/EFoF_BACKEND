@@ -81,6 +81,9 @@ public class AnswerController {
         answerService.participateForm(participateAnswerListDTO,currentNullableMemberId);
     }
 
+    @GetMapping(value = "/answer/participate/{surveyId}")
+    public ResponseEntity<>
+
     // TODO 현종 참고용
     @GetMapping(value = "/survey/currentMember/test")
     public ResponseEntity<Long> tester() {

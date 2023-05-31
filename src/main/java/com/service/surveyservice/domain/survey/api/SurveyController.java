@@ -277,5 +277,13 @@ public class SurveyController {
         return new ResponseEntity<>(surveySetting,HttpStatus.OK);
     }
 
+    @PatchMapping(value = "/{survey_id}/updateStatus")
+    public ResponseEntity updateReleaseStatus(@PathVariable Long survey_id){
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        surveyService.updateReleaseStatus(currentMemberId, survey_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 
 }

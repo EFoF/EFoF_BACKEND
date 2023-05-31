@@ -391,6 +391,15 @@ public class SurveyService {
     }
 
     @Transactional
+    public void updateReleaseStatus(Long member_id, Long survey_id) {
+
+        //설문이 존재하지 않는경우
+        Survey survey = checkSurveyOwner(member_id, survey_id);
+
+        survey.updateReleaseStatus();
+    }
+
+    @Transactional
     public SurveySettingResponseDto getSurveySetting(Long member_id, Long survey_id) {
 
         //설문이 존재하지 않는경우

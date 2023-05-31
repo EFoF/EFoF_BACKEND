@@ -96,6 +96,7 @@ public class MemberDTO {
     @AllArgsConstructor
     public static class LoginLastDTO {
         private Long expiresAt;
+        private String nickname;
     }
 
 

@@ -12,6 +12,7 @@ import com.service.surveyservice.domain.question.exception.exceptions.QuestionOp
 import com.service.surveyservice.domain.question.model.QuestionOption;
 import com.service.surveyservice.domain.survey.dao.SurveyCustomRepositoryImpl;
 import com.service.surveyservice.domain.survey.dao.SurveyRepository;
+import com.service.surveyservice.domain.survey.dto.SurveyDTO;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyMemberMisMatchException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyNotFoundException;
 import com.service.surveyservice.domain.survey.exception.exceptions.SurveyPreMisMatchException;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.service.surveyservice.domain.survey.dto.SurveyDTO.*;
@@ -459,24 +461,25 @@ public class SurveyService {
     @Transactional(readOnly = true)
     public Page<GetGenerateSurveyDTO> findSurveyByAuthorId(Long authorId, Pageable pageable) {
         Page<SurveyRepository.GetSurveyInterface> generateSurveyById = surveyRepository.findGenerateSurveyByAuthorId(authorId, pageable);
-        List<GetGenerateSurveyDTO> collect = generateSurveyById.stream().map(GetGenerateSurveyDTO::new).collect(Collectors.toList());
+        List<GetGenerateSurveyDTO> collect = generateSurveyById.stream().map(SurveyDTO.GetGenerateSurveyDTO::new).collect(Collectors.toList());
         return new PageImpl<>(collect, pageable, generateSurveyById.getTotalElements());
     }
 
     @Transactional(readOnly = true)
     public Page<GetGenerateSurveyDTO> findSurveyByAuthorIdWithStatus(Long authorId, String SurveyStatus, Pageable pageable) {
         Page<SurveyRepository.GetSurveyInterface> generateSurveyById;
-        if(SurveyStatus.equals("prerelease")){
+        if(SurveyStatus.equals("making")) {
+            generateSurveyById = surveyRepository.findGenerateSurveyByAuthorIdMake(authorId, pageable);
+        } else if(SurveyStatus.equals("prerelease")){
             generateSurveyById = surveyRepository.findGenerateSurveyByAuthorIdPre(authorId, pageable);
-        }else if(SurveyStatus.equals("over")){
+        } else if(SurveyStatus.equals("over")){
             generateSurveyById = surveyRepository.findGenerateSurveyByAuthorIdOver(authorId, pageable);
-        }
-        else if(SurveyStatus.equals("progress")){
+        } else if(SurveyStatus.equals("progress")){
             generateSurveyById = surveyRepository.findGenerateSurveyByAuthorIdPro(authorId, pageable);
-        }else{
+        }else {
             generateSurveyById = surveyRepository.findGenerateSurveyByAuthorId(authorId, pageable);
         }
-        List<GetGenerateSurveyDTO> collect = generateSurveyById.stream().map(GetGenerateSurveyDTO::new).collect(Collectors.toList());
+        List<GetGenerateSurveyDTO> collect = generateSurveyById.stream().map(SurveyDTO.GetGenerateSurveyDTO::new).collect(Collectors.toList());
         return new PageImpl<>(collect, pageable, generateSurveyById.getTotalElements());
     }
 }

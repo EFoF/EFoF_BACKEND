@@ -1,7 +1,7 @@
 package com.service.surveyservice.domain.survey.model;
 
 public enum SurveyStatus {
-    PRE_RELEASE(1, "prerelease"), PROGRESS(2, "progress"), OVER(3, "over");
+    MAKING(1, "making"), PRE_RELEASE(2, "prerelease"), PROGRESS(3, "progress"), OVER(4, "over");
 
     private final long id;
 

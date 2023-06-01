@@ -47,14 +47,14 @@ public interface MemberSurveyRepository extends JpaRepository<MemberSurvey, Long
 
     @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date " +
             "FROM survey s WHERE s.survey_id in (SELECT ms.survey_id FROM member_survey as ms WHERE ms.member_id= :userId)" +
-            "and s.release_status='OVER' and open_date<NOW() and NOW()<expire_date",
-            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and s.release_status='OVER'  and open_date<NOW() and NOW()<expire_date", nativeQuery = true)
+            "and s.release_status='OVER' and open_date<CONVERT_TZ(NOW(), '+00:00', '+09:00') and CONVERT_TZ(NOW(), '+00:00', '+09:00')<expire_date",
+            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and s.release_status='OVER'  and open_date<CONVERT_TZ(NOW(), '+00:00', '+09:00') and CONVERT_TZ(NOW(), '+00:00', '+09:00')<expire_date", nativeQuery = true)
     Page<MemberSurveyRepository.GetSurveyInterface> findMemberSurveyByMemberIdPro(@org.springframework.data.repository.query.Param(value = "userId") Long userId, Pageable pageable);
 
     @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date " +
             "FROM survey s WHERE s.survey_id in (SELECT ms.survey_id FROM member_survey as ms WHERE ms.member_id= :userId)" +
-            "and s.release_status='OVER' and expire_date<NOW()",
-            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and s.release_status='OVER' and expire_date< NOW()", nativeQuery = true)
+            "and s.release_status='OVER' and expire_date<CONVERT_TZ(NOW(), '+00:00', '+09:00')",
+            countQuery = "SELECT COUNT(*) FROM survey s WHERE s.survey_id IN (SELECT ms.survey_id FROM member_survey ms WHERE ms.member_id = :userId) and s.release_status='OVER' and expire_date< CONVERT_TZ(NOW(), '+00:00', '+09:00')", nativeQuery = true)
     Page<MemberSurveyRepository.GetSurveyInterface> findMemberSurveyByMemberIdOver(@Param(value = "userId") Long userId, Pageable pageable);
 
 

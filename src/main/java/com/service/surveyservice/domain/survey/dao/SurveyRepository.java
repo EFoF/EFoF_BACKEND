@@ -36,18 +36,18 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, SurveyCus
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorIdMake(@Param(value = "userId") Long userId, Pageable pageable);
 
     @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status " +
-            "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date>NOW()",
-            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date>NOW()", nativeQuery = true)
+            "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date>CONVERT_TZ(NOW(), '+00:00', '+09:00')",
+            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date>CONVERT_TZ(NOW(), '+00:00', '+09:00')", nativeQuery = true)
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorIdPre(@Param(value = "userId") Long userId, Pageable pageable);
 
     @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status " +
-            "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date<NOW() and NOW()<s.expire_date",
-            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date<NOW() and NOW()<s.expire_date", nativeQuery = true)
+            "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date<CONVERT_TZ(NOW(), '+00:00', '+09:00') and CONVERT_TZ(NOW(), '+00:00', '+09:00')<s.expire_date",
+            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.open_date<CONVERT_TZ(NOW(), '+00:00', '+09:00') and CONVERT_TZ(NOW(), '+00:00', '+09:00')<s.expire_date", nativeQuery = true)
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorIdPro(@Param(value = "userId") Long userId, Pageable pageable);
 
     @Query(value = "SELECT s.survey_id, s.title, s.description, s.member_id, s.s_imageurl, s.open_date, s.expire_date, s.release_status " +
-            "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.expire_date<NOW()",
-            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.expire_date< NOW()", nativeQuery = true)
+            "FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.expire_date<CONVERT_TZ(NOW(), '+00:00', '+09:00')",
+            countQuery = "SELECT count(*) FROM survey s WHERE s.member_id = :userId and s.release_status='OVER' and s.expire_date< CONVERT_TZ(NOW(), '+00:00', '+09:00')", nativeQuery = true)
     Page<SurveyRepository.GetSurveyInterface> findGenerateSurveyByAuthorIdOver(@Param(value = "userId") Long userId, Pageable pageable);
 
 

@@ -17,7 +17,7 @@ import java.util.List;
 public class MemberSurvey {
     @Id
     @Column(name = "memberSurvey_id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

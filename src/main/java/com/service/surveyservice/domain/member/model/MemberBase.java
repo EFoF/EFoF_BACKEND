@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class MemberBase extends BaseTimeEntity {
     @Id
     @Column(name = "member_id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String password;

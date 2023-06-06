@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.section.exception.handler;
 
+import com.service.surveyservice.domain.section.exception.exceptions.SectionQuestionMissMatchException;
 import com.service.surveyservice.domain.section.exception.exceptions.SurveyMissMatchException;
 import com.service.surveyservice.domain.section.exception.exceptions.SectionNotFoundException;
 import com.service.surveyservice.global.error.ErrorResponse;
@@ -27,4 +28,11 @@ public class SectionExceptionHandler {
         log.error(request.getDescription(false));
         return SURVEY_NOT_MATCH_SECTION;
     }
+
+    @ExceptionHandler(SectionQuestionMissMatchException.class)
+    protected final ResponseEntity<ErrorResponse> handleSectionQuestionMismatchException(SectionQuestionMissMatchException ex, WebRequest request) {
+        log.error(request.getDescription(false));
+        return QUESTION_NOT_MATCH_SECTION;
+    }
+
 }

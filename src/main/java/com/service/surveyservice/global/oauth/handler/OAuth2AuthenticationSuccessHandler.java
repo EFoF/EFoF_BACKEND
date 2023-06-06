@@ -51,6 +51,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         clearAuthenticationAttributes(request, response);
+        log.info("간편 로그인 성공, 리다이렉트 실행");
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
@@ -59,7 +60,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
-
         //토큰 생성
         TokenInfoDTO tokenDTO = tokenProvider.generateTokenDTO(authentication);
         saveRefreshTokenInStorage(tokenDTO.getRefreshToken(), Long.valueOf(authentication.getName()));
@@ -67,8 +67,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         CookieUtil.addCookie(response,ACCESS_TOKEN,tokenDTO.getAccessToken(),  ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
         // 여기에 사용자 정보를 받아올 수 있어야 함.
         // 다른 곳에서 사용자의 정보를 저장할 방법이 도무지 없다. 여기서 DB에 다녀오겠다.
-        MemberTokenPublishConfirmDTO memberTokenPublishConfirmDTO = memberCustomRepository.getMemberTokenPublishConfirm(Long.valueOf(authentication.getName())).orElseThrow(NotFoundByIdException::new);
-        CookieUtil.addCookie(response,TOKEN_PUBLISH_CONFIRM, memberTokenPublishConfirmDTO.getEmail(),  CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
+//        MemberTokenPublishConfirmDTO memberTokenPublishConfirmDTO = memberCustomRepository.getMemberTokenPublishConfirm(Long.valueOf(authentication.getName())).orElseThrow(NotFoundByIdException::new);
+//        CookieUtil.addCookie(response,TOKEN_PUBLISH_CONFIRM, memberTokenPublishConfirmDTO.getMemberLoginType().getType(), CONFIRM_TOKEN_COOKIE_EXPIRE_TIME, false);
         String uriString = UriComponentsBuilder.fromUriString(targetUrl)
 //                .queryParam("token", tokenDTO.getAccessToken())
                 .build().toUriString();

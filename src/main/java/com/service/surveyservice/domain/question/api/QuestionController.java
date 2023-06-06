@@ -40,23 +40,48 @@ public class QuestionController {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
         QuestionDTO.ResponseSaveQuestionDto question = questionService.createQuestion(saveQuestionRequestDto, currentMemberId, section_id, survey_id);
-        return new ResponseEntity<>(question,HttpStatus.OK);
+        return new ResponseEntity<>(question,HttpStatus.CREATED);
     }
 
     /**
      * 질문생성 - 테스트 완료
      */
-    @PatchMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}")
+    @PatchMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}/content")
     public ResponseEntity updateQuestionContent(
             @RequestBody QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
             @PathVariable Long section_id, @PathVariable Long survey_id, @PathVariable Long question_id) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
-        questionService.updateQuestionContent(saveQuestionRequestDto, currentMemberId, question_id, survey_id);
+        questionService.updateQuestionContent(saveQuestionRequestDto, currentMemberId, question_id, survey_id,section_id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * 질문생성 - 테스트 완료
+     */
+    @PatchMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}/type")
+    public ResponseEntity updateQuestionType(
+            @RequestBody QuestionDTO.SaveQuestionRequestDto saveQuestionRequestDto,
+            @PathVariable Long section_id, @PathVariable Long survey_id, @PathVariable Long question_id) {
+
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+
+        questionService.updateQuestionType(saveQuestionRequestDto, currentMemberId, question_id, survey_id,section_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    /**
+     * 질문생성 - 테스트 완료
+     */
+    @PatchMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}/isNecessary")
+    public ResponseEntity updateQuestionIsNecessary(
+            @PathVariable Long section_id, @PathVariable Long survey_id, @PathVariable Long question_id) {
+
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+
+        questionService.updateQuestionIsNecessary(currentMemberId, question_id, survey_id,section_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     @DeleteMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}")
     public ResponseEntity deleteQuestion(
             @PathVariable Long section_id, @PathVariable Long survey_id, @PathVariable Long question_id) {
@@ -69,14 +94,25 @@ public class QuestionController {
 
 
     @PostMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}")
-    public ResponseEntity createQuestionOption(
+    public ResponseEntity<Long> createQuestionOption(
             @RequestBody QuestionOptionDTO.SaveQuestionOptionTextRequestDTO saveQuestionOptionTextRequestDTO,
             @PathVariable Long question_id, @PathVariable Long section_id, @PathVariable Long survey_id) {
 
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
 
-        questionService.createQuestionOption(saveQuestionOptionTextRequestDTO,currentMemberId,question_id,survey_id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Long questionOptionId = questionService.createQuestionOption(saveQuestionOptionTextRequestDTO,currentMemberId, question_id, survey_id);
+        return new ResponseEntity<>(questionOptionId,HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}/all")
+    public ResponseEntity addAllQuestionOptionByBot(
+            @RequestBody QuestionOptionDTO.SaveQuestionOptionTextByBotRequestDTO saveQuestionOptionTextByBotRequestDTO,
+            @PathVariable Long question_id, @PathVariable Long section_id, @PathVariable Long survey_id) {
+
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+
+        questionService.addAllQuestionOptionByBot(saveQuestionOptionTextByBotRequestDTO,currentMemberId, question_id, survey_id);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/{survey_id}/section/{section_id}/question/{question_id}/question_option/{question_option_id}")

@@ -40,7 +40,7 @@ public class SecurityUtil {
      */
     public static Long getCurrentNullableMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getName() == null) {
+        if (authentication == null || authentication.getName() == null || authentication.getName().equals("anonymousUser")) {
             // 예외 발생이 아니라 null 값을 반환한다.
             // TODO null을 반환하기 보다는 임시 권한을 부여하는 식으로의 조치가 필요해보인다.
             return null;

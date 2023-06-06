@@ -22,4 +22,40 @@ public class ConstraintDTO {
 
         private String ConstraintValue; //GPS 나 PASSWORD, EMAIL 의 경우 값이 필요함
     }
+
+//    @Getter
+//    @NoArgsConstructor
+//    public static class ConstraintTypeDTO {
+//        private Float lat;
+//        private Float lng;
+//        private Long SurveyId;
+//
+//        @Builder
+//        public ConstraintTypeDTO(Float lat, Float lng, Long surveyId) {
+//            this.lat = lat;
+//            this.lng = lng;
+//            SurveyId = surveyId;
+//        }
+//    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ConstraintTypeDTO {
+        private Float lat;
+        private Float lng;
+        private Long id;
+        private String title;
+        private String description;
+        private String sImageURL;
+
+        @Builder
+        public ConstraintTypeDTO(Float lat, Float lng, Long id, String title, String description, String sImageURL) {
+            this.lat = lat;
+            this.lng = lng;
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.sImageURL = sImageURL;
+        }
+    }
 }

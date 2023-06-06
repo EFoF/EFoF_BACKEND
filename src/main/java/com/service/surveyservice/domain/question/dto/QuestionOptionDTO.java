@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class QuestionOptionDTO {
 
     @Getter
@@ -49,6 +51,14 @@ public class QuestionOptionDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class SaveQuestionOptionTextByBotRequestDTO {
+        private List<String> optionText;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SaveQuestionOptionNextSectionRequestDTO {
         private Long nextSection_id;
 
@@ -64,6 +74,18 @@ public class QuestionOptionDTO {
         private String imageUrl;
         private Long nextSectionId;
 
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestionOptionQueryDto{
+        private Long id;
+        private String option;
+        private String image;
+        private Long nextSectionId;
+        private Long questionId;
     }
 
 }

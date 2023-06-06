@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.service.surveyservice.domain.answer.dao.AnswerCustomRepository;
 import com.service.surveyservice.domain.constraintoptions.model.ConstraintOptions;
+import com.service.surveyservice.domain.constraintoptions.model.ConstraintType;
 import com.service.surveyservice.domain.constraintoptions.model.QConstraintOptions;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +26,15 @@ public class ConstraintCustomRepositoryImpl implements ConstraintCustomRepositor
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<ConstraintOptions> findConstraintBySurveyId(Long surveyId) {
+    public Integer findConstraintBySurveyId(Long surveyId) {
 
-        List<ConstraintOptions> constraintOptionsList = jpaQueryFactory
-                .select(constraintOptions)
+        return Math.toIntExact(jpaQueryFactory
+                .select(constraintOptions.count())
                 .from(constraintOptions)
-                .where(constraintOptions.survey.id.eq(surveyId)).fetch();
+                .where(constraintOptions.survey.id.eq(surveyId)
+                        .and(constraintOptions.constraintType.eq(ConstraintType.STATISTICS_ACCESS)))
+                .fetchFirst());
 
-        return constraintOptionsList;
     }
 }
 

@@ -1,6 +1,9 @@
 package com.service.surveyservice.domain.section.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.service.surveyservice.domain.question.dto.QuestionDTO;
 import com.service.surveyservice.domain.question.model.Question;
+import com.service.surveyservice.domain.section.dto.SectionDTO;
 import com.service.surveyservice.domain.survey.model.Survey;
 import lombok.*;
 import org.springframework.lang.Nullable;
@@ -24,6 +27,7 @@ public class Section {
     @OneToMany(mappedBy = "parentSection", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<Section> child = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id")
     private Survey survey;
@@ -54,6 +58,17 @@ public class Section {
     }
     public void setQuestionOrder(@Nullable String questionOrder){
         this.questionOrder = questionOrder;
+    }
+
+    public SectionDTO.createSectionResponseDto toResponseDto(Question question) {
+        List<QuestionDTO.createSectionResponseQuestionDto> questionList = new ArrayList<>();
+        questionList.add(question.toCreateSectionResponseDto());
+
+        return SectionDTO.createSectionResponseDto.builder()
+                .questionList(questionList)
+                .id(this.getId())
+                .questionOrder(this.getQuestionOrder())
+                .build();
     }
 }
 

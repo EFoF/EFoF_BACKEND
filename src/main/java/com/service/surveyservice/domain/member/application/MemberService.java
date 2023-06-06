@@ -1,5 +1,6 @@
 package com.service.surveyservice.domain.member.application;
 
+import com.service.surveyservice.domain.answer.exceptoin.exceptions.AuthorOrMemberNotFoundException;
 import com.service.surveyservice.domain.member.dao.MemberCustomRepositoryImpl;
 import com.service.surveyservice.domain.member.dao.MemberRepository;
 import com.service.surveyservice.domain.member.dto.MemberDTO.RedunCheckDTO;
@@ -83,17 +84,11 @@ public class MemberService {
     // 비밀번호 변경
     @Transactional
     public String updatePassword(UpdateMemberPasswordRequestDTO updateMemberPasswordRequestDTO, Long currentMemberId) {
-        String email = updateMemberPasswordRequestDTO.getEmail();
         String oldPassword = updateMemberPasswordRequestDTO.getOldPassword();
         String newPassword = updateMemberPasswordRequestDTO.getNewPassword();
 
         // 해당 이메일로 사용자를 찾을 수 없다면 예외 발생
-        Member member = memberRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-
-        // 요청자와 변경할 비밀번호의 주인이 다르다면 예외 발생
-        if(!member.getId().equals(currentMemberId)) {
-            throw new NotMatchingCurrentMemberAndRequesterException();
-        }
+        Member member = memberRepository.findById(currentMemberId).orElseThrow(UserNotFoundException::new);
 
         // 현재 사용자의 비밀번호가 전달 받은 비밀번호와 다르다면 예외 발생
         if(!passwordEncoder.matches(oldPassword, member.getPassword())) {

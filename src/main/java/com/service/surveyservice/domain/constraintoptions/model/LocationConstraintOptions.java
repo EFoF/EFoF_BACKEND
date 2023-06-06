@@ -6,9 +6,9 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class LocationConstraintOptions {
     @Id
     @Column(name = "locationConstraintOptions_id")

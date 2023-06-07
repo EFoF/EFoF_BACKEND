@@ -29,13 +29,13 @@ public interface MemberSurveyRepository extends JpaRepository<MemberSurvey, Long
     Optional<MemberSurvey> findByMemberAndSurvey(Member member, Survey survey);
 
     @Query(value = "SELECT count(*) FROM MemberSurvey ms WHERE ms.survey.id=:survey_id")
-    Integer countParticipantBySurveyId(Long survey_id);
+    Integer countParticipantBySurveyId(@Param("survey_id") Long survey_id);
 
 //    Select count(*) from MemberSurvey ms where 3 in (SELECT ms.member_id FROM MemberSurvey ms WHERE ms.survey_id=1)
     // 설문 통계를 조회할 때, 통계 보기 constraint가 걸려있는 경우, 해당 설문에 참여한 사람인지 조회
     @Query(value = "Select count(*) from MemberSurvey ms where :member_id\n" +
             "        in (SELECT ms.member.id FROM MemberSurvey ms WHERE ms.survey.id= :survey_id)")
-    int findMemberIdBySurveyId(Long survey_id, Long member_id);
+    int findMemberIdBySurveyId(@Param("survey_id") Long survey_id,@Param("member_id") Long member_id);
 
 //    boolean existsByMemberAndSurvey(Member member, Survey survey); // findByMemberAndSurvey().isPresent 로 해결할 수 있을듯?
 

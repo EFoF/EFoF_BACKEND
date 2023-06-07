@@ -63,7 +63,6 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
     private final AnswerCustomRepository answerCustomRepository;
     private final QuestionRepository questionRepository;
-    private final QuestionOptionRepository questionOptionRepository;
     private final ConstraintRepository constraintRepository;
     private final ConstraintCustomRepositoryImpl constraintCustomRepository;
     private final JwtTokenProvider jwtTokenProvider;

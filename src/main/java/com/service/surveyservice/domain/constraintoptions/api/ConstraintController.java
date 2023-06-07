@@ -26,7 +26,6 @@ public class ConstraintController {
      */
     @PostMapping(value = "/gps")
     private List<ConstraintTypeDTO> getLocations(@RequestBody ConstraintTypeDTO constraintTypeDTO){
-        log.info("/gps 호출");
         List<ConstraintTypeDTO> locations = constraintService.getLocations(constraintTypeDTO);
 
         return locations;

@@ -471,7 +471,7 @@ public class AnswerService {
         if (!survey.getAuthor().getId().equals(member_id)) {
             throw new SurveyMemberMisMatchException();
         }
-        SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyIdWithAnswer(survey_id);
+        SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyIdWithAnswer(member_id, survey_id);
         return surveyBySurveyId;
     }
 }

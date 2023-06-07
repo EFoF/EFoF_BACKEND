@@ -156,14 +156,14 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
     }
 
     @Override
-    public SurveySectionQueryDTO findSurveyBySurveyIdWithAnswer (Long survey_id) {
+    public SurveySectionQueryDTO findSurveyBySurveyIdWithAnswer (Long memberId, Long survey_id) {
 
         SurveySectionQueryDTO surveySectionQueryDTO = findSurveyInfo(survey_id);
         List<SectionDTO.SectionQuestionQueryDto> surveySectionInfo = findSurveySectionInfo(survey_id);
         List<Long> sectionIdList = surveySectionInfo.stream()
                 .map(SectionDTO.SectionQuestionQueryDto::getId)
                 .collect(Collectors.toList());
-        Map<Long, List<QuestionQueryDto>> questionInfo = findQuestionInfoWithAnswer(sectionIdList);
+        Map<Long, List<QuestionQueryDto>> questionInfo = findQuestionInfoWithAnswer(memberId, sectionIdList);
 
         surveySectionInfo.forEach(sS ->
         {
@@ -181,7 +181,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
         return surveySectionQueryDTO;
     }
 
-    private Map<Long, List<QuestionQueryDto>> findQuestionInfoWithAnswer(List<Long> sectionIdList) {
+    private Map<Long, List<QuestionQueryDto>> findQuestionInfoWithAnswer(Long memberId, List<Long> sectionIdList) {
         List<QuestionQueryDto> questionList = queryFactory.select(Projections.constructor(QuestionQueryDto.class,
                 question.id,
                 question.questionType,
@@ -198,7 +198,7 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
                 .collect(Collectors.toList());
 
         Map<Long, List<QuestionOptionQueryDto>> questionOptionInfo = findQuestionOptionInfo(questionIdList);
-        Map<Long, List<QuestionAnswersQueryDto>> questionAnswers = findQuestionAnswers(questionIdList);
+        Map<Long, List<QuestionAnswersQueryDto>> questionAnswers = findQuestionAnswers(memberId, questionIdList);
 
         List<QuestionQueryDto> result = new ArrayList<>();
 
@@ -236,12 +236,16 @@ public class SurveyCustomRepositoryImpl implements SurveyCustomRepository{
     }
 
     // 사실상 AnswerCustomRepository로 가야하는데, 가독성을 위해 여기서 다루겠음
-    private Map<Long, List<QuestionAnswersQueryDto>> findQuestionAnswers(List<Long> questionIdList) {
+    private Map<Long, List<QuestionAnswersQueryDto>> findQuestionAnswers(Long memberId, List<Long> questionIdList) {
         List<QuestionAnswersQueryDto> totalQueryResult = queryFactory.select(Projections.constructor(QuestionAnswersQueryDto.class,
                 answer.question.id,
                 answer.answerSentence,
                 answer.questionOption.id
-        )).from(answer).where(answer.question.id.in(questionIdList)).fetch();
+        ))
+                .from(answer)
+                .where(answer.question.id.in(questionIdList))
+                .where(answer.memberSurvey.member.id.eq(memberId))
+                .fetch();
 
         Map<Long, List<QuestionAnswersQueryDto>> collect
                 = totalQueryResult.stream().collect(Collectors.groupingBy(field -> field.getId()));

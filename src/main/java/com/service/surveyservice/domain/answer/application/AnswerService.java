@@ -466,10 +466,10 @@ public class AnswerService {
     public SurveySectionQueryDTO getSurveyDataWithAnswer(Long member_id, Long survey_id) {
         Survey survey = surveyRepository.findById(survey_id)
                 .orElseThrow(SurveyNotFoundException::new);
-        //설문 생성자의 요청이 아닌 경우
-        if (!survey.getAuthor().getId().equals(member_id)) {
-            throw new SurveyMemberMisMatchException();
-        }
+//        //설문 생성자의 요청이 아닌 경우
+//        if (!survey.getAuthor().getId().equals(member_id)) {
+//            throw new SurveyMemberMisMatchException();
+//        }
         SurveySectionQueryDTO surveyBySurveyId = surveyRepository.findSurveyBySurveyIdWithAnswer(survey_id);
         return surveyBySurveyId;
     }

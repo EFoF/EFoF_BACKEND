@@ -27,7 +27,6 @@ import static com.service.surveyservice.global.common.constants.JwtConstants.*;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-//    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
@@ -40,14 +39,6 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        // redux persist를 활용한 로직이다.
-//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-//        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-//            return bearerToken.substring(7);
-//        }
-//        return null;
-
-
         Cookie bearerToken = CookieUtil.getCookie(request, ACCESS_TOKEN).orElse(null);
         if(bearerToken != null) {
             return bearerToken.getValue();

@@ -55,7 +55,6 @@ public class SecurityConfig {
                 .cors().configurationSource(corsConfigurationSource());
         http
                 .exceptionHandling()
-                // 인증, 인가되지 않은 요청 시 발생
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
 
@@ -71,17 +70,14 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "**").permitAll()
-//                .antMatchers(HttpMethod.GET, "/post/**").permitAll()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/logout-redirect").permitAll()
                 .antMatchers("/answer/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-//                .antMatchers("/survey/**").access("hasRole('ADMIN') or hasRole('USER')")
-//                .antMatchers("/survey/**").access("hasRole('ADMIN') or hasRole('USER')")
                 .antMatchers("/survey/**").permitAll()
                 .antMatchers("/user/**").access("hasRole('ADMIN') or hasRole('USER')")
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
 
                 .and()
                 .apply(new JwtSecurityConfig(jwtTokenProvider))
@@ -97,7 +93,6 @@ public class SecurityConfig {
                 .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository())
                 .and()
                 .redirectionEndpoint()
-//                .baseUri("/auth/social_login/*")
                 .baseUri("/*/oauth2/code/*")
                 .and()
                 .userInfoEndpoint()

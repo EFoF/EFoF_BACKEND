@@ -78,12 +78,8 @@ public class AuthService {
                             .expiresAt(loginExpire.getTime())
                             .nickname(memberDetail.getNickname())
                             .build())
-//                            .loginType(MemberLoginType.DOKSEOL_LOGIN)
-//                              .tokenIssueDTO(tokenInfoDTO.toTokenIssueDTO())
                     .build();
-
             CookieUtil.addCookie(response, ACCESS_TOKEN, tokenInfoDTO.getAccessToken(), ACCESS_TOKEN_COOKIE_EXPIRE_TIME, true);
-
             return memberLoginDTO;
         } catch (BadCredentialsException e) {
             throw new InvalidEmailAndPasswordRequestException();
